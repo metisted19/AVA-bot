@@ -15,49 +15,50 @@ def analyse_signaux(df):
     # Règles d'analyse combinée
     if macd is not None and signal_macd is not None:
         if macd > signal_macd:
-            messages.append("📈 Le MACD vient de croiser au-dessus de sa ligne de signal. Cela peut indiquer un début de tendance haussière.")
+            messages.append("📈 Le MACD vient de croiser au-dessus de sa ligne de signal. C'est souvent bon signe, ça sent la reprise ! 💪")
         elif macd < signal_macd:
-            messages.append("📉 Le MACD vient de croiser en dessous de sa ligne de signal. Cela peut indiquer une tendance baissière naissante.")
+            messages.append("📉 Le MACD est passé sous sa ligne de signal. Reste vigilant, ça peut glisser. 🧊")
 
     if rsi is not None:
         if rsi < 30:
-            messages.append("🟢 Le RSI est en dessous de 30 → actif survendu. Potentiel rebond à venir.")
+            messages.append("🟢 RSI < 30 → l'actif semble survendu. Une belle occasion à surveiller de près ? 👀")
         elif rsi > 70:
-            messages.append("🔴 Le RSI dépasse 70 → actif potentiellement suracheté.")
+            messages.append("🔴 RSI > 70 → attention, on entre en zone de surachat. Ne fonce pas tête baissée ! 🚧")
 
     if close is not None and bb_lower is not None:
         if close < bb_lower:
-            messages.append("📉 Le cours a franchi la bande inférieure de Bollinger. Possibilité de retournement à la hausse.")
+            messages.append("📉 Le cours a touché la bande inférieure de Bollinger. Peut-être le calme avant le rebond ? 🌀")
 
     if adx is not None:
         if adx > 25:
-            messages.append("💪 L'ADX est supérieur à 25 → tendance forte en cours.")
+            messages.append("💪 ADX > 25 → la tendance est solide, comme un roc. 🚀")
         elif adx < 20:
-            messages.append("😴 L'ADX est faible → marché sans direction claire.")
+            messages.append("😴 ADX < 20 → marché endormi… Pas beaucoup d'élan pour le moment. 💤")
 
     if cci is not None:
         if cci > 100:
-            messages.append("📈 Le CCI indique une zone de surachat.")
+            messages.append("📈 CCI > 100 → actif peut-être suracheté. C’est chaud, mais attention à la surchauffe 🔥")
         elif cci < -100:
-            messages.append("📉 Le CCI indique une zone de survente.")
+            messages.append("📉 CCI < -100 → actif survendu. Une opportunité qui couve ? 👀")
 
     if williams_r is not None:
         if williams_r < -80:
-            messages.append("🟢 Williams %R < -80 → actif survendu.")
+            messages.append("🟢 Williams %R < -80 → zone de survendu. Potentiel de rebond ?")
         elif williams_r > -20:
-            messages.append("🔴 Williams %R > -20 → actif suracheté.")
+            messages.append("🔴 Williams %R > -20 → zone de surachat. Prudence si tu es déjà positionné.")
 
     # Analyse combinée renforcée
     if rsi is not None and macd is not None and signal_macd is not None:
         if rsi < 30 and macd > signal_macd:
-            messages.append("🚀 RSI bas + MACD haussier = Signal d'achat fort détecté !")
+            messages.append("🚀 RSI bas + MACD haussier = Signal d'achat fort détecté ! C’est peut-être le moment d’entrer en piste ! 🎯")
         elif rsi > 70 and macd < signal_macd:
-            messages.append("⚠️ RSI élevé + MACD baissier = Potentiel retournement baissier !")
+            messages.append("⚠️ RSI élevé + MACD baissier = Attention au retournement baissier. Un repli semble se préparer. 🕳️")
 
     if not messages:
-        return "🤔 Aucun signal clair détecté pour le moment. Reste en alerte, les marchés bougent vite !"
+        return "🤔 Pour l’instant, je ne détecte aucun signal clair. Mais t’inquiète, je garde un œil sur les marchés pour toi ! 👁️📉"
 
     return "\n\n".join(messages)
+
 
 
 
