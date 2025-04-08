@@ -1,25 +1,34 @@
 import streamlit as st
-from PIL import Image
 
-st.set_page_config(page_title="Accueil AVA", layout="centered")
+st.set_page_config(page_title="Bienvenue sur AVA", layout="centered")
 
-# Centre et agrandit le logo
-st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-logo = Image.open("ava_logo.png")
-st.image(logo, width=200)  # Tu peux augmenter la taille ici (200 à 300 px par ex.)
-st.markdown("</div>", unsafe_allow_html=True)
+# Style CSS personnalisé
+st.markdown("""
+    <style>
+    .main {
+        padding-top: 2rem;
+    }
+    .ava-logo {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    .intro-texte {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 500;
+        color: #555;
+        margin-top: -20px;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# Message de bienvenue personnalisé
-st.markdown(
-    """
-    <div style='text-align: center; font-size: 20px; margin-top: 20px;'>
-        <strong>Bienvenue sur AVA</strong> 🤖<br>
-        Ton assistante d’analyse boursière intelligente 📊<br>
-        Explore les marchés, détecte les signaux, discute avec moi… et prends une longueur d'avance 🚀
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Affichage du logo centré
+st.markdown('<div class="ava-logo"><img src="ava_logo.png" width="160"></div>', unsafe_allow_html=True)
+
+# Phrase d’accroche
+st.markdown('<div class="intro-texte">Bienvenue sur AVA, votre assistante boursière intelligente 🔍💼</div>', unsafe_allow_html=True)
+
 
 
 
