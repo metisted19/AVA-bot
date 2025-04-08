@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import os
-from utils.analyse_technique import analyse_signaux
+from utils.analyse_technique import analyse_signaux  # ✅ Analyse technique d’AVA
 
 # Chargement des données
 @st.cache_data
@@ -17,33 +17,32 @@ def charger_donnees(path):
         df.dropna(subset=['date'], inplace=True)
     return df
 
-# Interface
+# Interface Streamlit
 st.set_page_config(page_title="📈 Signaux AVA", layout="wide")
-
-# Affichage du logo
-st.image("ava_logo.png", width=60)
-
 st.title("📈 Signaux détectés")
 st.markdown("Voici les signaux d’achat/vente détectés par AVA sur les indicateurs techniques.")
 
-# Choix de l’actif
+# Sélection de l'actif
 tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
 ticker = st.selectbox("Choisissez un actif :", tickers)
 
-# Chargement des données
 data_path = f"data/donnees_{ticker.lower()}.csv"
 
 if os.path.exists(data_path):
     df = charger_donnees(data_path)
 
     st.subheader(f"📊 Données récentes pour {ticker}")
-    colonnes_base = ['date', 'close', 'macd', 'macd_signal', 'rsi', 'bb_lower']
-    colonnes_signaux = ['Signal_MACD', 'Signal_RSI', 'Signal_BB']
-    colonnes_dispo = [col for col in colonnes_base + colonnes_signaux if col in df.columns]
-    st.dataframe(df[colonnes_dispo].tail(10), use_container_width=True)
+    colonnes_affichage = ['date', 'close', 'macd', 'macd_signal', 'rsi', 'bb_lower', 'adx', 'cci', 'williams_r']
+    colonnes_disponibles = [col for col in colonnes_affichage if col in df.columns]
 
-    # Bougies japonaises + indicateurs
-    st.subheader("📈 Graphique en bougies japonaises avec SMA/EMA")
+    if 'date' in df.columns:
+        try:
+            st.dataframe(df[colonnes_disponibles + ['Signal_MACD', 'Signal_RSI', 'Signal_BB']].tail(10), use_container_width=True)
+        except:
+            st.dataframe(df[colonnes_disponibles].tail(10), use_container_width=True)
+
+    # Graphique en bougies
+    st.subheader("📈 Graphique en bougies japonaises")
     fig = go.Figure()
     fig.add_trace(go.Candlestick(
         x=df["date"],
@@ -62,13 +61,14 @@ if os.path.exists(data_path):
     fig.update_layout(xaxis_title="Date", yaxis_title="Prix", xaxis_rangeslider_visible=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # Analyse d'AVA
-    st.subheader("🔎 Analyse technique d'AVA")
+    # Analyse technique d'AVA
+    st.subheader("🔎 Analyse d’AVA")
     interpretation = analyse_signaux(df)
     st.markdown(interpretation)
 
 else:
-    st.error("❌ Fichier de données introuvable ou colonne 'date' manquante.")
+    st.error(f"❌ Colonne 'date' manquante ou données indisponibles pour {ticker}.")
+
 
 
 

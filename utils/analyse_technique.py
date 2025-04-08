@@ -1,34 +1,53 @@
 def analyse_signaux(df):
+    if df.empty:
+        return "⚠️ Je n’ai pas encore assez de données pour donner une analyse fiable."
+
+    dernier = df.iloc[-1]
+
     messages = []
+    rsi = dernier.get("rsi", None)
+    macd = dernier.get("macd", None)
+    signal = dernier.get("macd_signal", None)
+    close = dernier.get("close", None)
+    bb_lower = dernier.get("bb_lower", None)
+    bb_upper = dernier.get("bb_upper", None)
 
-    # Analyse RSI
-    if 'rsi' in df.columns:
-        rsi = df['rsi'].iloc[-1]
+    # RSI : surachat / survente
+    if rsi is not None:
         if rsi > 70:
-            messages.append("🔴 RSI élevé : possible surachat. Prudence, un retournement est possible.")
+            messages.append("🔴 RSI élevé : L’actif est en zone de surachat, une correction pourrait arriver.")
         elif rsi < 30:
-            messages.append("🟢 RSI bas : actif potentiellement survendu. Cela peut annoncer une hausse.")
+            messages.append("🟢 RSI faible : L’actif est en zone de survente, un rebond est possible.")
+        else:
+            messages.append("⚪ RSI neutre : Aucun signal fort actuellement.")
 
-    # Analyse MACD
-    if 'macd' in df.columns and 'macd_signal' in df.columns:
-        macd = df['macd'].iloc[-1]
-        signal = df['macd_signal'].iloc[-1]
+    # MACD croisement
+    if macd is not None and signal is not None:
         if macd > signal:
-            messages.append("📈 MACD haussier : le momentum semble positif.")
+            messages.append("🟢 MACD haussier : Croisement haussier détecté, potentiel d’achat.")
         elif macd < signal:
-            messages.append("📉 MACD baissier : le momentum est en perte de vitesse.")
+            messages.append("🔴 MACD baissier : Croisement baissier détecté, prudence.")
+        else:
+            messages.append("⚪ MACD stable : Pas de croisement significatif.")
 
-    # Analyse des bandes de Bollinger
-    if 'close' in df.columns and 'bb_upper' in df.columns and 'bb_lower' in df.columns:
-        close = df['close'].iloc[-1]
-        upper = df['bb_upper'].iloc[-1]
-        lower = df['bb_lower'].iloc[-1]
-        if close > upper:
-            messages.append("🚨 Le cours a dépassé la bande supérieure de Bollinger. Cela peut indiquer une surévaluation.")
-        elif close < lower:
-            messages.append("📉 Le cours est sous la bande inférieure de Bollinger. Rebond possible ?")
+    # Bandes de Bollinger
+    if close is not None and bb_lower is not None and bb_upper is not None:
+        if close < bb_lower:
+            messages.append("🟢 Prix sous les bandes de Bollinger : possible retournement haussier.")
+        elif close > bb_upper:
+            messages.append("🔴 Prix au-dessus des bandes de Bollinger : surachat potentiel.")
+        else:
+            messages.append("⚪ Prix dans les bandes : situation stable.")
 
-    if not messages:
-        return "🤖 Aucun signal significatif détecté pour le moment. Reste en veille..."
+    # Synthèse finale
+    if "🟢" in "".join(messages) and "🔴" not in "".join(messages):
+        tendance = "✅ Conclusion : les indicateurs montrent une **tendance haussière globale**."
+    elif "🔴" in "".join(messages) and "🟢" not in "".join(messages):
+        tendance = "⚠️ Conclusion : les signaux indiquent une **tendance baissière à surveiller**."
     else:
-        return "\n".join(messages)
+        tendance = "🤔 Conclusion : les signaux sont mitigés, restons prudents."
+
+    return "\n\n".join(messages + ["", tendance])
+
+
+
