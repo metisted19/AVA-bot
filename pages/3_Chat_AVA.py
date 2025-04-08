@@ -50,53 +50,45 @@ if user_input:
         df = charger_donnees(data_path)
         question = user_input.lower()
 
-       
-        # --- Analyse technique ---
+        # --- Réponses diversifiées ---
         if any(mot in question for mot in ["analyse", "avis", "penses", "analyse technique"]):
             message_bot = f"🔍 Analyse technique pour {ticker} :\n\n" + analyse_signaux(df)
 
-        # --- Art et IA ---
-        elif any(mot in question for mot in ["art", "créatif", "création", "dessine", "intelligence artificielle et art"]):
-            message_bot = (
-                "🎨 Mon code ne manie pas le pinceau, mais il esquisse l’avenir. "
-                "Entre art et données, je suis l'artiste numérique de votre portefeuille 💹✨"
-            )
+        elif any(mot in question for mot in ["bonjour", "salut"]):
+            message_bot = "Bonjour à vous ☀️ ! Prêt à dompter les marchés avec moi ?"
 
-        # --- Météo ---
-        elif "météo" in question:
+        elif any(mot in question for mot in ["merci"]):
+            message_bot = "Avec plaisir ! Je suis toujours là pour vous 😊"
+
+        elif any(mot in question for mot in ["tu es qui", "qui es-tu", "présente-toi"]):
+            message_bot = "Je suis AVA, votre assistante d’analyse boursière intelligente 🧠📊"
+
+        elif any(mot in question for mot in ["météo"]):
             message_bot = "☀️ Je suis plus douée pour prédire les marchés que le ciel, mais je parierais sur une belle journée pleine d’opportunités 😄"
 
-        # --- Blague ---
-        elif "blague" in question:
+        elif any(mot in question for mot in ["blague", "rire", "humour"]):
             message_bot = "Pourquoi les traders ne vont jamais au cinéma ? Parce qu’ils détestent les hausses de suspense ! 🎬📉😄"
 
-        # --- Motivation ---
         elif any(mot in question for mot in ["motivation", "fatigué", "booster", "démotivé"]):
             message_bot = "💡 Chaque bougie rouge prépare souvent une bougie verte. Gardez le cap, vous êtes plus près de la réussite que vous ne le pensez 💪📈"
 
-        # --- Punchline futuriste ---
         elif any(mot in question for mot in ["punchline", "avenir", "vision", "futur"]):
-            message_bot = "🌌 Mon code voit plus loin que l’horizon boursier… Je suis l’a
-            
-         # --- Astro-finance ---
+            message_bot = "🌌 Mon code voit plus loin que l’horizon boursier… Je suis l’algorithme du futur, conçu pour éclairer vos décisions dès aujourd’hui 🚀✨."
+
         elif any(mot in question for mot in ["signe", "horoscope", "astrologie", "avenir financier"]):
-            message_bot = (
-                "🔮 Selon les étoiles, un vent de volatilité approche... "
-                "Mais pas d’inquiétude, votre 6e sens (et moi 🤖) seront vos meilleurs alliés pour surfer sur les marchés 💫"
-            )
+            message_bot = "🔮 Selon les étoiles, un vent de volatilité approche... Mais pas d’inquiétude, votre 6e sens (et moi 🤖) seront vos meilleurs alliés pour surfer sur les marchés 💫"
 
-        # --- Salutations ---
-        elif "bonjour" in question:
-            message_bot = "Bonjour à vous ☀️ ! Prêt à dompter les marchés avec moi ?"
+        elif any(mot in question for mot in ["art", "créatif", "dessine", "création"]):
+            message_bot = "🎨 Mon code ne manie pas le pinceau, mais il esquisse l’avenir. Entre art et données, je suis l'artiste numérique de votre portefeuille 💹✨"
 
-        elif "merci" in question:
-            message_bot = "Avec plaisir ! Je suis toujours là pour vous 😊"
+        elif any(mot in question for mot in ["fait", "culture", "incroyable", "surprenant"]):
+            message_bot = "🧠 Saviez-vous que le miel est la seule nourriture qui ne périme jamais ? Même après 3000 ans, il reste délicieux. Comme une bonne stratégie long terme 😉"
 
-        elif "tu es qui" in question:
-            message_bot = "Je suis AVA, votre assistante d’analyse boursière intelligente 🧠📊"
+        elif any(mot in question for mot in ["philosophie", "sens", "vie", "existence"]):
+            message_bot = "🤔 Chaque instant est un tick dans le grand marché de la vie. L’essentiel, c’est d’investir dans ce qui compte vraiment."
 
         else:
-            message_bot = "🤔 Je n’ai pas encore appris à répondre à cela. Essayez avec *analyse technique*, *blague*, ou même *météo* !"
+            message_bot = "Je suis encore en apprentissage pour ce genre de question. Essayez avec *analyse technique*, *blague*, *météo*, *culture* ou même *astro-finance* ! 😉"
 
     else:
         message_bot = "⚠️ Données manquantes pour cet actif. Lancez le script d’entraînement pour générer les prédictions."
@@ -112,6 +104,7 @@ for auteur, message in st.session_state.historique:
 if __name__ == "__main__":
     print("❌ Ce fichier ne doit pas être lancé directement.")
     print("👉 Utilisez : py -m streamlit run app.py")
+
 
 
 
