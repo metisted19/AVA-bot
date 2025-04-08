@@ -50,14 +50,15 @@ def analyse_signaux(df):
     # Analyse combinée renforcée
     if rsi is not None and macd is not None and signal_macd is not None:
         if rsi < 30 and macd > signal_macd:
-            messages.append("🚀 Un signal puissant ! Le RSI bas combiné à un MACD haussier pourrait indiquer un excellent point d'entrée.")
+            messages.append("🚀 Un signal puissant détecté ! RSI bas + MACD haussier = possible point d’entrée stratégique.")
         elif rsi > 70 and macd < signal_macd:
-            messages.append("⚠️ Attention : RSI élevé et MACD baissier. Cela peut annoncer une correction à venir.")
+            messages.append("⚠️ Attention : RSI élevé et MACD baissier. Une correction pourrait se profiler à l’horizon.")
 
     if not messages:
-        return "🤔 Aucun signal clair détecté pour le moment. Restez concentré, les opportunités ne tarderont pas à se manifester."
+        return "🤔 Aucun signal clair détecté pour le moment. Patience... les marchés aiment surprendre !"
 
     return "\n\n".join(messages)
+
 
 
 
