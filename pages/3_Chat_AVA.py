@@ -50,6 +50,14 @@ if user_input:
             message_bot = f"Voici mon analyse pour {ticker} :\n\n" + analyse_signaux(df)
         elif "bonjour" in user_input.lower():
             message_bot = "Bonjour à toi ☀️ ! Prêt à dompter les marchés ?"
+        elif "météo" in user_input.lower():
+            message_bot = "☀️ Je suis plus douée pour prédire les marchés que le ciel, mais je parierais sur une belle journée pleine d’opportunités 😄"
+        elif "blague" in user_input.lower():
+            message_bot = "Pourquoi les traders ne vont jamais au cinéma ? Parce qu’ils détestent les hausses de suspense ! 🎬📉😄"
+        elif any(mot in user_input.lower() for mot in ["motivation", "démotivé", "fatigué", "booster"]):
+        message_bot = "Rappelez-vous : chaque bougie rouge prépare souvent une bougie verte 🌱. Continuez à avancer, vous êtes sur la bonne voie 💪📈 !"
+        elif any(mot in user_input.lower() for mot in ["punchline", "futur", "avenir", "vision"]):
+        message_bot = "🌌 Mon code voit plus loin que l’horizon boursier… Je suis l’algorithme du futur, conçu pour éclairer vos décisions dès aujourd’hui 🚀✨."
         elif "merci" in user_input.lower():
             message_bot = "Avec plaisir ! Je suis toujours là pour toi 😊"
         elif "tu es qui" in user_input.lower():
