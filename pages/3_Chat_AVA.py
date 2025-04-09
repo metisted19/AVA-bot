@@ -18,6 +18,9 @@ def get_meteo_ville(ville):
     else:
        return "❌ Impossible de récupérer la météo pour " + ville + ". Code erreur : " + str(data['cod']) + " - " + str(data.get('message', 'Aucune information sur l\'erreur.'))
 
+data = response.json()
+print(data)  # Cela affichera la réponse de l'API pour un débogage
+
 
 # Configuration de la page
 st.set_page_config(page_title="Chat AVA", layout="centered")
