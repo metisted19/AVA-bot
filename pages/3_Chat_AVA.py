@@ -6,6 +6,48 @@ from datetime import datetime
 import pytz
 import requests
 
+# Fonction pour récupérer les actualités générales
+def get_general_news():
+    # Remplace "YOUR_API_KEY" par ta clé API
+    api_key = "YOUR_API_KEY"
+    url = f"https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        if data["status"] == "ok" and data["totalResults"] > 0:
+            news = []
+            for article in data["articles"][:5]:  # Récupérer les 5 premières actualités
+                title = article["title"]
+                url = article["url"]
+                description = article["description"]
+                news.append(f"🔹 [{title}]({url})\n{description}")
+            return "\n\n".join(news)
+        else:
+            return "Désolé, je n'ai pas pu récupérer les actualités. Essayez de nouveau plus tard."
+    except Exception as e:
+        return f"Erreur lors de la récupération des actualités : {e}"
+
+# Code principal du chatbot
+if user_input:
+    question = user_input.lower().strip()
+
+    if "actualités du jour" in question or "news" in question:
+        message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
+    else:
+        # Ajoute les autres conditions de réponse comme les prédictions ou les analyses
+        pass
+
+    # Afficher la réponse
+    st.session_state.historique.append(("🧑‍💻 Vous", user_input))
+    st.session_state.historique.append(("🤖 AVA", message_bot))
+
+# Affichage de l'historique
+for auteur, message in st.session_state.historique:
+    with st.chat_message(auteur):
+        st.markdown(message)
+        
 # Remplace par ta clé API OpenWeatherMap
 API_KEY = 'ton_api_key_ici'
 
