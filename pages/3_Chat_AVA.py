@@ -46,7 +46,7 @@ if user_input:
         ville = "Londres"  # Ville par défaut, tu pourrais demander à l'utilisateur d'entrer une ville
         meteo = get_meteo_ville(ville)
         message_bot = meteo
-        
+
     else:
         message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
 
