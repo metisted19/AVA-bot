@@ -23,7 +23,8 @@ end_date = "2025-04-06"
 
 # --- LOOP SUR CHAQUE TICKER ---
 for ticker in tickers:
-    print(f"\n📥 Traitement de {ticker}...")
+    print(f"\nTraitement de {ticker}...")
+
 
     # 1. Téléchargement des données
     df = yf.download(ticker, start=start_date, end=end_date)
@@ -86,7 +87,7 @@ for ticker in tickers:
     y_pred = model.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
 
-    print(f"✅ Modèle {ticker} - Accuracy moyenne CV : {scores.mean():.4f}, Test : {acc:.4f}")
+    print(f"[OK] Modèle {ticker} - Accuracy moyenne CV : {scores.mean():.4f}, Test : {acc:.4f}")
 
     # 7. Sauvegardes CSV et modèle
     df.to_csv(f"data/donnees_{ticker.lower()}.csv", index=True)
@@ -105,18 +106,29 @@ if "date" not in df.columns:
     elif "Date" in df.columns:
         df.rename(columns={"Date": "date"}, inplace=True)
 
-# 🔁 Conversion en datetime (sécurisée)
+# --- S'assurer que la colonne "date" est bien présente et utilisable
+df = df.reset_index()  # remet l'index comme colonne normale
+
+# 🔧 S'il y a une colonne "index" ou autre qui représente les dates, on la renomme
+if "index" in df.columns and "date" not in df.columns:
+    df.rename(columns={"index": "date"}, inplace=True)
+
+# 🔧 Supprimer toute colonne en double appelée "date"
+df = df.loc[:, ~df.columns.duplicated()]
+
+# 🔧 Convertir en datetime si possible
 if "date" in df.columns:
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df.dropna(subset=["date"], inplace=True)
 
-# Vérifie à nouveau que "date" est utilisable pour la dernière ligne
-if "date" in df.columns and not df["date"].empty:
-    date_finale = df["date"].iloc[-1]
-    pd.DataFrame({
-        "date": [date_finale],
-        "prediction": [prediction]
-    }).to_csv(f"predictions/prediction_{ticker.lower()}.csv", index=False)
+    if not df.empty and not df["date"].isnull().all():
+        pd.DataFrame({
+            "date": [df["date"].iloc[-1]],
+            "prediction": [prediction]
+        }).to_csv(f"predictions/prediction_{ticker.lower()}.csv", index=False)
 
-    print(f"🔮 Prédiction AVA {ticker} pour demain : {'📈 Hausse' if prediction == 1 else '📉 Baisse'}")
+        print(f"🔮 Prédiction AVA {ticker} pour demain : {'📈 Hausse' if prediction == 1 else '📉 Baisse'}")
+    else:
+        print(f"⚠️ Colonne 'date' invalide ou vide pour {ticker} — fichier non exporté.")
 else:
-    print(f"⚠️ Impossible d'extraire une date valide pour {ticker} — fichier non exporté.")
+    print(f"⚠️ Colonne 'date' absente pour {ticker} — fichier non exporté.")
