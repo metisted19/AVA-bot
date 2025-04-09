@@ -42,11 +42,11 @@ if user_input:
     question = user_input.lower().strip()  # Normaliser la question de l'utilisateur
     message_bot = ""  # Initialiser la réponse du bot
 
-    if "météo" in question or "quel temps" in question:
-    ville = "Londres"
-    meteo = get_meteo_ville(ville)
-    print(meteo)
-
+    elif "météo" in question or "quel temps" in question:
+        ville = "Londres"  # Ville par défaut, tu pourrais demander à l'utilisateur d'entrer une ville
+        meteo = get_meteo_ville(ville)
+        message_bot = meteo
+        
     else:
         message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
 
