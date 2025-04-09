@@ -1,8 +1,11 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
+import datetime
+import pytz
 import os
-from utils.analyse_technique import analyse_signaux  # ✅ Analyse technique d’AVA
+# Configuration de la page
+st.set_page_config(page_title="📊 Signaux & Alertes", layout="wide")
+st.title("📡 Détection de signaux et alertes AVA")
 
 # Chargement des données
 @st.cache_data
@@ -17,57 +20,68 @@ def charger_donnees(path):
         df.dropna(subset=['date'], inplace=True)
     return df
 
-# Interface Streamlit
-st.set_page_config(page_title="📈 Signaux AVA", layout="wide")
-st.title("📈 Signaux détectés")
-st.markdown("Voici les signaux d’achat/vente détectés par AVA sur les indicateurs techniques.")
-
-# Sélection de l'actif
+# Sélection d’actif
 tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
-ticker = st.selectbox("Choisissez un actif :", tickers)
-
+ticker = st.selectbox("📌 Choisissez un actif :", tickers)
 data_path = f"data/donnees_{ticker.lower()}.csv"
 
+# Si le fichier existe
 if os.path.exists(data_path):
     df = charger_donnees(data_path)
+    df = df.sort_values("date")
 
-    st.subheader(f"📊 Données récentes pour {ticker}")
-    colonnes_affichage = ['date', 'close', 'macd', 'macd_signal', 'rsi', 'bb_lower', 'adx', 'cci', 'williams_r']
-    colonnes_disponibles = [col for col in colonnes_affichage if col in df.columns]
+    st.subheader(f"🔍 Analyse des signaux techniques pour {ticker}")
 
-    if 'date' in df.columns:
-        try:
-            st.dataframe(df[colonnes_disponibles + ['Signal_MACD', 'Signal_RSI', 'Signal_BB']].tail(10), use_container_width=True)
-        except:
-            st.dataframe(df[colonnes_disponibles].tail(10), use_container_width=True)
+    alertes = []
 
-    # Graphique en bougies
-    st.subheader("📈 Graphique en bougies japonaises")
-    fig = go.Figure()
-    fig.add_trace(go.Candlestick(
-        x=df["date"],
-        open=df["open"],
-        high=df["high"],
-        low=df["low"],
-        close=df["close"],
-        name="Bougies"
-    ))
+    # 🔼 Hausse ou 🔽 Baisse sur 3 jours consécutifs
+    df['delta_close'] = df['close'].diff()
+    df['direction'] = df['delta_close'].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
+    df['streak'] = df['direction'].groupby((df['direction'] != df['direction'].shift()).cumsum()).transform('size') * df['direction']
+    if df['streak'].iloc[-1] >= 3:
+        alertes.append("🔼 **Hausse sur 3 jours consécutifs** détectée !")
+    elif df['streak'].iloc[-1] <= -3:
+        alertes.append("🔽 **Baisse sur 3 jours consécutifs** détectée !")
 
-    if 'sma_10' in df.columns:
-        fig.add_trace(go.Scatter(x=df["date"], y=df["sma_10"], mode="lines", name="SMA 10"))
-    if 'ema_10' in df.columns:
-        fig.add_trace(go.Scatter(x=df["date"], y=df["ema_10"], mode="lines", name="EMA 10"))
+    # 💥 Croisement SMA/EMA
+    if 'sma_10' in df.columns and 'ema_10' in df.columns:
+        if df['sma_10'].iloc[-2] < df['ema_10'].iloc[-2] and df['sma_10'].iloc[-1] > df['ema_10'].iloc[-1]:
+            alertes.append("💥 **Croisement haussier SMA/EMA** détecté !")
+        elif df['sma_10'].iloc[-2] > df['ema_10'].iloc[-2] and df['sma_10'].iloc[-1] < df['ema_10'].iloc[-1]:
+            alertes.append("💥 **Croisement baissier SMA/EMA** détecté !")
 
-    fig.update_layout(xaxis_title="Date", yaxis_title="Prix", xaxis_rangeslider_visible=False)
-    st.plotly_chart(fig, use_container_width=True)
+    # 🔄 RSI extrême
+    if 'rsi' in df.columns:
+        if df['rsi'].iloc[-1] > 70:
+            alertes.append("🔴 **RSI > 70 : Surachat** !")
+        elif df['rsi'].iloc[-1] < 30:
+            alertes.append("🟢 **RSI < 30 : Survente** !")
 
-    # Analyse technique d'AVA
-    st.subheader("🔎 Analyse d’AVA")
-    interpretation = analyse_signaux(df)
-    st.markdown(interpretation)
+    # 📉 Croisement MACD
+    if 'macd' in df.columns and 'macd_signal' in df.columns:
+        if df['macd'].iloc[-2] < df['macd_signal'].iloc[-2] and df['macd'].iloc[-1] > df['macd_signal'].iloc[-1]:
+            alertes.append("📈 **Croisement haussier MACD** détecté !")
+        elif df['macd'].iloc[-2] > df['macd_signal'].iloc[-2] and df['macd'].iloc[-1] < df['macd_signal'].iloc[-1]:
+            alertes.append("📉 **Croisement baissier MACD** détecté !")
 
+    # ⚠️ Tendance forte détectée (ADX > 25)
+    if 'adx' in df.columns:
+        if df['adx'].iloc[-1] > 25:
+            alertes.append("⚠️ **Tendance forte en cours (ADX > 25)**")
+
+    # Affichage des alertes
+    if alertes:
+        for alerte in alertes:
+            st.success(alerte)
+    else:
+        st.info("Aucune alerte technique majeure détectée aujourd'hui.")
+
+    # Affichage des dernières lignes
+    st.subheader("📄 Données récentes")
+    st.dataframe(df.tail(10), use_container_width=True)
 else:
-    st.error(f"❌ Colonne 'date' manquante ou données indisponibles pour {ticker}.")
+    st.error(f"❌ Aucune donnée trouvée pour {ticker}. Veuillez lancer le script d'entraînement.")
+
 
 
 
