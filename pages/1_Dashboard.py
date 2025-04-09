@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import os
+import feedparser
 
+# --- Chargement des données ---
 @st.cache_data
 def charger_donnees(path):
     df = pd.read_csv(path)
@@ -30,71 +32,30 @@ ticker = st.selectbox("Choisissez un actif :", tickers)
 
 # --- Chemin des données ---
 data_path = f"data/donnees_{ticker.lower()}.csv"
+prediction_path = f"predictions/prediction_{ticker.lower()}.txt"
 
-# --- Affichage des données ---
+# --- Vérification et affichage ---
 if os.path.exists(data_path):
     df = charger_donnees(data_path)
+
     st.subheader(f"Vue d'ensemble - {ticker}")
     st.dataframe(df.tail(10), use_container_width=True)
 
-    # --- Candlestick Chart ---
+    # --- Graphique en bougies japonaises ---
     st.subheader("📈 Graphique en bougies japonaises avec SMA/EMA")
-    fig = go.Figure()
-# --- Prédictions IA ---
-st.subheader("🤖 Prédiction de l'IA vs Réalité")
-
-# Chargement des prédictions
-prediction_path = f"predictions/prediction_{ticker.lower()}.txt"
-if os.path.exists(prediction_path):
-    try:
-        df_pred = pd.read_csv(prediction_path)
-
-        if "prediction" in df_pred.columns:
-            df["prediction"] = df_pred["prediction"].values[-len(df):]  # Associer à la fin du DataFrame existant
-
-            fig_pred = go.Figure()
-            fig_pred.add_trace(go.Scatter(x=df["date"], y=df["close"], mode="lines", name="Prix réel"))
-            fig_pred.add_trace(go.Scatter(x=df["date"], y=df["prediction"], mode="lines", name="Prédiction IA"))
-            fig_pred.update_layout(
-                xaxis_title="Date",
-                yaxis_title="Prix",
-                height=400
-            )
-            st.plotly_chart(fig_pred, use_container_width=True)
-        else:
-            st.warning("❌ Le fichier de prédictions ne contient pas de colonne 'prediction'.")
-    except Exception as e:
-        st.error(f"Erreur lors du chargement des prédictions : {e}")
-else:
-    st.info("ℹ️ Aucune prédiction disponible pour cet actif. Lancez le script d'entraînement pour générer les prédictions.")
-
-    fig.add_trace(go.Candlestick(
+    fig = go.Figure(data=[go.Candlestick(
         x=df["date"],
         open=df["open"],
         high=df["high"],
         low=df["low"],
         close=df["close"],
-        increasing_line_color='green',
-        decreasing_line_color='red',
-        name='Bougies'
-    ))
-
-    if "sma_10" in df.columns:
-        fig.add_trace(go.Scatter(x=df["date"], y=df["sma_10"], mode='lines', name='SMA 10'))
-
-    if "ema_10" in df.columns:
-        fig.add_trace(go.Scatter(x=df["date"], y=df["ema_10"], mode='lines', name='EMA 10'))
-
-    fig.update_layout(
-        xaxis_title='Date',
-        yaxis_title='Prix',
-        xaxis_rangeslider_visible=False,
-        height=600
-    )
-
+        increasing_line_color="green",
+        decreasing_line_color="red"
+    )])
+    fig.update_layout(xaxis_title="Date", yaxis_title="Prix", height=500)
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- RSI Chart ---
+    # --- RSI ---
     if "rsi" in df.columns:
         st.subheader("📉 Indicateur RSI (14)")
         fig_rsi = go.Figure()
@@ -103,24 +64,42 @@ else:
         fig_rsi.add_hline(y=30, line_dash="dot", line_color="green")
         fig_rsi.update_layout(height=300, xaxis_title="Date", yaxis_title="RSI")
         st.plotly_chart(fig_rsi, use_container_width=True)
+
+    # --- Prédictions IA ---
+    st.subheader("🤖 Prédiction de l'IA vs Réalité")
+    if os.path.exists(prediction_path):
+        try:
+            df_pred = pd.read_csv(prediction_path)
+            if "prediction" in df_pred.columns:
+                df["prediction"] = df_pred["prediction"].values[-len(df):]
+
+                fig_pred = go.Figure()
+                fig_pred.add_trace(go.Scatter(x=df["date"], y=df["close"], mode="lines", name="Prix réel"))
+                fig_pred.add_trace(go.Scatter(x=df["date"], y=df["prediction"], mode="lines", name="Prédiction IA"))
+                fig_pred.update_layout(xaxis_title="Date", yaxis_title="Prix", height=400)
+                st.plotly_chart(fig_pred, use_container_width=True)
+            else:
+                st.warning("❌ Le fichier de prédictions ne contient pas de colonne 'prediction'.")
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des prédictions : {e}")
+    else:
+        st.info("📭 Aucune prédiction IA trouvée pour cet actif.")
+
+    # --- Actualités financières ---
+    st.subheader("📰 Actualités financières récentes")
+    try:
+        flux_rss = "https://www.investing.com/rss/news_301.rss"
+        flux = feedparser.parse(flux_rss)
+
+        if flux.entries:
+            for entry in flux.entries[:5]:
+                st.markdown(f"🔹 [{entry.title}]({entry.link})", unsafe_allow_html=True)
+        else:
+            st.info("Aucune actualité n’a pu être récupérée pour le moment.")
+    except Exception as e:
+        st.warning("⚠️ Impossible de charger les actualités.")
+        st.text(f"Erreur : {e}")
+
 else:
     st.error(f"❌ Aucune donnée trouvée pour {ticker}. Veuillez lancer le script d'entraînement.")
-import feedparser
-
-st.subheader("📰 Actualités financières récentes")
-
-# Exemple de flux RSS fiable (Investing)
-flux_rss = "https://www.investing.com/rss/news_301.rss"
-flux = feedparser.parse(flux_rss)
-
-if flux.entries:
-    for entry in flux.entries[:5]:
-        st.markdown(f"🔹 [{entry.title}]({entry.link})", unsafe_allow_html=True)
-else:
-    st.info("Aucune actualité n’a pu être récupérée pour le moment.")
-
-
-
-
-
 
