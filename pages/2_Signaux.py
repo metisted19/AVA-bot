@@ -31,7 +31,7 @@ data_path = f"data/donnees_{ticker.lower()}.csv"
 st.title("📊 Signaux d'Analyse et Prédictions")
 
 # Sélectionner un actif
-ticker = st.selectbox("📌 Choisissez un actif :", tickers)
+ticker = st.selectbox("📌 Choisissez un actif :", tickers, key="ticker_selectbox")
 
 # Lire les données de prédiction
 prediction_path = f"predictions/prediction_{ticker.lower()}.csv"
