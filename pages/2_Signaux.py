@@ -26,6 +26,34 @@ tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
 ticker = st.selectbox("📌 Choisissez un actif :", tickers)
 data_path = f"data/donnees_{ticker.lower()}.csv"
 
+# --- Section Signaux ---
+
+st.title("📊 Signaux d'Analyse et Prédictions")
+
+# Sélectionner un actif
+ticker = st.selectbox("📌 Choisissez un actif :", tickers)
+
+# Lire les données de prédiction
+prediction_path = f"predictions/prediction_{ticker.lower()}.csv"
+
+# Lire et afficher les prédictions
+if os.path.exists(prediction_path):
+    prediction_df = pd.read_csv(prediction_path)
+    last_prediction = prediction_df["prediction"].iloc[-1]
+
+    # Afficher la prédiction dans Signaux
+    st.subheader(f"Prédiction de l'IA pour {ticker} :")
+    if last_prediction == 1:
+        st.markdown("📈 Hausse prévue pour demain")
+    else:
+        st.markdown("📉 Baisse prévue pour demain")
+else:
+    st.warning(f"❌ Aucun fichier de prédiction trouvé pour {ticker}.")
+
+# Affichage des autres signaux comme RSI, etc.
+st.subheader(f"Indicateur RSI pour {ticker} :")
+# Ajoutez ici votre code pour afficher le RSI et autres signaux
+
 # Si le fichier existe
 if os.path.exists(data_path):
     df = charger_donnees(data_path)
