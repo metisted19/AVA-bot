@@ -48,6 +48,7 @@ def get_meteo_ville(ville):
         return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\'erreur.')}"
 
 
+
 # Configuration de la page
 st.set_page_config(page_title="Chat AVA", layout="centered")
 st.title("💬 Bienvenue dans l'espace conversationnel d'AVA")
