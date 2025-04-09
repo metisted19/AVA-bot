@@ -25,7 +25,6 @@ end_date = "2025-04-06"
 for ticker in tickers:
     print(f"\nTraitement de {ticker}...")
 
-
     # 1. Téléchargement des données
     df = yf.download(ticker, start=start_date, end=end_date)
     df.dropna(inplace=True)
@@ -94,41 +93,34 @@ for ticker in tickers:
     with open(f"modeles/ava3_{ticker.lower()}.pkl", "wb") as f:
         pickle.dump(model, f)
 
- # 8. Prédiction finale + export CSV propre
-derniere_ligne = df[features].iloc[[-1]]
-prediction = model.predict(derniere_ligne)[0]
+    # 8. Prédiction finale + export CSV propre
+    derniere_ligne = df[features].iloc[[-1]]
+    prediction = model.predict(derniere_ligne)[0]
 
-# 🔧 Gestion robuste de la colonne date
-if "date" not in df.columns:
+    # 🔧 Gestion robuste de la colonne date
     df = df.reset_index()
-    if "index" in df.columns:
+    if "index" in df.columns and "date" not in df.columns:
         df.rename(columns={"index": "date"}, inplace=True)
     elif "Date" in df.columns:
         df.rename(columns={"Date": "date"}, inplace=True)
 
-# --- S'assurer que la colonne "date" est bien présente et utilisable
-df = df.reset_index()  # remet l'index comme colonne normale
+    # 🔧 Supprimer les colonnes dupliquées (souvent "date")
+    df = df.loc[:, ~df.columns.duplicated()]
 
-# 🔧 S'il y a une colonne "index" ou autre qui représente les dates, on la renomme
-if "index" in df.columns and "date" not in df.columns:
-    df.rename(columns={"index": "date"}, inplace=True)
+    # 🔧 Convertir la colonne date si elle existe
+    if "date" in df.columns:
+        df["date"] = pd.to_datetime(df["date"], errors="coerce")
+        df.dropna(subset=["date"], inplace=True)
 
-# 🔧 Supprimer toute colonne en double appelée "date"
-df = df.loc[:, ~df.columns.duplicated()]
+        if not df.empty and not df["date"].isnull().all():
+            pd.DataFrame({
+                "date": [df["date"].iloc[-1]],
+                "prediction": [prediction]
+            }).to_csv(f"predictions/prediction_{ticker.lower()}.csv", index=False)
 
-# 🔧 Convertir en datetime si possible
-if "date" in df.columns:
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")
-    df.dropna(subset=["date"], inplace=True)
-
-    if not df.empty and not df["date"].isnull().all():
-        pd.DataFrame({
-            "date": [df["date"].iloc[-1]],
-            "prediction": [prediction]
-        }).to_csv(f"predictions/prediction_{ticker.lower()}.csv", index=False)
-
-        print(f"🔮 Prédiction AVA {ticker} pour demain : {'📈 Hausse' if prediction == 1 else '📉 Baisse'}")
+            print(f"🔮 Prédiction AVA {ticker} pour demain : {'📈 Hausse' if prediction == 1 else '📉 Baisse'}")
+        else:
+            print(f"⚠️ Colonne 'date' invalide ou vide pour {ticker} — fichier non exporté.")
     else:
-        print(f"⚠️ Colonne 'date' invalide ou vide pour {ticker} — fichier non exporté.")
-else:
-    print(f"⚠️ Colonne 'date' absente pour {ticker} — fichier non exporté.")
+        print(f"⚠️ Colonne 'date' absente pour {ticker} — fichier non exporté.")
+
