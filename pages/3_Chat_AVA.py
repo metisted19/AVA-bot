@@ -28,6 +28,9 @@ def get_general_news():
 # Fonction pour récupérer la météo
 API_KEY = 'ton_api_key_ici'  # Remplace par ta clé API OpenWeatherMap
 
+# Fonction pour récupérer la météo
+API_KEY = 'ton_api_key_ici'  # Remplace par ta clé API OpenWeatherMap
+
 def get_meteo_ville(ville):
     url = f'http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY}&units=metric&lang=fr'
     try:
@@ -45,6 +48,7 @@ def get_meteo_ville(ville):
             return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\'erreur.')}"
     except Exception as e:
         return f"Erreur lors de la récupération des données météo : {e}"
+
 
 # Configuration de la page
 st.set_page_config(page_title="Chat AVA", layout="centered")
