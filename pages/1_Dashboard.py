@@ -57,23 +57,30 @@ if os.path.exists(data_path):
         fig_rsi.update_layout(height=300, xaxis_title="Date", yaxis_title="RSI")
         st.plotly_chart(fig_rsi, use_container_width=True)
 
-    # --- Prédictions IA ---
-    st.subheader("🤖 Prédiction de l'IA vs Réalité")
-    prediction_path = f"predictions/prediction_{ticker.lower()}.csv"
-    if os.path.exists(prediction_path):
-        try:
-            df_pred = pd.read_csv(prediction_path)
-            if "prediction" in df_pred.columns and "date" in df_pred.columns:
-                df["prediction"] = df["close"].copy()
-                df["prediction"].iloc[-1] = df["close"].iloc[-1] * (1.01 if df_pred["prediction"].iloc[-1] == 1 else 0.99)
+# --- Prédictions IA ---
+st.subheader("🤖 Prédiction de l'IA vs Réalité")
+prediction_path = f"predictions/prediction_{ticker.lower()}.csv"
 
-                fig_pred = go.Figure()
-                fig_pred.add_trace(go.Scatter(x=df["date"], y=df["close"], mode="lines", name="Prix réel"))
-                fig_pred.add_trace(go.Scatter(x=df["date"], y=df["prediction"], mode="lines+markers", name="Prédiction IA", line=dict(dash="dot")))
-                fig_pred.update_layout(xaxis_title="Date", yaxis_title="Prix", height=400)
-                st.plotly_chart(fig_pred, use_container_width=True)
-            else:
-                st.warning("❌ Le fichier de prédictions ne contient pas les colonnes attendues.")
+if os.path.exists(prediction_path):
+    try:
+        df_pred = pd.read_csv(prediction_path)
+
+        if "prediction" in df_pred.columns:
+            # Appliquer la prédiction à toute la série pour affichage
+            df["prediction"] = [df_pred["prediction"].iloc[-1]] * len(df)
+
+            fig_pred = go.Figure()
+            fig_pred.add_trace(go.Scatter(x=df["date"], y=df["close"], mode="lines", name="Prix réel"))
+            fig_pred.add_trace(go.Scatter(x=df["date"], y=df["prediction"], mode="lines", name="Prédiction IA"))
+            fig_pred.update_layout(xaxis_title="Date", yaxis_title="Prix", height=400)
+            st.plotly_chart(fig_pred, use_container_width=True)
+        else:
+            st.warning("❌ Le fichier de prédictions ne contient pas de colonne 'prediction'.")
+    except Exception as e:
+        st.error(f"Erreur lors du chargement des prédictions : {e}")
+else:
+    st.warning("📭 Aucun fichier de prédiction trouvé. Avez-vous bien lancé `auto_ava3.py` ?")
+
         except Exception as e:
             st.error(f"Erreur lors du chargement des prédictions : {e}")
     else:
