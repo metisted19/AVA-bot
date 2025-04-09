@@ -40,6 +40,33 @@ if os.path.exists(data_path):
     # --- Candlestick Chart ---
     st.subheader("📈 Graphique en bougies japonaises avec SMA/EMA")
     fig = go.Figure()
+# --- Prédictions IA ---
+st.subheader("🤖 Prédiction de l'IA vs Réalité")
+
+# Chargement des prédictions
+prediction_path = f"predictions/prediction_{ticker.lower()}.txt"
+if os.path.exists(prediction_path):
+    try:
+        df_pred = pd.read_csv(prediction_path)
+
+        if "prediction" in df_pred.columns:
+            df["prediction"] = df_pred["prediction"].values[-len(df):]  # Associer à la fin du DataFrame existant
+
+            fig_pred = go.Figure()
+            fig_pred.add_trace(go.Scatter(x=df["date"], y=df["close"], mode="lines", name="Prix réel"))
+            fig_pred.add_trace(go.Scatter(x=df["date"], y=df["prediction"], mode="lines", name="Prédiction IA"))
+            fig_pred.update_layout(
+                xaxis_title="Date",
+                yaxis_title="Prix",
+                height=400
+            )
+            st.plotly_chart(fig_pred, use_container_width=True)
+        else:
+            st.warning("❌ Le fichier de prédictions ne contient pas de colonne 'prediction'.")
+    except Exception as e:
+        st.error(f"Erreur lors du chargement des prédictions : {e}")
+else:
+    st.info("ℹ️ Aucune prédiction disponible pour cet actif. Lancez le script d'entraînement pour générer les prédictions.")
 
     fig.add_trace(go.Candlestick(
         x=df["date"],
@@ -91,7 +118,7 @@ if flux.entries:
         st.markdown(f"🔹 [{entry.title}]({entry.link})", unsafe_allow_html=True)
 else:
     st.info("Aucune actualité n’a pu être récupérée pour le moment.")
-feedparser
+
 
 
 
