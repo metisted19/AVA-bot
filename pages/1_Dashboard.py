@@ -91,7 +91,7 @@ if flux.entries:
         st.markdown(f"🔹 [{entry.title}]({entry.link})", unsafe_allow_html=True)
 else:
     st.info("Aucune actualité n’a pu être récupérée pour le moment.")
-
+feedparser
 
 
 
