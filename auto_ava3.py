@@ -93,24 +93,30 @@ for ticker in tickers:
     with open(f"modeles/ava3_{ticker.lower()}.pkl", "wb") as f:
         pickle.dump(model, f)
 
-# 8. Prédiction finale + export CSV propre
+ # 8. Prédiction finale + export CSV propre
 derniere_ligne = df[features].iloc[[-1]]
 prediction = model.predict(derniere_ligne)[0]
 
-# 🔧 S'assurer que la colonne "date" existe et est formatée
+# 🔧 Gestion robuste de la colonne date
 if "date" not in df.columns:
     df = df.reset_index()
     if "index" in df.columns:
         df.rename(columns={"index": "date"}, inplace=True)
+    elif "Date" in df.columns:
+        df.rename(columns={"Date": "date"}, inplace=True)
 
+# 🔁 Conversion en datetime (sécurisée)
 if "date" in df.columns:
-    df["date"] = pd.to_datetime(df["date"], errors='coerce')  # 🔧 Force le format datetime
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
+# Vérifie à nouveau que "date" est utilisable pour la dernière ligne
+if "date" in df.columns and not df["date"].empty:
+    date_finale = df["date"].iloc[-1]
     pd.DataFrame({
-        "date": [df["date"].iloc[-1]],
+        "date": [date_finale],
         "prediction": [prediction]
     }).to_csv(f"predictions/prediction_{ticker.lower()}.csv", index=False)
 
     print(f"🔮 Prédiction AVA {ticker} pour demain : {'📈 Hausse' if prediction == 1 else '📉 Baisse'}")
 else:
-    print(f"⚠️ Impossible d'extraire la date pour {ticker} — fichier non exporté.")
+    print(f"⚠️ Impossible d'extraire une date valide pour {ticker} — fichier non exporté.")
