@@ -29,17 +29,46 @@ def get_general_news():
     except Exception as e:
         return f"Erreur lors de la récupération des actualités : {e}"
 
-# Code principal du chatbot
+# Chargement des données et autre code existant...
+@st.cache_data
+def charger_donnees(path):
+    df = pd.read_csv(path)
+    if 'date' not in df.columns:
+        df.reset_index(inplace=True)
+    if 'Date' in df.columns and 'date' not in df.columns:
+        df.rename(columns={'Date': 'date'}, inplace=True)
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        df.dropna(subset=['date'], inplace=True)
+    return df
+
+# Sélection d’actif
+tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
+ticker = st.selectbox("📌 Choisissez un actif :", tickers)
+
+# Zone d'historique du chat
+if "historique" not in st.session_state:
+    st.session_state.historique = []
+
+# Champ de saisie utilisateur
+user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
+
 if user_input:
     question = user_input.lower().strip()
+    message_bot = ""
 
+    # Si l'utilisateur demande les actualités du jour
     if "actualités du jour" in question or "news" in question:
         message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
+    
     else:
-        # Ajoute les autres conditions de réponse comme les prédictions ou les analyses
-        pass
+        # Ajoute les autres conditions comme les prédictions, l'analyse technique, etc.
+        data_path = f"data/donnees_{ticker.lower()}.csv"
+        if os.path.exists(data_path):
+            df = charger_donnees(data_path)
+            # Traitement des autres demandes (analyses techniques, prédictions, etc.)
 
-    # Afficher la réponse
+    # Ajout à l’historique
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
 
@@ -47,7 +76,7 @@ if user_input:
 for auteur, message in st.session_state.historique:
     with st.chat_message(auteur):
         st.markdown(message)
-        
+
 # Remplace par ta clé API OpenWeatherMap
 API_KEY = 'ton_api_key_ici'
 
