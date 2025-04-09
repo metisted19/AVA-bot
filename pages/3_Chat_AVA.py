@@ -17,7 +17,7 @@ def get_meteo_ville(ville):
         description = data['weather'][0]['description']
         return f"🌤 La température à {ville} est de {temp}°C avec {description}."
     else:
-        return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\'erreur.')}"
+       return "❌ Impossible de récupérer la météo pour " + ville + ". Code erreur : " + str(data['cod']) + " - " + str(data.get('message', 'Aucune information sur l\'erreur.'))
 
 
 # Configuration de la page
