@@ -66,7 +66,7 @@ if user_input:
         message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
     
     elif "météo" in question or "quel temps" in question:
-        ville = "Londres"  # Ville par défaut, tu pourrais demander à l'utilisateur d'entrer une ville
+        ville = "Paris"  # Ville par défaut, tu pourrais demander à l'utilisateur d'entrer une ville
         meteo = get_meteo_ville(ville)
         message_bot = meteo
 
