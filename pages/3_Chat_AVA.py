@@ -3,7 +3,8 @@ import requests
 from datetime import datetime
 import pytz
 
-API_KEY = 'ta_clé_API_openweathermap' # Remplace par ta clé API OpenWeatherMap   
+# Remplace avec ta vraie clé API OpenWeatherMap
+API_KEY = 'ta_vraie_clé_API'  # Remplace par ta clé API valide
 
 def get_meteo_ville(ville):
     url = f'http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY}&units=metric&lang=fr'
