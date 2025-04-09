@@ -51,15 +51,22 @@ if "historique" not in st.session_state:
     st.session_state.historique = []
 
 # Champ de saisie utilisateur
+# Champ de saisie utilisateur
 user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
-if user_input:
-    question = user_input.lower().strip()
+if user_input:  # S'assurer que l'utilisateur a entré quelque chose
+    question = user_input.lower().strip()  # Définir la variable 'question' avec le texte de l'utilisateur
     message_bot = ""
 
     # Si l'utilisateur demande les actualités du jour
     if "actualités du jour" in question or "news" in question:
         message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
+    
+    # Si l'utilisateur demande la météo
+    elif "météo" in question or "quel temps" in question:
+        ville = "Paris"  # Tu peux personnaliser la ville ici
+        meteo = get_meteo_ville(ville)
+        message_bot = meteo
     
     else:
         # Ajoute les autres conditions comme les prédictions, l'analyse technique, etc.
