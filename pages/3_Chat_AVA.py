@@ -8,7 +8,7 @@ import requests
 
 # Fonction pour récupérer les actualités générales
 def get_general_news():
-    api_key = "YOUR_API_KEY"  # Remplace par ta clé API NewsAPI
+    API_KEY = 'ta_vraie_clé_API'  # Remplace par ta clé API NewsAPI
     url = f"https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}"
     
     try:
