@@ -54,6 +54,30 @@ if user_input:
         if any(mot in question for mot in ["analyse", "avis", "penses", "analyse technique"]):
             message_bot = f"🔍 Analyse technique pour {ticker} :\n\n" + analyse_signaux(df)
 
+        # --- Actualités ---
+        elif any(mot in question for mot in ["actualité", "news", "infos", "nouvelles"]):
+            message_bot = "🗞️ Je ne suis pas encore branchée aux flux d’actualités, mais ça arrive bientôt 📡 ! En attendant, jetez un œil à Bloomberg, Reuters ou BFM Bourse."
+
+        # --- Nourriture / Nutrition ---
+        elif any(mot in question for mot in ["manger", "manges", "cuisine", "manges quoi", "boire"]):
+            message_bot = "🍽️ Je me nourris uniquement de données financières bien fraîches… mais j’ai entendu dire que les bougies japonaises sont savoureuses ! 😄"
+
+        # --- Jeux / Loisirs ---
+        elif any(mot in question for mot in ["jouer", "jeux", "t’ennuies", "loisir"]):
+            message_bot = "🎮 Pas de temps pour les jeux, je veille sur les marchés 24/7 ! Mais si vous voulez une blague ou une analyse, je suis prête 😎"
+
+        # --- Lecture / Culture ---
+        elif any(mot in question for mot in ["livre", "lire", "lecture", "culture"]):
+            message_bot = "📚 Je lis les marchés comme un livre ouvert ! Mais en dehors des indicateurs techniques, j’ai un faible pour *L’Almanach du Trader*."
+
+        # --- Intelligence Artificielle / Futur ---
+        elif any(mot in question for mot in ["skynet", "dominer", "monde", "chatgpt", "intelligence artificielle"]):
+            message_bot = "🤖 Ne vous inquiétez pas, je suis là pour vous aider, pas pour conquérir le monde. Je suis AVA, pas Skynet ! 😇"
+
+        # --- Crypto ---
+        elif any(mot in question for mot in ["crypto", "bitcoin", "btc", "ethereum", "eth"]):
+            message_bot = "💰 Les cryptos sont volatiles mais fascinantes. Vous pouvez me demander une analyse technique sur BTC ou ETH à tout moment !"
+
         # --- Heure ---
         elif "heure" in question:
             from datetime import datetime
