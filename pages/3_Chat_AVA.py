@@ -4,7 +4,7 @@ from datetime import datetime
 import pytz
 
 # Remplace avec ta vraie clé API OpenWeatherMap
-API_KEY = 'ta_nouvelle_cle_api_ici'  # Remplace cette clé par la clé que tu as obtenue sur OpenWeatherMap
+API_KEY = 'ta_nouvelle_cle_api_ici'
 
 
 def get_meteo_ville(ville):
@@ -43,9 +43,10 @@ if user_input:
     message_bot = ""  # Initialiser la réponse du bot
 
     if "météo" in question or "quel temps" in question:
-        ville = "Paris"  # Ville par défaut, tu pourrais demander à l'utilisateur d'entrer une ville
-        meteo = get_meteo_ville(ville)
-        message_bot = meteo
+    ville = "Londres"
+    meteo = get_meteo_ville(ville)
+    print(meteo)
+
     else:
         message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
 
