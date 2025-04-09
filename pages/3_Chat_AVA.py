@@ -4,6 +4,29 @@ import os
 import sys
 from datetime import datetime
 import pytz
+import requests
+
+# Remplace par ta clé API OpenWeatherMap
+API_KEY = 'ton_api_key_ici'
+
+def get_meteo_ville(ville):
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY}&units=metric&lang=fr'
+    response = requests.get(url)
+    data = response.json()
+
+    if data['cod'] == 200:
+        temp = data['main']['temp']
+        description = data['weather'][0]['description']
+        return f"🌤 La température à {ville} est de {temp}°C avec {description}."
+    else:
+        return "❌ Impossible de récupérer la météo pour cette ville."
+
+# Exemple d'intégration dans le chatbot AVA
+if "météo" in question or "quel temps" in question:
+    # Demander la ville, ou mettre une valeur par défaut
+    ville = "Paris"  # Remplacer par la ville souhaitée ou par une question du user
+    meteo = get_meteo_ville(ville)
+    message_bot = meteo
 
 # Accès au module utils/analyse_technique.py
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
