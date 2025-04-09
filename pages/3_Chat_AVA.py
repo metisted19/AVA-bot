@@ -10,16 +10,14 @@ def get_meteo_ville(ville):
     url = f'http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY}&units=metric&lang=fr'
     response = requests.get(url)
     data = response.json()
-
+ # Afficher la réponse brute pour débogage
+    print(data)  # Ajoute ceci pour voir la réponse de l'API
     if data['cod'] == 200:
         temp = data['main']['temp']
         description = data['weather'][0]['description']
         return f"🌤 La température à {ville} est de {temp}°C avec {description}."
     else:
        return "❌ Impossible de récupérer la météo pour " + ville + ". Code erreur : " + str(data['cod']) + " - " + str(data.get('message', 'Aucune information sur l\'erreur.'))
-
-data = response.json()
-print(data)  # Cela affichera la réponse de l'API pour un débogage
 
 
 # Configuration de la page
