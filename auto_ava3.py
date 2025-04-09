@@ -80,7 +80,7 @@ for ticker in tickers:
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
     # 6. Entraînement du modèle XGBoost
-    model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, use_label_encoder=False, eval_metric="logloss")
+    model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, eval_metric="logloss")
     scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
@@ -88,15 +88,26 @@ for ticker in tickers:
 
     print(f"✅ Modèle {ticker} - Accuracy moyenne CV : {scores.mean():.4f}, Test : {acc:.4f}")
 
-    # 7. Sauvegardes
-    df.to_csv(f"data/donnees_{ticker.lower()}.csv", index=False)
+    # 7. Sauvegardes CSV et modèle
+    df.to_csv(f"data/donnees_{ticker.lower()}.csv", index=True)
     with open(f"modeles/ava3_{ticker.lower()}.pkl", "wb") as f:
         pickle.dump(model, f)
 
-    # 8. Prédiction finale du dernier jour
-    derniere_ligne = df[features].iloc[[-1]]
-    prediction = model.predict(derniere_ligne)[0]
-    with open(f"predictions/prediction_{ticker.lower()}.txt", "w") as f:
-        f.write(str(prediction))
+    # 8. Prédiction finale + export CSV propre
+derniere_ligne = df[features].iloc[[-1]]
+prediction = model.predict(derniere_ligne)[0]
 
-    print(f"🔮 Prédiction AVA {ticker} pour demain : {'📈 Hausse' if prediction == 1 else '📉 Baisse'}")
+# S'assurer que la colonne "date" existe
+if "date" not in df.columns:
+    if df.index.name is not None:
+        df = df.reset_index()
+    if "index" in df.columns:
+        df.rename(columns={"index": "date"}, inplace=True)
+
+# Export de la prédiction
+pd.DataFrame({
+    "date": [df["date"].iloc[-1]],
+    "prediction": [prediction]
+}).to_csv(f"predictions/prediction_{ticker.lower()}.csv", index=False)
+
+print(f"🔮 Prédiction AVA {ticker} pour demain : {'📈 Hausse' if prediction == 1 else '📉 Baisse'}")
