@@ -50,8 +50,8 @@ ticker = st.selectbox("📌 Choisissez un actif :", tickers)
 if "historique" not in st.session_state:
     st.session_state.historique = []
 
- # Champ de saisie utilisateur
- user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
+# Champ de saisie utilisateur
+user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
 if user_input:  # S'assurer que l'utilisateur a entré quelque chose
     question = user_input.lower().strip()  # Définir la variable 'question' avec le texte de l'utilisateur
