@@ -35,13 +35,17 @@ def charger_donnees(path):
 tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
 ticker = st.selectbox("📌 Choisissez un actif :", tickers)
 
-# Historique du chat
+# --- Zone d'historique du chat ---
 if "historique" not in st.session_state:
     st.session_state.historique = []
 
-# 🗑️ Bouton de suppression
+# 🗑️ Bouton pour effacer l'historique (à placer AVANT les échanges)
 if st.button("🗑️ Effacer la conversation"):
     st.session_state.historique = []
+    st.experimental_rerun()  # 🔁 Recharge la page pour effacer l’affichage en direct
+
+# Champ de saisie
+user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
 # Saisie utilisateur
 user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
