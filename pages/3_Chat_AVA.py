@@ -3,23 +3,22 @@ import pandas as pd
 import os
 import sys
 from datetime import datetime
+import pytz
 
-# Pour accéder à utils/analyse_technique.py
+# Accès au module utils/analyse_technique.py
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.analyse_technique import analyse_signaux
 
-# --- Configuration de la page ---
+# Configuration de la page
 st.set_page_config(page_title="Chat AVA", layout="centered")
 st.title("💬 Bienvenue dans l'espace conversationnel d'AVA")
-
-# --- Logo et description ---
 st.image("ava_logo.png", width=100)
 st.markdown("""
 ### 👋 Salut, je suis AVA  
 Votre assistante boursière digitale. Posez-moi une question sur les marchés, ou parlez-moi de tout et de rien 😄
 """)
 
-# --- Chargement des données ---
+# Chargement des données
 @st.cache_data
 def charger_donnees(path):
     df = pd.read_csv(path)
@@ -32,16 +31,22 @@ def charger_donnees(path):
         df.dropna(subset=['date'], inplace=True)
     return df
 
-# --- Sélection de l’actif ---
+# Sélection d’actif
 tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
 ticker = st.selectbox("📌 Choisissez un actif :", tickers)
 
-# --- Zone de chat ---
+# Historique du chat
 if "historique" not in st.session_state:
     st.session_state.historique = []
 
-user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?")
+# 🗑️ Bouton de suppression
+if st.button("🗑️ Effacer la conversation"):
+    st.session_state.historique = []
 
+# Saisie utilisateur
+user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
+
+# Traitement du message
 if user_input:
     data_path = f"data/donnees_{ticker.lower()}.csv"
     message_bot = ""
@@ -50,13 +55,10 @@ if user_input:
         df = charger_donnees(data_path)
         question = user_input.lower().strip()
 
-        # Corrections basiques
+        # Corrections orthographiques simples
         corrections = {
-            "analize": "analyse",
-            "matéo": "météo",
-            "rci": "rsi",
-            "mercie": "merci",
-            "blag": "blague",
+            "analize": "analyse", "matéo": "météo", "rci": "rsi",
+            "mercie": "merci", "blag": "blague"
         }
         for faute, correction in corrections.items():
             question = question.replace(faute, correction)
@@ -65,21 +67,19 @@ if user_input:
         if any(mot in question for mot in ["analyse", "avis", "penses", "analyse technique"]):
             message_bot = f"🔍 Mon analyse technique pour **{ticker}** :\n\n" + analyse_signaux(df)
 
-        # Heure actuelle
+        # Heure
         elif "heure" in question:
-            import pytz
-            heure_actuelle = datetime.now(pytz.timezone("Europe/Paris")).strftime("%H:%M")
-            message_bot = f"🕒 Il est actuellement **{heure_actuelle}** à Paris."
+            heure = datetime.now(pytz.timezone("Europe/Paris")).strftime("%H:%M")
+            message_bot = f"🕒 Il est **{heure}** à Paris."
 
-        # Date du jour
+        # Date
         elif "date" in question:
-            import pytz
-            date_actuelle = datetime.now(pytz.timezone("Europe/Paris")).strftime("%A %d %B %Y")
-            message_bot = f"📅 Nous sommes le **{date_actuelle}**."
+            date = datetime.now(pytz.timezone("Europe/Paris")).strftime("%A %d %B %Y")
+            message_bot = f"📅 Aujourd’hui, nous sommes le **{date}**."
 
         # Météo fictive
         elif "météo" in question:
-            message_bot = "🌤 Je ne suis pas encore connectée à la météo réelle... Mais je sens qu’il fait **beau pour investir** aujourd’hui ! 😄"
+            message_bot = "🌤 Je ne suis pas encore connectée à la météo réelle... mais je sens qu’il fait **beau pour investir** aujourd’hui !"
 
         # Blague
         elif "blague" in question:
@@ -104,19 +104,15 @@ if user_input:
             message_bot = "Je suis AVA, votre copilote boursier personnel 🤖. J’analyse les marchés pour vous guider au mieux !"
 
         else:
-            message_bot = "Je n’ai pas encore appris à répondre à ça… Essayez avec *analyse technique*, *heure*, *blague*, *vision* ou même *météo* 🌍"
-
+            message_bot = "Je n’ai pas encore appris à répondre à cela… Essayez avec *analyse technique*, *heure*, *blague*, ou *météo* 🌍"
     else:
         message_bot = f"⚠️ Je n’ai pas trouvé les données pour {ticker}. Pensez à lancer le script d'entraînement."
 
+    # Ajout dans l'historique
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
 
-# --- Affichage des échanges ---
+# Affichage de l'historique
 for auteur, message in st.session_state.historique:
     with st.chat_message(auteur):
         st.markdown(message)
-
-if __name__ == "__main__":
-    print("❌ Ce fichier ne doit pas être lancé directement.")
-    print("👉 Utilisez : py -m streamlit run app.py")
