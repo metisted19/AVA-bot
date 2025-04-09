@@ -45,7 +45,7 @@ def get_meteo_ville(ville):
         return f"🌤 La température à {ville} est de {temp}°C avec {description}."
     else:
         # Affiche le code d'erreur retourné par l'API pour aider au débogage
-      return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\'erreur.')}"
+      return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\"erreur.')}"
 
 
 
