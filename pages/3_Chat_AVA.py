@@ -1,14 +1,9 @@
 import streamlit as st
-import pandas as pd
-import os
-import sys
+import requests
 from datetime import datetime
 import pytz
-import requests
-import streamlit as st
-import requests
 
-# Remplace par ta clé API OpenWeatherMap
+# Remplace avec ta vraie clé API OpenWeatherMap
 API_KEY = 'ta_vraie_clé_API'
 
 # Fonction pour récupérer la météo
@@ -22,9 +17,17 @@ def get_meteo_ville(ville):
         description = data['weather'][0]['description']
         return f"🌤 La température à {ville} est de {temp}°C avec {description}."
     else:
-        return "❌ Impossible de récupérer la météo pour " + ville + ". Code erreur : " + str(data['cod']) + " - " + str(data.get('message', 'Aucune information sur l\'erreur.'))
+        return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\'erreur.')}"
 
 
+# Configuration de la page
+st.set_page_config(page_title="Chat AVA", layout="centered")
+st.title("💬 Bienvenue dans l'espace conversationnel d'AVA")
+st.image("ava_logo.png", width=100)
+st.markdown("""
+### 👋 Salut, je suis AVA  
+Votre assistante boursière digitale. Posez-moi une question sur les marchés, ou parlez-moi de tout et de rien 😄
+""")
 
 # Zone d'historique du chat
 if "historique" not in st.session_state:
