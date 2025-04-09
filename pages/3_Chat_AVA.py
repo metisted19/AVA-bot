@@ -4,7 +4,7 @@ import os
 import sys
 from datetime import datetime
 
-# Pour accéder au module utils/analyse_technique.py
+# Pour accéder à utils/analyse_technique.py
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.analyse_technique import analyse_signaux
 
@@ -50,7 +50,7 @@ if user_input:
         df = charger_donnees(data_path)
         question = user_input.lower().strip()
 
-        # Corrections basiques (fautes fréquentes ou orthographes alternatives)
+        # Corrections basiques
         corrections = {
             "analize": "analyse",
             "matéo": "météo",
@@ -67,14 +67,12 @@ if user_input:
 
         # Heure actuelle
         elif "heure" in question:
-            from datetime import datetime
             import pytz
             heure_actuelle = datetime.now(pytz.timezone("Europe/Paris")).strftime("%H:%M")
             message_bot = f"🕒 Il est actuellement **{heure_actuelle}** à Paris."
 
         # Date du jour
         elif "date" in question:
-            from datetime import datetime
             import pytz
             date_actuelle = datetime.now(pytz.timezone("Europe/Paris")).strftime("%A %d %B %Y")
             message_bot = f"📅 Nous sommes le **{date_actuelle}**."
@@ -113,3 +111,12 @@ if user_input:
 
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
+
+# --- Affichage des échanges ---
+for auteur, message in st.session_state.historique:
+    with st.chat_message(auteur):
+        st.markdown(message)
+
+if __name__ == "__main__":
+    print("❌ Ce fichier ne doit pas être lancé directement.")
+    print("👉 Utilisez : py -m streamlit run app.py")
