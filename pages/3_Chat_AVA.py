@@ -36,12 +36,17 @@ def get_meteo_ville(ville):
     response = requests.get(url)
     data = response.json()
 
+    # Ajouter un débogage pour afficher les données retournées
+    print(data)  # Ajoute ceci pour voir la réponse brute
+
     if data['cod'] == 200:
         temp = data['main']['temp']
         description = data['weather'][0]['description']
         return f"🌤 La température à {ville} est de {temp}°C avec {description}."
     else:
-        return "❌ Impossible de récupérer la météo pour cette ville."
+        # Affiche le code d'erreur retourné par l'API pour aider au débogage
+        return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\'erreur.')}"
+
 
 # Configuration de la page
 st.set_page_config(page_title="Chat AVA", layout="centered")
