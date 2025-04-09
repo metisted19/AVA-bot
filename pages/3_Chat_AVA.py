@@ -44,11 +44,14 @@ if st.button("🗑️ Effacer la conversation"):
     st.session_state.historique = []
     st.experimental_rerun()  # 🔁 Recharge la page pour effacer l’affichage en direct
 
-# Champ de saisie
+# 🗑️ Bouton pour effacer l'historique
+if st.button("🗑️ Effacer la conversation"):
+    st.session_state.historique = []
+    st.experimental_rerun()
+
+# ✅ Une seule fois ici, PAS deux fois !
 user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
-# Saisie utilisateur
-user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
 # Traitement du message
 if user_input:
@@ -67,56 +70,55 @@ if user_input:
         for faute, correction in corrections.items():
             question = question.replace(faute, correction)
 
-        # Analyse technique
-        if any(mot in question for mot in ["analyse", "avis", "penses", "analyse technique"]):
-            message_bot = f"🔍 Mon analyse technique pour **{ticker}** :\n\n" + analyse_signaux(df)
+        # --- Salutations (en priorité avant les autres) ---
+if "bonjour" in question or "salut" in question:
+    message_bot = "Bonjour 👋 ! Je suis ravie de vous retrouver. Une question sur les marchés ? Ou juste envie de discuter ? 😊"
 
-        # Heure
-        elif "heure" in question:
-            heure = datetime.now(pytz.timezone("Europe/Paris")).strftime("%H:%M")
-            message_bot = f"🕒 Il est **{heure}** à Paris."
+elif "merci" in question:
+    message_bot = "Avec plaisir 💙 ! N’hésitez pas à me solliciter dès que vous avez besoin."
 
-        # Date
-        elif "date" in question:
-            date = datetime.now(pytz.timezone("Europe/Paris")).strftime("%A %d %B %Y")
-            message_bot = f"📅 Aujourd’hui, nous sommes le **{date}**."
+elif "tu es qui" in question:
+    message_bot = "Je suis AVA, votre copilote boursier personnel 🤖. J’analyse les marchés pour vous guider au mieux !"
 
-        # Météo fictive
-        elif "météo" in question:
-            message_bot = "🌤 Je ne suis pas encore connectée à la météo réelle... mais je sens qu’il fait **beau pour investir** aujourd’hui !"
+# --- Analyse technique
+elif any(mot in question for mot in ["analyse", "avis", "penses", "analyse technique"]):
+    message_bot = f"🔍 Mon analyse technique pour **{ticker}** :\n\n" + analyse_signaux(df)
 
-        # Blague
-        elif "blague" in question:
-            message_bot = "Pourquoi les traders utilisent-ils toujours Google ? Parce qu’ils veulent toujours être dans la tendance ! 📉😄"
+# --- Heure
+elif "heure" in question:
+    heure = datetime.now(pytz.timezone("Europe/Paris")).strftime("%H:%M")
+    message_bot = f"🕒 Il est **{heure}** à Paris."
 
-        # Motivation
-        elif any(mot in question for mot in ["motivation", "fatigué", "booster", "démotivé"]):
-            message_bot = "💪 Même les marchés consolident parfois. Reprenez des forces, la prochaine bougie verte est peut-être pour vous 🚀."
+# --- Date
+elif "date" in question:
+    date = datetime.now(pytz.timezone("Europe/Paris")).strftime("%A %d %B %Y")
+    message_bot = f"📅 Aujourd’hui, nous sommes le **{date}**."
 
-        # Punchline futuriste
-        elif any(mot in question for mot in ["punchline", "avenir", "vision", "futur"]):
-            message_bot = "🔮 Mon IA scrute les lignes de code et de tendance... Je ne prédis pas l’avenir, je l’**analyse** 📊✨."
+# --- Météo fictive
+elif "météo" in question:
+    message_bot = "🌤 Je ne suis pas encore connectée à la météo réelle... mais je sens qu’il fait **beau pour investir** aujourd’hui !"
 
-        # Salutations
-        elif "bonjour" in question or "salut" in question:
-            message_bot = "Bonjour 👋 ! Je suis ravie de vous retrouver. Une question sur les marchés ? Ou juste envie de discuter ? 😊"
+# --- Blague
+elif "blague" in question:
+    message_bot = "Pourquoi les traders utilisent-ils toujours Google ? Parce qu’ils veulent toujours être dans la tendance ! 📉😄"
 
-        elif "merci" in question:
-            message_bot = "Avec plaisir 💙 ! N’hésitez pas à me solliciter dès que vous avez besoin."
+# --- Motivation
+elif any(mot in question for mot in ["motivation", "fatigué", "booster", "démotivé"]):
+    message_bot = "💪 Même les marchés consolident parfois. Reprenez des forces, la prochaine bougie verte est peut-être pour vous 🚀."
 
-        elif "tu es qui" in question:
-            message_bot = "Je suis AVA, votre copilote boursier personnel 🤖. J’analyse les marchés pour vous guider au mieux !"
+# --- Punchline futuriste
+elif any(mot in question for mot in ["punchline", "avenir", "vision", "futur"]):
+    message_bot = "🔮 Mon IA scrute les lignes de code et de tendance... Je ne prédis pas l’avenir, je l’**analyse** 📊✨."
 
-        else:
-            message_bot = "Je n’ai pas encore appris à répondre à cela… Essayez avec *analyse technique*, *heure*, *blague*, ou *météo* 🌍"
-    else:
-        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {ticker}. Pensez à lancer le script d'entraînement."
+# --- Par défaut
+else:
+    message_bot = "Je n’ai pas encore appris à répondre à cela… Essayez avec *analyse technique*, *heure*, *blague*, ou *météo* 🌍"
 
-    # Ajout dans l'historique
+    # Ajout à l’historique
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
 
 # Affichage de l'historique
 for auteur, message in st.session_state.historique:
     with st.chat_message(auteur):
-        st.markdown(message)
+        st.markdown(message) 
