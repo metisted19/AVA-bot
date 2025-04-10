@@ -53,6 +53,10 @@ Votre assistante boursière digitale. Posez-moi une question sur les marchés, o
 # --- Initialisation de l'historique ---
 if "historique" not in st.session_state:
     st.session_state.historique = []
+# --- Bouton pour effacer la conversation ---
+if st.button("🗑️ Effacer la conversation"):
+    st.session_state.historique = []
+    st.experimental_rerun()
 
 # --- Sélecteur de ticker (pour réponses adaptées) ---
 ticker = st.selectbox("📌 Choisissez un actif :", ["AAPL", "TSLA", "BTC", "ETH"])
