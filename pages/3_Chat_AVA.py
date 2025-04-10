@@ -32,7 +32,7 @@ def get_general_news():
         headlines = newsapi.get_top_headlines(language="fr", country="fr", page_size=3)
         print("📰 Articles récupérés :")
         for article in headlines["articles"]:
-        print("-", article["title"])
+            print("-", article["title"])
     except Exception as e:
         print("❌ Erreur :", e)
 
