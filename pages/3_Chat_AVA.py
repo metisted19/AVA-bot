@@ -111,10 +111,11 @@ if user_input:
     elif "salut" in question or "bonjour" in question:
         message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        # --- Analyse technique ---
+    # --- Analyse technique ---
     elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
+        from utils.analyse_technique import analyse_signaux
         nom_ticker = question.replace(" ", "").replace("-", "")
-        
+
         if "btc" in nom_ticker:
             nom_ticker = "btc-usd"
         elif "eth" in nom_ticker:
@@ -126,20 +127,21 @@ if user_input:
         elif "googl" in nom_ticker:
             nom_ticker = "googl"
 
-         data_path = f"data/donnees_{nom_ticker}.csv"
+        data_path = f"data/donnees_{nom_ticker}.csv"
 
-    if os.path.exists(data_path):
-        df = pd.read_csv(data_path)
-        suggestion = ""
-        if "rsi" in df.columns and df['rsi'].iloc[-1] < 30:
-            suggestion = "💡 Le RSI est bas, cela pourrait indiquer une opportunité d'achat."
-        elif "rsi" in df.columns and df['rsi'].iloc[-1] > 70:
-            suggestion = "⚠️ Le RSI est élevé, cela pourrait signaler une zone de surachat."
-        message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
-        if suggestion:
-            message_bot += f"\n\n{suggestion}"
-    else:
-        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement."
+        if os.path.exists(data_path):
+            df = pd.read_csv(data_path)
+            suggestion = ""
+            if "rsi" in df.columns and df['rsi'].iloc[-1] < 30:
+                suggestion = "💡 Le RSI est bas, cela pourrait indiquer une opportunité d'achat."
+            elif "rsi" in df.columns and df['rsi'].iloc[-1] > 70:
+                suggestion = "⚠️ Le RSI est élevé, cela pourrait signaler une zone de surachat."
+            message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
+            if suggestion:
+                message_bot += f"\n\n{suggestion}"
+        else:
+            message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement."
+
 
 # --- Réponse par défaut ---
 else:
