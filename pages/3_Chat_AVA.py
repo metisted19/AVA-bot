@@ -31,7 +31,7 @@ newsapi = NewsApiClient(api_key=API_KEY_NEWS)
 # --- Fonction pour récupérer les actualités ---
 def get_general_news():
     try:
-        headlines = newsapi.get_top_headlines(language="fr", country="fr", page_size=3)
+        headlines = newsapi.get_top_headlines(language="en", country="us", page_size=3)
         articles = headlines.get("articles", [])
 
         print("📰 Articles récupérés :")
