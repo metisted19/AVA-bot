@@ -111,9 +111,9 @@ if user_input:
     elif "salut" in question or "bonjour" in question:
         message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-    # --- Analyse technique automatique ---
-        elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
-             nom_ticker = question.replace(" ", "").replace("-", "")
+        # --- Analyse technique ---
+    elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
+        nom_ticker = question.replace(" ", "").replace("-", "")
         
         if "btc" in nom_ticker:
             nom_ticker = "btc-usd"
@@ -126,31 +126,30 @@ if user_input:
         elif "googl" in nom_ticker:
             nom_ticker = "googl"
 
+         data_path = f"data/donnees_{nom_ticker}.csv"
 
-        data_path = f"data/donnees_{nom_ticker}.csv"
-
-        if os.path.exists(data_path):
-            df = pd.read_csv(data_path)
-            suggestion = ""
-            if "rsi" in df.columns and df['rsi'].iloc[-1] < 30:
-                suggestion = "💡 Le RSI est bas, cela pourrait indiquer une opportunité d'achat."
-            elif "rsi" in df.columns and df['rsi'].iloc[-1] > 70:
-                suggestion = "⚠️ Le RSI est élevé, cela pourrait signaler une zone de surachat."
-            message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
-            if suggestion:
-                message_bot += f"\n\n{suggestion}"
-        else:
-            message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement."
-
-    # --- Réponse par défaut ---
+    if os.path.exists(data_path):
+        df = pd.read_csv(data_path)
+        suggestion = ""
+        if "rsi" in df.columns and df['rsi'].iloc[-1] < 30:
+            suggestion = "💡 Le RSI est bas, cela pourrait indiquer une opportunité d'achat."
+        elif "rsi" in df.columns and df['rsi'].iloc[-1] > 70:
+            suggestion = "⚠️ Le RSI est élevé, cela pourrait signaler une zone de surachat."
+        message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
+        if suggestion:
+            message_bot += f"\n\n{suggestion}"
     else:
-        message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités, la météo ou une analyse technique ! 😊"
+        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement."
 
-    # --- Ajout historique ---
-    st.session_state.historique.append(("🧑‍💻 Vous", user_input))
-    st.session_state.historique.append(("🤖 AVA", message_bot))
+# --- Réponse par défaut ---
+else:
+    message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités, la météo ou une analyse technique ! 😊"
 
-# --- Affichage historique ---
+# --- Historique ---
+st.session_state.historique.append(("🧑‍💻 Vous", user_input))
+st.session_state.historique.append(("🤖 AVA", message_bot))
+
+# --- Affichage de l'historique ---
 for auteur, message in st.session_state.historique:
     with st.chat_message(auteur):
         st.markdown(message)
