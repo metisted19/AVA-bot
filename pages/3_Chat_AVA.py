@@ -26,22 +26,25 @@ def get_meteo_ville(ville):
 print(get_meteo_ville("Paris"))
 
 
-# --- Fonction pour les actualités ---
-newsapi = NewsApiClient(api_key='681120bace124ee99d390cc059e6aca5')
+# --- Fonction pour récupérer les actualités ---
 def get_general_news():
     try:
-        top_headlines = newsapi.get_top_headlines(language="fr", country="fr", page_size=3)
-        print(top_headlines)    
-      
+        headlines = newsapi.get_top_headlines(
+            language="fr",
+            country="fr",
+            page_size=5
+        )
+
+        articles = headlines.get("articles", [])
         if articles:
-            news = []
+            news_list = []
             for article in articles:
                 titre = article.get("title", "Sans titre")
                 lien = article.get("url", "#")
-                news.append(f"🔹 [{titre}]({lien})")
-            return "\n\n".join(news)
+                news_list.append(f"🔹 [{titre}]({lien})")
+            return "\n\n".join(news_list)
         else:
-            return "❌ Aucune actualité trouvée pour aujourd’hui."
+            return "❌ Aucune actualité disponible pour le moment."
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
 
@@ -67,7 +70,8 @@ if user_input:
     message_bot = ""
 
     if "actualités" in question or "news" in question:
-        message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
+    message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
+
 
     elif "météo" in question or "quel temps" in question or "temps" in question:
         ville = "Paris"  # Ville par défaut
