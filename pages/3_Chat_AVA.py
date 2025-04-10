@@ -63,31 +63,45 @@ user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="cha
 
 ville_meteo = st.text_input("🏙️ Entrez une ville pour la météo :", "Paris", key="ville_input")
 
+# --- Traitement du message ---
 if user_input:
     question = user_input.lower().strip()
     message_bot = ""
 
+    # --- Actualités ---
     if "actualité" in question or "news" in question:
         message_bot = f"📰 Voici les actualités :\n\n{get_general_news()}"
 
-    elif "météo" in question or "quel temps" in question or "temps" in question:
-        message_bot = get_meteo_ville(ville_meteo)
+    # --- Météo ---
+    elif "météo" in question or "quel temps" in question:
+        ville_detectee = "Paris"
+        for mot in question.split():
+            if mot[0].isupper() and len(mot) > 2:
+                ville_detectee = mot
+        message_bot = get_meteo_ville(ville_detectee)
 
+    # --- Salutation ---
     elif "salut" in question or "bonjour" in question:
-        message_bot = f"Hello ! Ici AVA. {ticker} vous intéresse aujourd'hui ? Prête à analyser tout cela 💼"
+        message_bot = f"👋 Hello ! Je suis AVA. Besoin d’un conseil sur {ticker} ?"
 
-    elif "btc" in question or ticker == "BTC-USD":
-        message_bot = "🚀 Bitcoin est souvent imprévisible... mais j'aime ça. Vous voulez une analyse technique ?"
+    # --- Analyse automatique si le message parle d'un ticker connu ---
+    elif any(symb.lower() in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
+        from utils.analyse_technique import analyse_signaux
+        data_path = f"data/donnees_{ticker.lower()}.csv"
+        if os.path.exists(data_path):
+            df = pd.read_csv(data_path)
+            message_bot = f"📊 Analyse technique actuelle de **{ticker}** :\n\n" + analyse_signaux(df)
+        else:
+            message_bot = f"⚠️ Je n’ai pas trouvé les données pour {ticker}. Lancez le script d'entraînement avant."
 
-    elif ticker == "TSLA":
-        message_bot = "⚡ Tesla vibre entre innovation et volatilité. Une analyse technique vous tente ?"
-
+    # --- Réponse par défaut ---
     else:
         message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
 
-    # ✅ Ce bloc fait bien partie du `if user_input:` donc il est bien indenté
+    # --- Historique ---
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
+
 
 # --- Affichage historique ---
 for auteur, message in st.session_state.historique:
