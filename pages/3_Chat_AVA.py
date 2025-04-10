@@ -82,7 +82,7 @@ if st.button("🗑️ Effacer la conversation"):
     st.session_state.historique = []
     st.experimental_rerun()
 
-# --- Saisie ---
+# --- Saisie utilisateur ---
 user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
 if user_input:
@@ -91,7 +91,13 @@ if user_input:
 
     # --- Actualités ---
     if "actualité" in question or "news" in question:
-        message_bot = f"📰 Voici les actualités :\n\n{get_general_news()}"
+        actus = get_general_news()
+        if isinstance(actus, str):  # Cas d'erreur
+            message_bot = actus
+        elif actus:
+            message_bot = "📰 Voici les actualités :\n\n" + "\n\n".join(actus)
+        else:
+            message_bot = "❌ Aucune actualité disponible pour le moment."
 
     # --- Météo ---
     elif "météo" in question or "quel temps" in question:
@@ -105,9 +111,8 @@ if user_input:
     elif "salut" in question or "bonjour" in question:
         message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-    # --- Analyse automatique ---
-    elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
-        from utils.analyse_technique import analyse_signaux
+    # --- Analyse technique automatique ---
+        elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
         nom_ticker = question.replace(" ", "").replace("-", "")
         
         if "btc" in nom_ticker:
@@ -120,6 +125,7 @@ if user_input:
             nom_ticker = "tsla"
         elif "googl" in nom_ticker:
             nom_ticker = "googl"
+
 
         data_path = f"data/donnees_{nom_ticker}.csv"
 
@@ -140,6 +146,11 @@ if user_input:
     else:
         message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités, la météo ou une analyse technique ! 😊"
 
-    # --- Historique ---
+    # --- Ajout historique ---
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
+
+# --- Affichage historique ---
+for auteur, message in st.session_state.historique:
+    with st.chat_message(auteur):
+        st.markdown(message)
