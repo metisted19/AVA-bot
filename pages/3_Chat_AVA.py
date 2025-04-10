@@ -5,7 +5,7 @@ import pytz
 from newsapi import NewsApiClient
 
 # --- Clés API ---
-API_KEY_METEO = "681120bace124ee99d390cc059e6aca5P"
+API_KEY_METEO = "681120bace124ee99d390cc059e6aca5"
 API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"
 
 # --- Fonction pour la météo ---
