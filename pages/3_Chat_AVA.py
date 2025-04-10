@@ -110,13 +110,13 @@ elif any(symb.lower() in question for symb in ["aapl", "tsla", "googl", "btc", "
         else:
             message_bot = f"⚠️ Je n’ai pas trouvé les données pour {ticker}. Lancez le script d'entraînement avant."
 
-    # --- Réponse par défaut ---
-    else:
-        message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
+# --- Réponse par défaut ---
+else:
+    message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
 
-    # --- Historique ---
-    st.session_state.historique.append(("🧑‍💻 Vous", user_input))
-    st.session_state.historique.append(("🤖 AVA", message_bot))
+# --- Historique ---
+st.session_state.historique.append(("🧑‍💻 Vous", user_input))
+st.session_state.historique.append(("🤖 AVA", message_bot))
 
 
 # --- Affichage historique ---
