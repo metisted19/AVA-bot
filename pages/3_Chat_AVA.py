@@ -4,6 +4,7 @@ from datetime import datetime
 import pytz
 import requests
 
+
 # --- Clés API ---
 API_KEY_METEO = "TA_CLE_OPENWEATHERMAP"
 API_KEY_NEWS = "TA_CLE_NEWSAPI"
@@ -42,41 +43,6 @@ def get_general_news():
             return "❌ Impossible de récupérer les actualités du jour."
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
-
-
-
-# Fonction pour récupérer la météo
-API_KEY = 'ton_api_key_ici'  # Remplace par ta clé API OpenWeatherMap
-
-# Fonction pour récupérer la météo
-API_KEY = 'ton_api_key_ici'  # Remplace par ta clé API OpenWeatherMap
-
-# Fonction pour récupérer la météo
-API_KEY = 'ton_api_key_ici'  # Remplace par ta clé API OpenWeatherMap
-
-# Fonction pour récupérer la météo
-API_KEY = 'ton_api_key_ici'  # Remplace par ta clé API OpenWeatherMap
-
-def get_meteo_ville(ville):
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY}&units=metric&lang=fr'
-    try:
-        response = requests.get(url)
-        data = response.json()
-
-        # Ajouter un débogage pour afficher les données retournées
-        print(data)  # Ajoute ceci pour voir la réponse brute
-
-        if data['cod'] == 200:
-            temp = data['main']['temp']
-            description = data['weather'][0]['description']
-            return f"🌤 La température à {ville} est de {temp}°C avec {description}."
-        else:
-            # Utiliser des guillemets doubles pour éviter le conflit avec l'apostrophe
-            return f"❌ Impossible de récupérer la météo pour {ville}. Code erreur : {data['cod']} - {data.get('message', 'Aucune information sur l\'erreur.')}"
-    except Exception as e:
-        return f"Erreur lors de la récupération des données météo : {e}"
-
-
 
 
 # Configuration de la page
