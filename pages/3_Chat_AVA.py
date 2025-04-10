@@ -5,7 +5,7 @@ import pytz
 from newsapi import NewsApiClient
 
 # --- Clés API ---
-API_KEY_METEO = "ta_clé_météo_openweathermap_ici"
+API_KEY_METEO = "26b32c230513505762cb096f4d05b0cc"
 API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"  # ta clé NewsAPI actuelle
 
 
@@ -27,7 +27,7 @@ def get_meteo_ville(ville):
         return f"❌ Erreur réseau lors de la récupération météo : {e}"
 
 # --- Fonction pour les actualités ---
-newsapi = NewsApiClient(api_key=API_KEY_NEWS)
+newsapi = NewsApiClient(api_key='681120bace124ee99d390cc059e6aca5')
 def get_general_news():
     try:
         top_headlines = newsapi.get_top_headlines(
