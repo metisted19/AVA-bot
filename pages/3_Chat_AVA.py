@@ -29,11 +29,10 @@ print(get_meteo_ville("Paris"))
 # --- Fonction pour récupérer les actualités ---
 def get_general_news():
     try:
-        headlines = newsapi.get_top_headlines(
-            language="fr",
-            country="fr",
-            page_size=5
-        )
+        headlines = newsapi.get_top_headlines(language="fr", country="fr", page_size=3)
+    print(headlines)
+         except Exception as e:
+    print("Erreur :", e)
 
         articles = headlines.get("articles", [])
         if articles:
