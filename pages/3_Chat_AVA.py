@@ -2,12 +2,10 @@ import streamlit as st
 import requests
 from datetime import datetime
 import pytz
-import requests
 
-
+# --- Clés API ---
 API_KEY_METEO = "ta_cle_openweathermap"  # Remplace par ta vraie clé
 API_KEY_NEWS = "ta_cle_newsapi"  # Remplace par ta vraie clé
-
 
 # --- Fonction pour la météo ---
 def get_meteo_ville(ville):
@@ -15,6 +13,10 @@ def get_meteo_ville(ville):
     try:
         response = requests.get(url)
         data = response.json()
+        
+        # Afficher la réponse brute pour débogage
+        print(data)  # Ajoute ceci pour voir la réponse brute
+
         if data['cod'] == 200:
             temp = data['main']['temp']
             description = data['weather'][0]['description']
@@ -26,13 +28,16 @@ def get_meteo_ville(ville):
     except Exception as e:
         return f"❌ Erreur réseau lors de la récupération météo : {e}"
 
-
 # --- Fonction pour les actualités ---
 def get_general_news():
     url = f"https://newsapi.org/v2/top-headlines?country=fr&apiKey={API_KEY_NEWS}"
     try:
         response = requests.get(url)
         data = response.json()
+
+        # Afficher la réponse brute pour débogage
+        print(data)  # Ajoute ceci pour voir la réponse brute
+
         if data["status"] == "ok" and data["totalResults"] > 0:
             news = []
             for article in data["articles"][:5]:
@@ -44,8 +49,6 @@ def get_general_news():
             return "❌ Impossible de récupérer les actualités du jour."
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
-
-print(data)  # Affiche la réponse brute de l'API pour la météo ou les actualités
 
 # Configuration de la page
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -91,4 +94,5 @@ if st.session_state.historique:
     for auteur, message in st.session_state.historique:
         with st.chat_message(auteur):
             st.markdown(message)
+
 
