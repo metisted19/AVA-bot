@@ -4,8 +4,9 @@ from datetime import datetime
 import pytz
 from newsapi import NewsApiClient
 
-# Init
-newsapi = NewsApiClient(api_key="681120bace124ee99d390cc059e6aca5")
+# --- Clés API ---
+API_KEY_METEO = "681120bace124ee99d390cc059e6aca5P"
+API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"
 
 def get_general_news():
     try:
