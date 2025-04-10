@@ -119,5 +119,6 @@ if user_input:
 
 # --- Affichage historique ---
 for auteur, message in st.session_state.historique:
-    with st.chat_message(auteur):
+    role = "user" if "🧑‍💻" in auteur else "assistant"
+    with st.chat_message(role):
         st.markdown(message)
