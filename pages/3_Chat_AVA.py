@@ -9,14 +9,10 @@ API_KEY_NEWS = "ta_cle_newsapi"  # Remplace par ta vraie clé
 
 # --- Fonction pour la météo ---
 def get_meteo_ville(ville):
-    url = f"http://api.openweathermap.org/data/2.5/weather?q=Paris&appid=ta_nouvelle_cle_obtenue&units=metric&lang=fr"
-
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
     try:
         response = requests.get(url)
         data = response.json()
-        
-        # Afficher la réponse brute pour débogage
-        print(data)  # Ajoute ceci pour voir la réponse brute
 
         if data['cod'] == 200:
             temp = data['main']['temp']
@@ -28,6 +24,7 @@ def get_meteo_ville(ville):
             return f"❌ Impossible d'obtenir la météo pour {ville}.\nCode : {code} - Message : {msg}"
     except Exception as e:
         return f"❌ Erreur réseau lors de la récupération météo : {e}"
+
 
 # --- Fonction pour les actualités ---
 def get_general_news():
