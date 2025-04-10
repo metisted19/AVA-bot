@@ -48,6 +48,7 @@ def get_general_news():
             return "\n\n".join(news_list)
         else:
             return "❌ Aucune actualité disponible pour le moment."
+
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
 
