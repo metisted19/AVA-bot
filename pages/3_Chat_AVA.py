@@ -21,8 +21,9 @@ def get_meteo_ville(ville):
             return f"🌤 La température à {ville} est de {temp}°C avec {description}."
         else:
             # Utiliser des guillemets doubles pour éviter le conflit avec l'apostrophe
-            return " ❌ Impossible de récupérer la météo pour " + ville + ". Code erreur : " + str(data['cod']) + " - " + str(data.get('message', 'Aucune information sur l\'erreur.'))
+            return " ❌ Impossible de récupérer la météo pour " + ville + ". Code erreur : " + str(data['cod']) + " - " + str(data.get('message', "Aucune information sur l'erreur.")))
 
+        
 
 
     except Exception as e:
