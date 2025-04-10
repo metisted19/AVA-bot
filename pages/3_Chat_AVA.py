@@ -4,17 +4,38 @@ from datetime import datetime
 import pytz
 from newsapi import NewsApiClient
 
-# Init
-newsapi = NewsApiClient(api_key="681120bace124ee99d390cc059e6aca5")
+# --- CLÉS API ---
+API_KEY_METEO = "681120bace124ee99d390cc059e6aca5"  # Remplace par ta vraie clé
+API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"  # Clé NewsAPI
 
+# --- Initialisation client NewsAPI ---
+newsapi = NewsApiClient(api_key=API_KEY_NEWS)
+
+# --- Fonction Météo ---
+def get_meteo_ville(ville):
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data['cod'] == 200:
+            temp = data['main']['temp']
+            description = data['weather'][0]['description']
+            return f"🌤 Il fait {temp}°C à {ville} avec {description}."
+        else:
+            code = data.get('cod', '❓')
+            msg = data.get('message', 'Erreur inconnue')
+            return f"❌ Impossible d'obtenir la météo pour {ville}.\nCode : {code} - Message : {msg}"
+    except Exception as e:
+        return f"❌ Erreur lors de la récupération météo : {e}"
+
+# --- Fonction Actualités ---
 def get_general_news():
     try:
         top_headlines = newsapi.get_top_headlines(
             language="fr",
             country="fr",
-            page_size=5  # Limite à 5 articles
+            page_size=5
         )
-
         articles = top_headlines["articles"]
         if articles:
             news = []
@@ -28,31 +49,7 @@ def get_general_news():
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
 
-
-
-# --- Fonction pour les actualités ---
-def get_general_news():
-    url = f"https://newsapi.org/v2/top-headlines?country=fr&apiKey={API_KEY_NEWS}"
-    try:
-        response = requests.get(url)
-        data = response.json()
-
-        # Afficher la réponse brute pour débogage
-        print(data)  # Ajoute ceci pour voir la réponse brute
-
-        if data["status"] == "ok" and data["totalResults"] > 0:
-            news = []
-            for article in data["articles"][:5]:
-                titre = article.get("title", "Sans titre")
-                lien = article.get("url", "#")
-                news.append(f"🔹 [{titre}]({lien})")
-            return "\n\n".join(news)
-        else:
-            return "❌ Impossible de récupérer les actualités du jour."
-    except Exception as e:
-        return f"❌ Erreur lors de la récupération des actualités : {e}"
-
-# Configuration de la page
+# --- Configuration de la page ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
 st.title("💬 Bienvenue dans l'espace conversationnel d'AVA")
 st.image("ava_logo.png", width=100)
@@ -61,40 +58,32 @@ st.markdown("""
 Votre assistante boursière digitale. Posez-moi une question sur les marchés, ou parlez-moi de tout et de rien 😄
 """)
 
-# Zone d'historique du chat
+# --- Historique du chat ---
 if "historique" not in st.session_state:
     st.session_state.historique = []
 
-# Champ de saisie utilisateur
+# --- Saisie utilisateur ---
 user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
-# Traitement du message
+# --- Traitement du message ---
 if user_input:
-    question = user_input.lower().strip()  # Normaliser la question de l'utilisateur
-    message_bot = ""  # Initialiser la réponse du bot
+    question = user_input.lower().strip()
+    message_bot = ""
 
-    # Vérification des conditions d'entrée de l'utilisateur pour répondre avec les actualités
-    if "actualités du jour" in question or "news" in question:
+    if "actualité" in question or "news" in question:
         message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
-    
-    # Vérification des conditions d'entrée de l'utilisateur pour la météo
+
     elif "météo" in question or "quel temps" in question or "temps" in question:
-        ville = "Paris"  # Ville par défaut, tu pourrais demander à l'utilisateur d'entrer une ville
-        meteo = get_meteo_ville(ville)
-        message_bot = meteo
+        ville = "Paris"  # Valeur par défaut
+        message_bot = get_meteo_ville(ville)
 
     else:
-        # Si la question ne correspond à rien de spécifique, on renvoie un message par défaut
         message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
 
-    # Ajout à l'historique des messages
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
 
-# Affichage de l'historique
-if st.session_state.historique:
-    for auteur, message in st.session_state.historique:
-        with st.chat_message(auteur):
-            st.markdown(message)
-
-
+# --- Affichage de l'historique ---
+for auteur, message in st.session_state.historique:
+    with st.chat_message(auteur):
+        st.markdown(message)
