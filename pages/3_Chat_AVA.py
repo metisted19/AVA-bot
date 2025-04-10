@@ -25,6 +25,8 @@ def get_meteo_ville(ville):
 # Test
 print(get_meteo_ville("Paris"))
 
+# --- Initialisation ---
+newsapi = NewsApiClient(api_key=API_KEY_NEWS)
 
 # --- Fonction pour récupérer les actualités ---
 def get_general_news():
