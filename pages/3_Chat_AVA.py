@@ -95,7 +95,7 @@ if user_input:
         if isinstance(actus, str):  # Cas d'erreur
             message_bot = actus
         elif actus:
-            message_bot = "📰 Voici les actualités :\n\n" + "\n\n".join(actus)
+            message_bot = "📰 Voici les actualités :\n\n" + "\n\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
         else:
             message_bot = "❌ Aucune actualité disponible pour le moment."
 
