@@ -86,29 +86,28 @@ if user_input:
         message_bot = f"👋 Hello ! Je suis AVA. Besoin d’un conseil sur {ticker} ?"
 
 # --- Analyse automatique si le message parle d'un ticker connu ---
-elif any(symb.lower() in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
+elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
     from utils.analyse_technique import analyse_signaux
-    nom_ticker = ticker.lower()
-    
-    if nom_ticker == "btc":
+
+    nom_ticker = question.replace(" ", "").replace("-", "")
+    if "btc" in nom_ticker:
         nom_ticker = "btc-usd"
-    elif nom_ticker == "eth":
+    elif "eth" in nom_ticker:
         nom_ticker = "eth-usd"
+    elif "aapl" in nom_ticker:
+        nom_ticker = "aapl"
+    elif "tsla" in nom_ticker:
+        nom_ticker = "tsla"
+    elif "googl" in nom_ticker:
+        nom_ticker = "googl"
 
     data_path = f"data/donnees_{nom_ticker}.csv"
 
     if os.path.exists(data_path):
         df = pd.read_csv(data_path)
-        message_bot = f"📊 Voici mon analyse technique pour **{ticker.upper()}** :\n\n" + analyse_signaux(df)
+        message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
     else:
-        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {ticker.upper()}. Lancez le script d'entraînement avant."
-
-
-        if os.path.exists(data_path):
-            df = pd.read_csv(data_path)
-            message_bot = f"📊 Analyse technique actuelle de **{ticker}** :\n\n" + analyse_signaux(df)
-        else:
-            message_bot = f"⚠️ Je n’ai pas trouvé les données pour {ticker}. Lancez le script d'entraînement avant."
+        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement avant."
 
 # --- Réponse par défaut ---
 else:
