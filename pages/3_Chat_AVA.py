@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 import pytz
 from newsapi import NewsApiClient
+import os
 
 # --- Clés API ---
 API_KEY_METEO = "26b32c230513505762cb096f4d05b0cc"
