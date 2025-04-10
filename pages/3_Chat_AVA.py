@@ -5,9 +5,9 @@ import pytz
 import requests
 
 
-# --- Clés API ---
-API_KEY_METEO = "TA_CLE_OPENWEATHERMAP"
-API_KEY_NEWS = "TA_CLE_NEWSAPI"
+API_KEY_METEO = "ta_cle_openweathermap"  # Remplace par ta vraie clé
+API_KEY_NEWS = "ta_cle_newsapi"  # Remplace par ta vraie clé
+
 
 # --- Fonction pour la météo ---
 def get_meteo_ville(ville):
@@ -25,6 +25,7 @@ def get_meteo_ville(ville):
             return f"❌ Impossible d'obtenir la météo pour {ville}.\nCode : {code} - Message : {msg}"
     except Exception as e:
         return f"❌ Erreur réseau lors de la récupération météo : {e}"
+
 
 # --- Fonction pour les actualités ---
 def get_general_news():
@@ -44,6 +45,7 @@ def get_general_news():
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
 
+print(data)  # Affiche la réponse brute de l'API pour la météo ou les actualités
 
 # Configuration de la page
 st.set_page_config(page_title="Chat AVA", layout="centered")
