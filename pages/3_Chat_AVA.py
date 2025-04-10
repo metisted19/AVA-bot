@@ -31,25 +31,27 @@ newsapi = NewsApiClient(api_key=API_KEY_NEWS)
 # --- Fonction pour récupérer les actualités ---
 def get_general_news():
     try:
-        headlines = newsapi.get_top_headlines(language="en", country="us", page_size=3)
+        # 🇫🇷 Tentative en français
+        headlines = newsapi.get_top_headlines(language="fr", page_size=5)
+
+        # 🔁 Si aucun résultat, bascule vers 🇺🇸 anglais
+        if not headlines.get("articles"):
+            headlines = newsapi.get_top_headlines(language="en", country="us", page_size=5)
+
         articles = headlines.get("articles", [])
-
-        print("📰 Articles récupérés :")
-        if not articles:
-            print("Aucune actualité trouvée.")
+        if articles:
+            news_list = []
+            for article in articles:
+                titre = article.get("title", "Sans titre")
+                lien = article.get("url", "#")
+                news_list.append(f"🔹 [{titre}]({lien})")
+            return "\n\n".join(news_list)
+        else:
             return "❌ Aucune actualité disponible pour le moment."
-
-        news_list = []
-        for article in articles:
-            titre = article.get("title", "Sans titre")
-            lien = article.get("url", "#")
-            print("-", titre)  # Pour debug console
-            news_list.append(f"🔹 [{titre}]({lien})")
-
-        return "\n\n".join(news_list)
 
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
+
 
 
 
