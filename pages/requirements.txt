@@ -1,0 +1,8 @@
+streamlit
+pandas
+requests
+pytz
+newsapi-python
+scikit-learn
+xgboost
+yfinance
