@@ -8,7 +8,7 @@ API_KEY_METEO = "ta_nouvelle_cle_obtenue"  # Remplace par la vraie clé
 API_KEY_NEWS = "ta_cle_newsapi"  # Remplace par ta vraie clé
 
 # --- Fonction pour la météo ---
-def get_meteo_ville(ville):
+def get_meteo_ville(Paris):
     url = f"http://api.openweathermap.org/data/2.5/weather?q=Paris&appid=ta_nouvelle_cle_obtenue&units=metric&lang=fr"
 
     try:
