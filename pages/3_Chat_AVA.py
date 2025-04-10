@@ -30,12 +30,9 @@ print(get_meteo_ville("Paris"))
 newsapi = NewsApiClient(api_key='681120bace124ee99d390cc059e6aca5')
 def get_general_news():
     try:
-        top_headlines = newsapi.get_top_headlines(
-            language="fr",
-            country="fr",
-            page_size=5
-        )
-        articles = top_headlines.get("articles", [])
+        top_headlines = newsapi.get_top_headlines(language="fr", country="fr", page_size=3)
+        print(top_headlines)    
+      
         if articles:
             news = []
             for article in articles:
