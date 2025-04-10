@@ -113,7 +113,7 @@ if user_input:
 
     # --- Analyse technique automatique ---
         elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
-        nom_ticker = question.replace(" ", "").replace("-", "")
+             nom_ticker = question.replace(" ", "").replace("-", "")
         
         if "btc" in nom_ticker:
             nom_ticker = "btc-usd"
