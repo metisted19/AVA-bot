@@ -2,32 +2,47 @@ import streamlit as st
 import requests
 from datetime import datetime
 import pytz
+import requests
 
-# Fonction pour récupérer la météo
-API_KEY = 'ton_api_key_ici'  # Remplace par ta clé API OpenWeatherMap
+# --- Clés API ---
+API_KEY_METEO = "TA_CLE_OPENWEATHERMAP"
+API_KEY_NEWS = "TA_CLE_NEWSAPI"
 
+# --- Fonction pour la météo ---
 def get_meteo_ville(ville):
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY}&units=metric&lang=fr'
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
     try:
         response = requests.get(url)
         data = response.json()
-
-        # Ajouter un débogage pour afficher les données retournées
-        print(data)  # Ajoute ceci pour voir la réponse brute
-
-        if data["cod"] == 200:
-            temp = data["main"]["temp"]
-            description = data["weather"][0]["description"]
-            return f"🌤 La température à {ville} est de {temp}°C avec {description}."
+        if data['cod'] == 200:
+            temp = data['main']['temp']
+            description = data['weather'][0]['description']
+            return f"🌤 Il fait {temp}°C à {ville} avec {description}."
         else:
-            # Utiliser des guillemets doubles pour éviter le conflit avec l'apostrophe
-            return " ❌ Impossible de récupérer la météo pour " + ville + ". Code erreur : " + str(data['cod']) + " - " + str(data.get('message', "Aucune information sur l'erreur.")))
-
-        
-
-
+            code = data.get('cod', '❓')
+            msg = data.get('message', 'Erreur inconnue')
+            return f"❌ Impossible d'obtenir la météo pour {ville}.\nCode : {code} - Message : {msg}"
     except Exception as e:
-        return f"Erreur lors de la récupération des données météo : {e}"
+        return f"❌ Erreur réseau lors de la récupération météo : {e}"
+
+# --- Fonction pour les actualités ---
+def get_general_news():
+    url = f"https://newsapi.org/v2/top-headlines?country=fr&apiKey={API_KEY_NEWS}"
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data["status"] == "ok" and data["totalResults"] > 0:
+            news = []
+            for article in data["articles"][:5]:
+                titre = article.get("title", "Sans titre")
+                lien = article.get("url", "#")
+                news.append(f"🔹 [{titre}]({lien})")
+            return "\n\n".join(news)
+        else:
+            return "❌ Impossible de récupérer les actualités du jour."
+    except Exception as e:
+        return f"❌ Erreur lors de la récupération des actualités : {e}"
+
 
 
 # Fonction pour récupérer la météo
