@@ -35,8 +35,6 @@ def get_general_news():
         print("📰 Articles récupérés :")
         for article in headlines["articles"]:
             print("-", article["title"])
-    except Exception as e:
-        print("❌ Erreur :", e)
 
         articles = headlines.get("articles", [])
         if articles:
@@ -51,6 +49,7 @@ def get_general_news():
 
     except Exception as e:
         return f"❌ Erreur lors de la récupération des actualités : {e}"
+
 
 # --- Configuration de la page ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
