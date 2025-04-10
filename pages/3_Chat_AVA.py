@@ -2,28 +2,32 @@ import streamlit as st
 import requests
 from datetime import datetime
 import pytz
+from newsapi import NewsApiClient
 
-# --- Clés API ---
-API_KEY_METEO = "681120bace124ee99d390cc059e6aca5"
-API_KEY_NEWS = "ta_cle_newsapi"  # Remplace par ta vraie clé
+# Init
+newsapi = NewsApiClient(api_key="681120bace124ee99d390cc059e6aca5")
 
-# --- Fonction pour la météo ---
-def get_meteo_ville(ville):
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
+def get_general_news():
     try:
-        response = requests.get(url)
-        data = response.json()
+        top_headlines = newsapi.get_top_headlines(
+            language="fr",
+            country="fr",
+            page_size=5  # Limite à 5 articles
+        )
 
-        if data['cod'] == 200:
-            temp = data['main']['temp']
-            description = data['weather'][0]['description']
-            return f"🌤 Il fait {temp}°C à {ville} avec {description}."
+        articles = top_headlines["articles"]
+        if articles:
+            news = []
+            for article in articles:
+                titre = article.get("title", "Sans titre")
+                lien = article.get("url", "#")
+                news.append(f"🔹 [{titre}]({lien})")
+            return "\n\n".join(news)
         else:
-            code = data.get('cod', '❓')
-            msg = data.get('message', 'Erreur inconnue')
-            return f"❌ Impossible d'obtenir la météo pour {ville}.\nCode : {code} - Message : {msg}"
+            return "❌ Aucune actualité trouvée pour aujourd’hui."
     except Exception as e:
-        return f"❌ Erreur réseau lors de la récupération météo : {e}"
+        return f"❌ Erreur lors de la récupération des actualités : {e}"
+
 
 
 # --- Fonction pour les actualités ---
