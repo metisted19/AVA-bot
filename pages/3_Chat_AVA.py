@@ -9,7 +9,7 @@ API_KEY_NEWS = "ta_cle_newsapi"  # Remplace par ta vraie clé
 
 # --- Fonction pour la météo ---
 def get_meteo_ville(ville):
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
+   url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
     try:
         response = requests.get(url)
         data = response.json()
