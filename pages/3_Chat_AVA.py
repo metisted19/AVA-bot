@@ -85,38 +85,37 @@ if user_input:
     elif "salut" in question or "bonjour" in question:
         message_bot = f"👋 Hello ! Je suis AVA. Besoin d’un conseil sur {ticker} ?"
 
-# --- Analyse automatique si le message parle d'un ticker connu ---
-elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
-    from utils.analyse_technique import analyse_signaux
+    # --- Analyse automatique si le message parle d'un ticker connu ---
+    elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
+        from utils.analyse_technique import analyse_signaux
 
-    nom_ticker = question.replace(" ", "").replace("-", "")
-    if "btc" in nom_ticker:
-        nom_ticker = "btc-usd"
-    elif "eth" in nom_ticker:
-        nom_ticker = "eth-usd"
-    elif "aapl" in nom_ticker:
-        nom_ticker = "aapl"
-    elif "tsla" in nom_ticker:
-        nom_ticker = "tsla"
-    elif "googl" in nom_ticker:
-        nom_ticker = "googl"
+        nom_ticker = question.replace(" ", "").replace("-", "")
+        if "btc" in nom_ticker:
+            nom_ticker = "btc-usd"
+        elif "eth" in nom_ticker:
+            nom_ticker = "eth-usd"
+        elif "aapl" in nom_ticker:
+            nom_ticker = "aapl"
+        elif "tsla" in nom_ticker:
+            nom_ticker = "tsla"
+        elif "googl" in nom_ticker:
+            nom_ticker = "googl"
 
-    data_path = f"data/donnees_{nom_ticker}.csv"
+        data_path = f"data/donnees_{nom_ticker}.csv"
 
-    if os.path.exists(data_path):
-        df = pd.read_csv(data_path)
-        message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
+        if os.path.exists(data_path):
+            df = pd.read_csv(data_path)
+            message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
+        else:
+            message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement avant."
+
+    # --- Réponse par défaut ---
     else:
-        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement avant."
+        message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
 
-# --- Réponse par défaut ---
-else:
-    message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités ou la météo ! 😊"
-
-# --- Historique ---
-st.session_state.historique.append(("🧑‍💻 Vous", user_input))
-st.session_state.historique.append(("🤖 AVA", message_bot))
-
+    # --- Historique ---
+    st.session_state.historique.append(("🧑‍💻 Vous", user_input))
+    st.session_state.historique.append(("🤖 AVA", message_bot))
 
 # --- Affichage historique ---
 for auteur, message in st.session_state.historique:
