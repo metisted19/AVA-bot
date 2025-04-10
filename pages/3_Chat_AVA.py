@@ -9,22 +9,22 @@ API_KEY_METEO = "26b32c230513505762cb096f4d05b0cc"
 API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"  # ta clé NewsAPI actuelle
 
 
-# --- Fonction pour la météo ---
+
 def get_meteo_ville(ville):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
-    try:
-        response = requests.get(url)
-        data = response.json()
-        if data['cod'] == 200:
-            temp = data['main']['temp']
-            description = data['weather'][0]['description']
-            return f"🌤 Il fait {temp}°C à {ville} avec {description}."
-        else:
-            code = data.get('cod', '❓')
-            msg = data.get('message', 'Erreur inconnue')
-            return f"❌ Impossible d'obtenir la météo pour {ville}.\nCode : {code} - Message : {msg}"
-    except Exception as e:
-        return f"❌ Erreur réseau lors de la récupération météo : {e}"
+    response = requests.get(url)
+    data = response.json()
+    print(data)  # ➜ pour voir ce que l'API renvoie
+    if data['cod'] == 200:
+        temp = data['main']['temp']
+        description = data['weather'][0]['description']
+        return f"🌤 Il fait {temp}°C à {ville} avec {description}."
+    else:
+        return f"❌ Erreur météo : Code {data['cod']} - Message : {data.get('message', 'Erreur inconnue')}"
+
+# Test
+print(get_meteo_ville("Paris"))
+
 
 # --- Fonction pour les actualités ---
 newsapi = NewsApiClient(api_key='681120bace124ee99d390cc059e6aca5')
