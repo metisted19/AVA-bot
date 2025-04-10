@@ -71,7 +71,7 @@ if user_input:
     message_bot = ""
 
     if "actualités" in question or "news" in question:
-    message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
+        message_bot = f"📰 Voici les actualités générales du jour :\n\n{get_general_news()}"
 
 
     elif "météo" in question or "quel temps" in question or "temps" in question:
