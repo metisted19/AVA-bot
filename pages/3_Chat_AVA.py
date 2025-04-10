@@ -6,7 +6,7 @@ from newsapi import NewsApiClient
 
 # --- Clés API ---
 API_KEY_METEO = "681120bace124ee99d390cc059e6aca5"
-API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"
+API_KEY_NEWS = "ta_cle_newsapi"
 
 # --- Fonction pour la météo ---
 def get_meteo_ville(ville):
