@@ -5,8 +5,9 @@ import pytz
 from newsapi import NewsApiClient
 
 # --- Clés API ---
-API_KEY_METEO = "681120bace124ee99d390cc059e6aca5"
-API_KEY_NEWS = "ta_cle_newsapi"
+API_KEY_METEO = "ta_clé_météo_openweathermap_ici"
+API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"  # ta clé NewsAPI actuelle
+
 
 # --- Fonction pour la météo ---
 def get_meteo_ville(ville):
