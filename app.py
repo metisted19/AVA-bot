@@ -1,16 +1,15 @@
 import streamlit as st
-from streamlit.components.v1 import html
 from PIL import Image
-import base64
+from streamlit.components.v1 import html
 
-st.set_page_config(page_title="Bienvenue sur AVA", layout="wide")
+st.set_page_config(page_title="Bienvenue sur AVA", layout="centered")
 
-# --- CSS personnalisé pour fond nuit stylé ---
+# --- CSS pour fond et style ---
 st.markdown("""
     <style>
-        body, .stApp {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%) !important;
-            color: #ffffff !important;
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%);
+            color: #ffffff;
         }
         .title {
             text-align: center;
@@ -22,15 +21,14 @@ st.markdown("""
         }
         .subtitle {
             text-align: center;
-            font-size: 1.3em;
-            margin-bottom: 1rem;
+            font-size: 1.2em;
+            margin-bottom: 1.5rem;
             color: #d0d0d0;
         }
-        .description {
-            text-align: center;
-            font-size: 1.1em;
-            margin-top: -1rem;
-            color: #b0b0b0;
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
         }
         .button-container {
             display: flex;
@@ -42,7 +40,7 @@ st.markdown("""
             color: #000000;
             border: none;
             padding: 1rem 2.5rem;
-            font-size: 1.3em;
+            font-size: 1.2em;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 0 20px #00FFFF;
@@ -55,16 +53,20 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Logo AVA ---
-from PIL import Image
-logo = Image.open("assets/ava_logo.png")
-
-# --- Contenu principal ---
+# --- Contenu ---
 st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24 — toujours connectée, toujours prête 🤖</div>', unsafe_allow_html=True)
-st.markdown('<div class="description">Entrez dans une nouvelle ère d\'analyse intelligente. AVA vous accompagne avec précision et réactivité à chaque instant.</div>', unsafe_allow_html=True)
 
-# --- Bouton vers Dashboard ---
+# --- Logo centré ---
+try:
+    logo = Image.open("assets/ava_logo.png")
+    st.markdown('<div class="logo-container">', unsafe_allow_html=True)
+    st.image(logo, width=200)
+    st.markdown('</div>', unsafe_allow_html=True)
+except Exception as e:
+    st.error(f"Logo non trouvé : {e}")
+
+# --- Bouton vers le Dashboard ---
 html("""
     <div class="button-container">
         <a href="/Dashboard" target="_self">
@@ -73,5 +75,6 @@ html("""
     </div>
 """, height=100)
 
-# AVA est de retour en beauté 😎
+
+
 
