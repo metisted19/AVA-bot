@@ -1,61 +1,43 @@
-def analyse_signaux(df):
-    messages = []
+def analyser_signaux_techniques(data):
+    analyse = []
+    suggestion = ""
 
-    # Récupération des valeurs récentes
-    derniere_val = df.iloc[-1]
-    macd = derniere_val.get("macd")
-    signal_macd = derniere_val.get("macd_signal")
-    rsi = derniere_val.get("rsi")
-    bb_lower = derniere_val.get("bb_lower")
-    close = derniere_val.get("close")
-    adx = derniere_val.get("adx")
-    cci = derniere_val.get("cci")
-    williams_r = derniere_val.get("williams_r")
+    try:
+        rsi = data['RSI'].iloc[-1]
+        macd = data['MACD'].iloc[-1]
+        macd_signal = data['MACD_signal'].iloc[-1]
+        ema_20 = data['EMA_20'].iloc[-1]
+        sma_50 = data['SMA_50'].iloc[-1]
 
-    # Règles d'analyse combinée
-    if macd is not None and signal_macd is not None:
-        if macd > signal_macd:
-            messages.append("📈 Le MACD vient de croiser au-dessus de sa ligne de signal. Un regain d'élan haussier est possible.")
-        elif macd < signal_macd:
-            messages.append("📉 Le MACD est passé sous sa ligne de signal. Un essoufflement de la tendance pourrait se profiler.")
+        # Analyse technique brute
+        if rsi > 70:
+            analyse.append("RSI élevé : le marché pourrait être en situation de surachat.")
+        elif rsi < 30:
+            analyse.append("RSI faible : possible situation de survente.")
 
-    if rsi is not None:
-        if rsi < 30:
-            messages.append("🟢 Le RSI est en dessous de 30. L'actif semble survendu, un rebond pourrait survenir. Restez attentif.")
-        elif rsi > 70:
-            messages.append("🔴 Le RSI dépasse 70. Prudence, nous sommes peut-être en zone de surachat.")
+        if macd > macd_signal:
+            analyse.append("MACD au-dessus du signal : dynamique haussière.")
+        else:
+            analyse.append("MACD en dessous du signal : pression vendeuse.")
 
-    if close is not None and bb_lower is not None:
-        if close < bb_lower:
-            messages.append("📉 Le cours a franchi la bande inférieure de Bollinger. Cela pourrait signaler une opportunité à la hausse, si confirmé par d'autres indicateurs.")
+        if ema_20 > sma_50:
+            analyse.append("EMA 20 au-dessus de la SMA 50 : tendance haussière à court terme.")
+        else:
+            analyse.append("EMA 20 en dessous de la SMA 50 : tendance baissière à surveiller.")
 
-    if adx is not None:
-        if adx > 25:
-            messages.append("💪 L'ADX est au-dessus de 25. Cela renforce l’idée d’une tendance bien installée.")
-        elif adx < 20:
-            messages.append("😴 L'ADX est faible. Le marché est probablement en consolidation, sans direction forte.")
+        # Génération de la suggestion vivante
+        if rsi < 30 and macd < macd_signal:
+            suggestion = "C’est calme plat… trop calme. Le marché semble survendu, mais la tendance reste incertaine. Je garderais un œil attentif sans me précipiter."
+        elif macd > macd_signal and rsi < 70:
+            suggestion = "Des signaux haussiers apparaissent ! Si j’avais un portefeuille, j’irais peut-être gratter une opportunité d’achat discrète…"
+        elif rsi > 70 and macd < macd_signal:
+            suggestion = "Attention, surachat + perte de vitesse... Ça sent le piège des acheteurs trop confiants. Une pause s’impose."
+        else:
+            suggestion = "Analyse mitigée. Je reste prudente et j’observe encore un peu… Patience, c’est aussi une stratégie !"
 
-    if cci is not None:
-        if cci > 100:
-            messages.append("📈 Le CCI indique une zone de surachat. Peut-être un excès d’enthousiasme ?")
-        elif cci < -100:
-            messages.append("📉 Le CCI montre une zone de survente. Un retournement haussier pourrait s’esquisser.")
+    except Exception as e:
+        analyse.append("Impossible d'analyser les données : " + str(e))
+        suggestion = "Je ne peux pas vous guider sans données fiables. Essayez de recharger l’actif."
 
-    if williams_r is not None:
-        if williams_r < -80:
-            messages.append("🟢 Williams %R < -80. L’actif est profondément survendu.")
-        elif williams_r > -20:
-            messages.append("🔴 Williams %R > -20. L’actif est suracheté, vigilance.")
-
-    # Analyse combinée renforcée
-    if rsi is not None and macd is not None and signal_macd is not None:
-        if rsi < 30 and macd > signal_macd:
-            messages.append("🚀 Un signal puissant ! Le RSI bas combiné à un MACD haussier pourrait indiquer un excellent point d'entrée.")
-        elif rsi > 70 and macd < signal_macd:
-            messages.append("⚠️ Attention : RSI élevé et MACD baissier. Cela peut annoncer une correction à venir.")
-
-    if not messages:
-        return "🤔 Aucun signal clair détecté pour le moment. Restez concentré, les opportunités ne tarderont pas à se manifester."
-
-    return "\n\n".join(messages)
+    return "\n".join(analyse), suggestion
 
