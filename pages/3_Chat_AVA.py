@@ -106,6 +106,18 @@ if user_input:
             if mot[0].isupper() and len(mot) > 2:
                 ville_detectee = mot
         message_bot = get_meteo_ville(ville_detectee)
+        # --- Réponses simples pour échanges naturels ---
+    elif any(phrase in question for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
+        message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
+
+    elif any(phrase in question for phrase in ["quoi de neuf", "tu fais quoi", "des news"]):
+        message_bot = "Je scrute les marchés, je capte les tendances… une journée normale pour une IA boursière !"
+
+    elif any(phrase in question for phrase in ["t'es qui", "tu es qui", "t'es quoi", "tu es quoi"]):
+        message_bot = "Je suis AVA, votre assistante virtuelle boursière, météo, et bien plus. Disons... une alliée du futur."
+
+    elif any(phrase in question for phrase in ["tu dors", "t'es là", "tu es là"]):
+        message_bot = "Je ne dors jamais. Toujours connectée, toujours prête. Posez votre question !"
 
     # --- Salutations ---
     elif "salut" in question or "bonjour" in question:
@@ -152,6 +164,6 @@ st.session_state.historique.append(("🧑‍💻 Vous", user_input))
 st.session_state.historique.append(("🤖 AVA", message_bot))
 
 # --- Affichage de l'historique ---
-for auteur, message in st.session_state.historique:
+for auteur, message in st.session_state.historique:s=
     with st.chat_message(auteur):
         st.markdown(message)
