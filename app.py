@@ -1,54 +1,65 @@
 import streamlit as st
-import base64
+from PIL import Image
+import time
 
 # --- Configuration de la page ---
-st.set_page_config(page_title="Accueil AVA", layout="centered")
+st.set_page_config(page_title="Bienvenue sur AVA", layout="centered")
 
-# --- Image logo centrée ---
-st.image("ava_logo.png", width=150)
+# --- Logo ---
+logo = Image.open("ava_logo.png")
+st.image(logo, width=150)
 
-# --- Titre stylé ---
+# --- Titre stylisé ---
 st.markdown("""
-    <h1 style='text-align: center; font-size: 3em; color: #6C63FF;'>Bienvenue sur AVA</h1>
-    <p style='text-align: center; font-size: 1.2em;'>L'intelligence artificielle boursière autonome, à votre service 24h/24.</p>
+<style>
+.big-title {
+    font-size: 36px;
+    text-align: center;
+    font-weight: bold;
+    color: #10a37f;
+    margin-bottom: 20px;
+}
+.subtext {
+    text-align: center;
+    font-size: 20px;
+    color: #999;
+    margin-bottom: 40px;
+}
+.button-style {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+.stButton>button {
+    font-size: 18px !important;
+    padding: 0.6em 1.5em !important;
+    border-radius: 12px !important;
+}
+</style>
 """, unsafe_allow_html=True)
 
-# --- Animation d'intro (texte déroulant ou effet cool) ---
-st.markdown("""
-    <style>
-    .fade-in {
-        animation: fadeIn 2s ease-in;
-    }
-    @keyframes fadeIn {
-        0% {opacity: 0;}
-        100% {opacity: 1;}
-    }
-    </style>
-    <div class="fade-in" style='text-align: center; padding: 30px;'>
-        <p style='font-size: 1.1em;'>Prédictions, analyses techniques, actualités, météo... AVA ne dort jamais.</p>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown("<div class='big-title'>Bienvenue sur AVA</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtext'>L'intelligence artificielle boursière autonome, évolutive et prête à vous guider.</div>", unsafe_allow_html=True)
 
-# --- Boutons vers les fonctionnalités ---
-st.markdown("""
-    <div style='text-align: center;'>
-        <a href='/1_Dashboard' style='text-decoration: none;'>
-            <button style='margin: 10px; padding: 10px 25px; font-size: 1em; border-radius: 12px; background-color: #6C63FF; color: white; border: none;'>📈 Dashboard</button>
-        </a>
-        <a href='/2_Signaux' style='text-decoration: none;'>
-            <button style='margin: 10px; padding: 10px 25px; font-size: 1em; border-radius: 12px; background-color: #6C63FF; color: white; border: none;'>📊 Signaux</button>
-        </a>
-        <a href='/3_Chat_AVA' style='text-decoration: none;'>
-            <button style='margin: 10px; padding: 10px 25px; font-size: 1em; border-radius: 12px; background-color: #6C63FF; color: white; border: none;'>💬 Chat AVA</button>
-        </a>
-    </div>
-""", unsafe_allow_html=True)
+# --- Boutons de navigation ---
+st.markdown("<div class='button-style'>", unsafe_allow_html=True)
+col1, col2 = st.columns(2, gap="large")
 
-# --- Footer ---
+with col1:
+    if st.button("💬 Accéder au Chat"):
+        st.switch_page("pages/3_Chat_AVA.py")
+
+with col2:
+    if st.button("📈 Ouvrir le Dashboard"):
+        st.switch_page("pages/1_Dashboard.py")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# --- Bas de page ---
 st.markdown("""
-    <hr>
-    <p style='text-align: center; font-size: 0.8em; color: gray;'>© 2025 AVA Technologies. Projet de Teddy & ChatGPT 🤖</p>
-""", unsafe_allow_html=True)
+---
+<center><sub>Développé avec ❤️ par Teddy & AVA</sub></center>
+""")
 
 
 
