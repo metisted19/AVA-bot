@@ -4,10 +4,10 @@ from streamlit.components.v1 import html
 
 st.set_page_config(page_title="Bienvenue sur AVA", layout="centered")
 
-# --- CSS pour fond et style ---
+# --- CSS pour fond et style AVA ---
 st.markdown("""
     <style>
-        body {
+        .stApp {
             background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%);
             color: #ffffff;
         }
@@ -53,7 +53,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Contenu ---
+# --- Titre et sous-titre ---
 st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24 — toujours connectée, toujours prête 🤖</div>', unsafe_allow_html=True)
 
@@ -66,7 +66,7 @@ try:
 except Exception as e:
     st.error(f"Logo non trouvé : {e}")
 
-# --- Bouton vers le Dashboard ---
+# --- Bouton vers Dashboard ---
 html("""
     <div class="button-container">
         <a href="/Dashboard" target="_self">
@@ -74,6 +74,7 @@ html("""
         </a>
     </div>
 """, height=100)
+
 
 
 
