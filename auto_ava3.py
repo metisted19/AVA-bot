@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score
 import xgboost as xgb
 
 # --- TICKERS À TRAITER ---
-tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
+tickers = ["aapl", "tsla", "googl", "btc-usd", "eth-usd", "^fchi"]
 
 # --- CHEMINS DE SAUVEGARDE ---
 os.makedirs("data", exist_ok=True)
