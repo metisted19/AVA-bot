@@ -83,7 +83,7 @@ if st.button("🗑️ Effacer la conversation"):
     st.experimental_rerun()
 
 # --- Saisie utilisateur ---
-user_input = st.text_input("🧠 Que souhaitez-vous demander à AVA ?", key="chat_input")
+user_input = st.text_input("🧐 Que souhaitez-vous demander à AVA ?", key="chat_input")
 
 if user_input:
     question = user_input.lower().strip()
@@ -92,7 +92,7 @@ if user_input:
     # --- Actualités ---
     if "actualité" in question or "news" in question:
         actus = get_general_news()
-        if isinstance(actus, str):  # Cas d'erreur
+        if isinstance(actus, str):
             message_bot = actus
         elif actus:
             message_bot = "📰 Voici les actualités :\n\n" + "\n\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
@@ -107,7 +107,7 @@ if user_input:
                 ville_detectee = mot
         message_bot = get_meteo_ville(ville_detectee)
 
-    # --- Réponses simples pour échanges naturels ---
+    # --- Réponses simples ---
     elif any(phrase in question for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
         message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
 
@@ -126,7 +126,6 @@ if user_input:
 
     # --- Analyse technique ---
     elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
-        from utils.analyse_technique import analyse_signaux
         nom_ticker = question.replace(" ", "").replace("-", "")
 
         if "btc" in nom_ticker:
@@ -155,16 +154,16 @@ if user_input:
         else:
             message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement."
 
+    # --- Réponse par défaut ---
+    else:
+        message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités, la météo ou une analyse technique ! 😊"
 
-# --- Réponse par défaut ---
-else:
-    message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités, la météo ou une analyse technique ! 😊"
-
-# --- Historique ---
-st.session_state.historique.append(("🧑‍💻 Vous", user_input))
-st.session_state.historique.append(("🤖 AVA", message_bot))
+    # --- Historique ---
+    st.session_state.historique.append(("🧑‍💻 Vous", user_input))
+    st.session_state.historique.append(("🤖 AVA", message_bot))
 
 # --- Affichage de l'historique ---
-for auteur, message in st.session_state.historique:s=
+for auteur, message in st.session_state.historique:
     with st.chat_message(auteur):
         st.markdown(message)
+
