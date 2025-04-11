@@ -6,6 +6,7 @@ from utils.analyse_technique import analyse_signaux
 import pandas as pd
 import requests
 import streamlit as st
+from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 
 # --- Clés API ---
 API_KEY_METEO = "26b32c230513505762cb096f4d05b0cc"
