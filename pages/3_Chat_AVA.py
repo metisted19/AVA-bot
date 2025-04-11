@@ -1,42 +1,28 @@
 import streamlit as st
 import os
 import pandas as pd
+import yfinance as yf
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 
+# Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
 st.title("🤖 AVA - Chat IA")
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
-# --- Fonction d'analyse de sentiment ---
-def analyser_sentiment(news_list):
-    mots_positifs = ["progress", "gain", "rise", "success", "growth"]
-    mots_negatifs = ["fall", "loss", "drop", "crash", "recession"]
-    score = 0
-    for titre, _ in news_list:
-        titre = titre.lower()
-        score += sum(1 for mot in mots_positifs if mot in titre)
-        score -= sum(1 for mot in mots_negatifs if mot in titre)
-    if score > 1:
-        return "🟢 Le sentiment global du marché est **positif**."
-    elif score < -1:
-        return "🔴 Le sentiment global du marché est **négatif**."
-    else:
-        return "🟡 Le sentiment global du marché est **neutre**."
-
-# --- Initialisation du chat si vide ---
+# Initialisation du chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- Affichage de l'historique des échanges ---
+# Affichage de l'historique des messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# --- Saisie utilisateur ---
+# Saisie utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
 if question:
@@ -106,27 +92,40 @@ if question:
                         break
 
                 data_path = f"data/donnees_{nom_ticker}.csv"
+
+                if not os.path.exists(data_path):
+                    try:
+                        df = yf.download(nom_ticker, period="6mo", interval="1d")
+                        df.to_csv(data_path)
+                    except Exception as e:
+                        message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
+
                 if os.path.exists(data_path):
                     df = pd.read_csv(data_path)
-                    df = ajouter_indicateurs_techniques(df)
-                    try:
-                        analyse, suggestion = analyser_signaux_techniques(df)
-                        message_bot = (
-                            f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
-                            f"{analyse}\n\n"
-                            f"🤖 *Mon intuition d'IA ?* {suggestion}"
-                        )
-                    except Exception as e:
-                        message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+                    if "Close" in df.columns:
+                        df = ajouter_indicateurs_techniques(df)
+                        try:
+                            analyse, suggestion = analyser_signaux_techniques(df)
+                            message_bot = (
+                                f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                                f"{analyse}\n\n"
+                                f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                            )
+                        except Exception as e:
+                            message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+                    else:
+                        message_bot = f"⚠️ Le fichier de données ne contient pas de colonne 'Close'."
                 else:
-                    message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
+                    message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
 
-            # --- Réponse générale ---
-            else:
-                message_bot = obtenir_reponse_ava(question)
+else:
+    message_bot = obtenir_reponse_ava(question)
 
-            st.markdown(message_bot)
-            st.session_state.messages.append({"role": "assistant", "content": message_bot})
+# Sécurise l’affichage
+if message_bot:
+    st.markdown(message_bot)
+    st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-# --- Effacer uniquement les messages du chat ---
+
+# Bouton pour effacer les messages uniquement
 st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
