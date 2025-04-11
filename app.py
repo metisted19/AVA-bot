@@ -7,22 +7,33 @@ st.set_page_config(page_title="Bienvenue sur AVA", layout="wide")
 st.markdown("""
     <style>
         html, body, [class*="css"]  {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%) !important;
+            background: linear-gradient(135deg, #0a0a0a, #1e1e1e) !important;
             color: white !important;
         }
         .title {
             text-align: center;
-            font-size: 4em;
+            font-size: 3.5em;
             font-weight: bold;
-            margin-top: 4rem;
+            margin-top: 2rem;
             color: #00FFFF;
             text-shadow: 0 0 20px #00FFFF;
         }
         .subtitle {
             text-align: center;
             font-size: 1.4em;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             color: #CCCCCC;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .logo-container img {
+            width: 220px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 0 25px #00FFFF;
         }
         .button-container {
             display: flex;
@@ -51,6 +62,9 @@ st.markdown("""
 st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24 — toujours connectée, toujours prête 🤖</div>', unsafe_allow_html=True)
 
+# --- Logo centré ---
+st.markdown('<div class="logo-container"><img src="https://raw.githubusercontent.com/metisted19/ava-bot/main/assets/ava_logo.png" alt="Logo AVA"></div>', unsafe_allow_html=True)
+
 # --- Bouton vers Dashboard ---
 html("""
     <div class="button-container">
@@ -60,9 +74,4 @@ html("""
     </div>
 """, height=100)
 
-# TODO : ajouter logo ou animation futuriste plus tard
-
-
-
-
-
+# AVA est de retour en beauté 😎
