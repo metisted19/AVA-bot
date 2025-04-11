@@ -1,37 +1,66 @@
 import streamlit as st
-from PIL import Image
+from streamlit.components.v1 import html
 
-# Logo AVA
-logo_path = "ava_logo.png"
+st.set_page_config(page_title="Bienvenue sur AVA", layout="wide")
 
-st.set_page_config(
-    page_title="AVA 3 - Plateforme d’analyse",
-    page_icon=logo_path,
-    layout="wide",
-)
+# --- CSS personnalisé pour fond nuit stylé ---
+st.markdown("""
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%);
+            color: #ffffff;
+        }
+        .title {
+            text-align: center;
+            font-size: 3.5em;
+            font-weight: bold;
+            margin-top: 3rem;
+            color: #00FFFF;
+            text-shadow: 0 0 15px #00FFFF;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 2rem;
+            color: #d0d0d0;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+        .enter-button {
+            background-color: #00FFFF;
+            color: #000000;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00FFFF;
+            transition: 0.3s ease;
+        }
+        .enter-button:hover {
+            background-color: #00cccc;
+            box-shadow: 0 0 25px #00cccc;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# Affichage du logo et du titre
-col1, col2 = st.columns([1, 6])
-with col1:
-    st.image(logo_path, width=80)
-with col2:
-    st.markdown("<h1 style='margin-bottom: 0; color:#4FC3F7;'>Bienvenue sur AVA 3</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color:gray;'>Votre plateforme d'analyse prédictive multi-actifs avec IA</p>", unsafe_allow_html=True)
+# --- Contenu de la page ---
+st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24</div>', unsafe_allow_html=True)
 
-st.markdown("---")
+# --- Bouton stylé ---
+html("""
+    <div class="button-container">
+        <a href="/Dashboard" target="_self">
+            <button class="enter-button">Entrer dans la plateforme</button>
+        </a>
+    </div>
+""", height=100)
 
-# Sidebar stylée
-st.sidebar.image(logo_path, width=100)
-st.sidebar.markdown("## Navigation")
-st.sidebar.page_link("pages/1_Dashboard.py", label="Dashboard", icon="📊")
-st.sidebar.page_link("pages/2_Signaux.py", label="Signaux", icon="⚡")
-st.sidebar.page_link("pages/3_Chat_AVA.py", label="Chat AVA", icon="💬")
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("Développé par Teddy avec amour et un soupçon d'IA.")
-
-# Message de bienvenue ou instructions
-st.success("Utilise le menu de gauche pour explorer les fonctionnalités.")
+# Facultatif : espace pour plus tard (logo, image, animation...)
 
 
 
