@@ -121,6 +121,27 @@ if question:
                             f"{analyse}\n\n"
                             f"🤖 *Mon intuition d'IA ?* {suggestion}"
                         )
+                        # Résumé rapide intelligent
+                        resume_parts = []
+
+                        if 'rsi' in df.columns:
+                        rsi = df['rsi'].iloc[-1]
+                        if rsi < 30:
+                           resume_parts.append(f"RSI à {rsi:.0f} (survendu)")
+                        elif rsi > 70:
+                            resume_parts.append(f"RSI à {rsi:.0f} (suracheté)")
+
+                        if 'macd' in df.columns and 'macd_signal' in df.columns:
+                            macd = df['macd'].iloc[-1]
+                            signal = df['macd_signal'].iloc[-1]
+                            if macd > signal:
+                               resume_parts.append("MACD en croisement haussier")
+                            elif macd < signal:
+                                resume_parts.append("MACD en croisement baissier")
+
+                        if resume_parts:
+                            message_bot += "\n\n✅ **Résumé rapide :** " + ", ".join(resume_parts) + "."
+
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
 
