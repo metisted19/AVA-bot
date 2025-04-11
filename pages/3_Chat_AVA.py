@@ -1,55 +1,22 @@
-from datetime import datetime
-import pytz
-import os
-from newsapi import NewsApiClient
-from utils.analyse_technique import analyse_signaux
-import pandas as pd
-import requests
 import streamlit as st
+import os
+import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
+from fonctions_chat import obtenir_reponse_ava
+from fonctions_actualites import obtenir_actualites
+from fonctions_meteo import obtenir_meteo
 
-# --- Clés API ---
-API_KEY_METEO = "26b32c230513505762cb096f4d05b0cc"
-API_KEY_NEWS = "681120bace124ee99d390cc059e6aca5"
+st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# --- Initialisation ---
-newsapi = NewsApiClient(api_key=API_KEY_NEWS)
+st.title("🤖 AVA - Chat IA")
 
-# --- Fonction pour la météo ---
-def get_meteo_ville(ville):
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={ville}&appid={API_KEY_METEO}&units=metric&lang=fr"
-    try:
-        response = requests.get(url)
-        data = response.json()
-        if data['cod'] == 200:
-            temp = data['main']['temp']
-            description = data['weather'][0]['description']
-            return f"🌤 Il fait {temp}°C à {ville} avec {description}."
-        else:
-            code = data.get('cod', '❓')
-            msg = data.get('message', 'Erreur inconnue')
-            return f"❌ Impossible d'obtenir la météo pour {ville}.\nCode : {code} - Message : {msg}"
-    except Exception as e:
-        return f"❌ Erreur réseau lors de la récupération météo : {e}"
+st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
-# --- Fonction pour les actualités ---
-def get_general_news():
-    try:
-        headlines = newsapi.get_top_headlines(language="en", country="us", page_size=5)
-        articles = headlines.get("articles", [])
-        if articles:
-            news_list = []
-            for article in articles:
-                titre = article.get("title", "Sans titre")
-                lien = article.get("url", "#")
-                news_list.append((titre, lien))
-            return news_list
-        else:
-            return []
-    except Exception as e:
-        return []
+# Historique de chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# --- Fonction d'analyse de sentiment ---
+# --- Fonction d'analyse de sentiment --- 
 def analyser_sentiment(news_list):
     mots_positifs = ["progress", "gain", "rise", "success", "growth"]
     mots_negatifs = ["fall", "loss", "drop", "crash", "recession"]
@@ -65,23 +32,82 @@ def analyser_sentiment(news_list):
     else:
         return "🟡 Le sentiment global du marché est **neutre**."
 
-# --- Page UI ---
-st.set_page_config(page_title="Chat AVA", layout="centered")
-st.title("💬 Bienvenue dans l'espace conversationnel d'AVA")
-st.image("ava_logo.png", width=100)
-st.markdown("""
-### 👋 Salut, je suis AVA  
-Votre assistante boursière digitale. Posez-moi une question sur les marchés, ou parlez-moi de tout et de rien 😄
-""")
+# --- Affichage des messages ---
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# --- Historique ---
-if "historique" not in st.session_state:
-    st.session_state.historique = []
+# --- Interaction ---
+question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
-# --- Effacer ---
-if st.button("🗑️ Effacer la conversation"):
-    st.session_state.historique = []
-    st.experimental_rerun()
+if question:
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.markdown(question)
+
+    with st.chat_message("assistant"):
+        # --- Analyse technique vivante ---
+        if any(symb in question.lower() for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac"]):
+            nom_ticker = question.replace(" ", "").replace("-", "").lower()
+
+            if "btc" in nom_ticker:
+                nom_ticker = "btc-usd"
+            elif "eth" in nom_ticker:
+                nom_ticker = "eth-usd"
+            elif "aapl" in nom_ticker:
+                nom_ticker = "aapl"
+            elif "tsla" in nom_ticker:
+                nom_ticker = "tsla"
+            elif "googl" in nom_ticker:
+                nom_ticker = "googl"
+            elif "fchi" in nom_ticker or "cac" in nom_ticker:
+                nom_ticker = "^fchi"
+
+            data_path = f"data/donnees_{nom_ticker}.csv"
+
+            if os.path.exists(data_path):
+                df = pd.read_csv(data_path)
+                df = ajouter_indicateurs_techniques(df)
+
+                try:
+                    analyse, suggestion = analyser_signaux_techniques(df)
+
+                    message_bot = (
+                        f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                        f"{analyse}\n\n"
+                        f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                    )
+                except Exception as e:
+                    message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+            else:
+                message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
+
+        # --- Actualités ---
+        elif "actu" in question.lower() or "news" in question.lower():
+            actualites = obtenir_actualites()
+            sentiment = analyser_sentiment(actualites)
+            message_bot = "🗞️ Voici les dernières actualités :\n\n"
+            for titre, url in actualites:
+                message_bot += f"- [{titre}]({url})\n"
+            message_bot += f"\n\n{sentiment}"
+
+        # --- Météo ---
+        elif "météo" in question.lower():
+            ville = "Paris"
+            for mot in question.split():
+                if mot.istitle():
+                    ville = mot
+            message_bot = obtenir_meteo(ville)
+
+        # --- Réponse générale ---
+        else:
+            message_bot = obtenir_reponse_ava(question)
+
+        st.markdown(message_bot)
+        st.session_state.messages.append({"role": "assistant", "content": message_bot})
+
+# Bouton pour effacer l’historique
+st.sidebar.button("🧹 Effacer l'historique", on_click=lambda: st.session_state.clear())
 
 # --- Saisie utilisateur ---
 user_input = st.text_input("🧐 Que souhaitez-vous demander à AVA ?", key="chat_input")
