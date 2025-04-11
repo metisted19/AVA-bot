@@ -157,10 +157,14 @@ if user_input:
     # --- Réponse par défaut ---
     else:
         message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités, la météo ou une analyse technique ! 😊"
+    
+    # --- Suppression automatique de l'historique ---
+    st.session_state.historique = []
 
-    # --- Historique ---
+    # --- Ajout dans l'historique ---
     st.session_state.historique.append(("🧑‍💻 Vous", user_input))
     st.session_state.historique.append(("🤖 AVA", message_bot))
+
 
 # --- Affichage de l'historique ---
 for auteur, message in st.session_state.historique:
