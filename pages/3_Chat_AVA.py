@@ -7,7 +7,7 @@ from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 
-# Ajout du chemin parent pour accéder aux modules si on est dans /pages/
+# Ajout du chemin parent pour accéder aux modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -16,10 +16,7 @@ st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités.
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
-if "historique" not in st.session_state:
-    st.session_state.historique = []
-
+    
 def analyser_sentiment(news_list):
     mots_positifs = ["progress", "gain", "rise", "success", "growth"]
     mots_negatifs = ["fall", "loss", "drop", "crash", "recession"]
@@ -35,7 +32,7 @@ def analyser_sentiment(news_list):
     else:
         return "🟡 Le sentiment global du marché est **neutre**."
 
-# Affichage de l’historique
+# Affichage des messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
