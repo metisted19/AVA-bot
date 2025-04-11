@@ -109,8 +109,7 @@ if question:
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
             else:
-                message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.
-Lancez le script d'entraînement pour les générer."
+                message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
 
         else:
             message_bot = obtenir_reponse_ava(question)
