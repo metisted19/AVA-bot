@@ -103,6 +103,8 @@ if question:
                 message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
             else:
                 df = pd.read_csv(data_path)
+                df.columns = [col.capitalize() for col in df.columns]  # standardise les noms
+
                 if "Close" not in df.columns:
                     colonnes_dispo = ', '.join(df.columns.tolist())
                     message_bot = (
