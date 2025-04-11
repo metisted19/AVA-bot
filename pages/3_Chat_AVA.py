@@ -106,7 +106,8 @@ if user_input:
             if mot[0].isupper() and len(mot) > 2:
                 ville_detectee = mot
         message_bot = get_meteo_ville(ville_detectee)
-        # --- Réponses simples pour échanges naturels ---
+
+    # --- Réponses simples pour échanges naturels ---
     elif any(phrase in question for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
         message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
 
