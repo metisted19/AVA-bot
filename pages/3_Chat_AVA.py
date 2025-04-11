@@ -96,14 +96,18 @@ if question:
                 if not os.path.exists(data_path):
                     try:
                         df = yf.download(nom_ticker, period="6mo", interval="1d")
-                        df.to_csv(data_path)
+                        df.to_csv(data_path, index=True)  # ✅ garde les colonnes intactes
                     except Exception as e:
                         message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
 
+
+
                 if os.path.exists(data_path):
                     df = pd.read_csv(data_path)
-                    if "Close" in df.columns:
-                        df = ajouter_indicateurs_techniques(df)
+                      if "Close" not in df.columns:
+                         print("Colonnes disponibles :", df.columns.tolist())  # debug temporaire
+                         message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée."
+
                         try:
                             analyse, suggestion = analyser_signaux_techniques(df)
                             message_bot = (
