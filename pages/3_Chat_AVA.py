@@ -110,13 +110,17 @@ if question:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
             else:
                 message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.
-                Lancez le script d'entraînement pour les générer."
+Lancez le script d'entraînement pour les générer."
 
         else:
             message_bot = obtenir_reponse_ava(question)
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
+
+# --- Effacer l'historique ---
+st.sidebar.button("🧹 Effacer l'historique", on_click=lambda: st.session_state.clear())
+
 
 # --- Effacer l'historique ---
 st.sidebar.button("🧹 Effacer l'historique", on_click=lambda: st.session_state.clear())
