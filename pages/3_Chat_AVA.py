@@ -93,42 +93,43 @@ if question:
 
                 data_path = f"data/donnees_{nom_ticker}.csv"
 
-               if not os.path.exists(data_path):
-                  try:
-                      df = yf.download(nom_ticker, period="6mo", interval="1d")
-                      df.to_csv(data_path, index=True)  # ✅ garde les colonnes intactes
-                  except Exception as e:
-                    message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
+                if not os.path.exists(data_path):
+                    try:
+                        df = yf.download(nom_ticker, period="6mo", interval="1d")
+                        df.to_csv(data_path, index=True)
+                    except Exception as e:
+                        message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
 
-               if os.path.exists(data_path):
-                  df = pd.read_csv(data_path)
-
-                  if "Close" in df.columns:
-                     try:
-                        df = ajouter_indicateurs_techniques(df)
-                        analyse, suggestion = analyser_signaux_techniques(df)
-                        message_bot = (
-                            f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
-                            f"{analyse}\n\n"
-                            f"🤖 *Mon intuition d'IA ?* {suggestion}"
-                        )
-                     except Exception as e:
-                        message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+                if os.path.exists(data_path):
+                    df = pd.read_csv(data_path)
+                    if "Close" in df.columns:
+                        try:
+                            df = ajouter_indicateurs_techniques(df)
+                            analyse, suggestion = analyser_signaux_techniques(df)
+                            message_bot = (
+                                f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                                f"{analyse}\n\n"
+                                f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                            )
+                        except Exception as e:
+                            message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+                    else:
+                        print("Colonnes disponibles :", df.columns.tolist())
+                        message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée."
                 else:
-                    print("Colonnes disponibles :", df.columns.tolist())  # debug temporaire
-                    message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée."
-           else:
-               message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
+                    message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
 
+            else:
+                try:
+                    message_bot = obtenir_reponse_ava(question)
+                except Exception as e:
+                    message_bot = f"🤖 Une erreur est survenue lors du traitement : {e}"
 
-else:
-    message_bot = obtenir_reponse_ava(question)
-
-# Sécurise l’affichage
-if message_bot:
-    st.markdown(message_bot)
-    st.session_state.messages.append({"role": "assistant", "content": message_bot})
-
+            st.markdown(message_bot)
+            st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
-st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+def reset_messages():
+    st.session_state.messages = []
+
+st.sidebar.button("🧹 Effacer les messages", on_click=reset_messages)
