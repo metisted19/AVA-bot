@@ -1,46 +1,22 @@
 import streamlit as st
 import os
 import pandas as pd
+import yfinance as yf
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
-from fonctions_actualites import obtenir_actualites, get_general_news
-from fonctions_meteo import obtenir_meteo, get_meteo_ville
+from fonctions_actualites import get_general_news
+from fonctions_meteo import get_meteo_ville
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
-
 st.title("🤖 AVA - Chat IA")
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
-# Historique de chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- Fonction d'analyse de sentiment --- 
-def analyser_sentiment(news_list):
-    mots_positifs = ["progress", "gain", "rise", "success", "growth"]
-    mots_negatifs = ["fall", "loss", "drop", "crash", "recession"]
-    score = 0
-    for titre, _ in news_list:
-        titre = titre.lower()
-        score += sum(1 for mot in mots_positifs if mot in titre)
-        score -= sum(1 for mot in mots_negatifs if mot in titre)
-    if score > 1:
-        return "🟢 Le sentiment global du marché est **positif**."
-    elif score < -1:
-        return "🔴 Le sentiment global du marché est **négatif**."
-    else:
-        return "🟡 Le sentiment global du marché est **neutre**."
-
-# --- Affichage des messages ---
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# --- Interaction ---
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
 if question:
-    st.session_state.messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
 
@@ -90,20 +66,19 @@ if question:
                 "cac": "^fchi"
             }
 
-            for symb, ticker in mapping.items():
-                if symb in question_clean:
-                    nom_ticker = ticker
-                    break
-            else:
-                nom_ticker = question_clean
-
+            nom_ticker = next((mapping[symb] for symb in mapping if symb in question_clean), question_clean.replace(" ", "").replace("-", ""))
             data_path = f"data/donnees_{nom_ticker}.csv"
 
             if not os.path.exists(data_path):
-                message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
-            else:
+                try:
+                    df = yf.download(nom_ticker, period="6mo", interval="1d")
+                    df.to_csv(data_path, index=True)
+                except Exception as e:
+                    message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
+
+            if os.path.exists(data_path):
                 df = pd.read_csv(data_path)
-                df.columns = [col.capitalize() for col in df.columns]  # standardise les noms
+                df.columns = [col.capitalize() for col in df.columns]
 
                 if "Close" not in df.columns:
                     colonnes_dispo = ', '.join(df.columns.tolist())
@@ -121,29 +96,30 @@ if question:
                             f"{analyse}\n\n"
                             f"🤖 *Mon intuition d'IA ?* {suggestion}"
                         )
-                        # Résumé rapide intelligent
-                        resume_parts = []
 
+                        # Résumé rapide
+                        resume_parts = []
                         if 'rsi' in df.columns:
-                        rsi = df['rsi'].iloc[-1]
-                        if rsi < 30:
-                           resume_parts.append(f"RSI à {rsi:.0f} (survendu)")
-                        elif rsi > 70:
-                            resume_parts.append(f"RSI à {rsi:.0f} (suracheté)")
+                            rsi = df['rsi'].iloc[-1]
+                            if rsi < 30:
+                                resume_parts.append(f"RSI à {rsi:.0f} (survendu)")
+                            elif rsi > 70:
+                                resume_parts.append(f"RSI à {rsi:.0f} (suracheté)")
 
                         if 'macd' in df.columns and 'macd_signal' in df.columns:
                             macd = df['macd'].iloc[-1]
                             signal = df['macd_signal'].iloc[-1]
                             if macd > signal:
-                               resume_parts.append("MACD en croisement haussier")
+                                resume_parts.append("MACD en croisement haussier")
                             elif macd < signal:
                                 resume_parts.append("MACD en croisement baissier")
 
                         if resume_parts:
                             message_bot += "\n\n✅ **Résumé rapide :** " + ", ".join(resume_parts) + "."
-
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+            else:
+                message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
 
         else:
             message_bot = obtenir_reponse_ava(question)
@@ -153,3 +129,4 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
