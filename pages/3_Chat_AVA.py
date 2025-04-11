@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import pandas as pd
-from analyse_technique.py import ajouter_indicateurs_techniques, analyser_signaux_techniques
+from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
