@@ -1,14 +1,16 @@
 import streamlit as st
+from streamlit.components.v1 import html
 from PIL import Image
+import base64
 
 st.set_page_config(page_title="Bienvenue sur AVA", layout="wide")
 
 # --- CSS personnalisé pour fond nuit stylé ---
 st.markdown("""
     <style>
-        html, body, [class*="css"]  {
-            background: linear-gradient(135deg, #0a0a0a, #1e1e1e) !important;
-            color: white !important;
+        body, .stApp {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%) !important;
+            color: #ffffff !important;
         }
         .title {
             text-align: center;
@@ -16,18 +18,24 @@ st.markdown("""
             font-weight: bold;
             margin-top: 2rem;
             color: #00FFFF;
-            text-shadow: 0 0 20px #00FFFF;
+            text-shadow: 0 0 15px #00FFFF;
         }
         .subtitle {
             text-align: center;
-            font-size: 1.4em;
-            margin-bottom: 2rem;
-            color: #CCCCCC;
+            font-size: 1.3em;
+            margin-bottom: 1rem;
+            color: #d0d0d0;
+        }
+        .description {
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: -1rem;
+            color: #b0b0b0;
         }
         .button-container {
             display: flex;
             justify-content: center;
-            margin-top: 3rem;
+            margin-top: 2rem;
         }
         .enter-button {
             background-color: #00FFFF;
@@ -47,21 +55,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- Logo AVA ---
+logo = Image.open("ava_logo.png")
+st.image(logo, width=220)
+
 # --- Contenu principal ---
 st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24 — toujours connectée, toujours prête 🤖</div>', unsafe_allow_html=True)
+st.markdown('<div class="description">Entrez dans une nouvelle ère d'analyse intelligente. AVA vous accompagne avec précision et réactivité à chaque instant.</div>', unsafe_allow_html=True)
 
-# --- Logo AVA local centré ---
-logo = Image.open("assets/ava_logo.png")
-st.image(logo, width=220)
-
-# --- Bouton vers Dashboard (corrigé sans html) ---
-st.markdown("""
+# --- Bouton vers Dashboard ---
+html("""
     <div class="button-container">
         <a href="/Dashboard" target="_self">
             <button class="enter-button">Entrer dans la plateforme</button>
         </a>
     </div>
-""", unsafe_allow_html=True)
+""", height=100)
 
 # AVA est de retour en beauté 😎
+
