@@ -124,35 +124,41 @@ if user_input:
     elif "salut" in question or "bonjour" in question:
         message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-    # --- Analyse technique ---
-    elif any(symb in question for symb in ["aapl", "tsla", "googl", "btc", "eth"]):
-        nom_ticker = question.replace(" ", "").replace("-", "")
+    # --- Analyse technique vivante ---
+elif any(symb in question.lower() for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac"]):
+    nom_ticker = question.replace(" ", "").replace("-", "").lower()
 
-        if "btc" in nom_ticker:
-            nom_ticker = "btc-usd"
-        elif "eth" in nom_ticker:
-            nom_ticker = "eth-usd"
-        elif "aapl" in nom_ticker:
-            nom_ticker = "aapl"
-        elif "tsla" in nom_ticker:
-            nom_ticker = "tsla"
-        elif "googl" in nom_ticker:
-            nom_ticker = "googl"
+    if "btc" in nom_ticker:
+        nom_ticker = "btc-usd"
+    elif "eth" in nom_ticker:
+        nom_ticker = "eth-usd"
+    elif "aapl" in nom_ticker:
+        nom_ticker = "aapl"
+    elif "tsla" in nom_ticker:
+        nom_ticker = "tsla"
+    elif "googl" in nom_ticker:
+        nom_ticker = "googl"
+    elif "fchi" in nom_ticker or "cac" in nom_ticker:
+        nom_ticker = "^fchi"
 
-        data_path = f"data/donnees_{nom_ticker}.csv"
+    data_path = f"data/donnees_{nom_ticker}.csv"
 
-        if os.path.exists(data_path):
-            df = pd.read_csv(data_path)
-            suggestion = ""
-            if "rsi" in df.columns and df['rsi'].iloc[-1] < 30:
-                suggestion = "💡 Le RSI est bas, cela pourrait indiquer une opportunité d'achat."
-            elif "rsi" in df.columns and df['rsi'].iloc[-1] > 70:
-                suggestion = "⚠️ Le RSI est élevé, cela pourrait signaler une zone de surachat."
-            message_bot = f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n" + analyse_signaux(df)
-            if suggestion:
-                message_bot += f"\n\n{suggestion}"
-        else:
-            message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}. Lancez le script d'entraînement."
+    if os.path.exists(data_path):
+        df = pd.read_csv(data_path)
+        df = ajouter_indicateurs_techniques(df)
+
+        try:
+            analyse, suggestion = analyser_signaux_techniques(df)
+
+            message_bot = (
+                f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                f"{analyse}\n\n"
+                f"🤖 *Mon intuition d'IA ?* {suggestion}"
+            )
+        except Exception as e:
+            message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+    else:
+        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
 
     # --- Réponse par défaut ---
     else:
