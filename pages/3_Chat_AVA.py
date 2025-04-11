@@ -3,8 +3,8 @@ import os
 import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
-from fonctions_actualites import obtenir_actualites
-from fonctions_meteo import obtenir_meteo
+from fonctions_actualites import obtenir_actualites, get_general_news
+from fonctions_meteo import obtenir_meteo, get_meteo_ville
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
@@ -37,7 +37,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# --- Interaction ---
+# --- Interaction principale ---
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
 if question:
@@ -46,10 +46,42 @@ if question:
         st.markdown(question)
 
     with st.chat_message("assistant"):
-        # --- Analyse technique vivante ---
-        if any(symb in question.lower() for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac"]):
-            nom_ticker = question.replace(" ", "").replace("-", "").lower()
+        question_clean = question.lower().strip()
+        message_bot = ""
 
+        if "actualité" in question_clean or "news" in question_clean:
+            actus = get_general_news()
+            if isinstance(actus, str):
+                message_bot = actus
+            elif actus:
+                message_bot = "📰 Voici les actualités :\n\n" + "\n\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
+            else:
+                message_bot = "❌ Aucune actualité disponible pour le moment."
+
+        elif "météo" in question_clean or "quel temps" in question_clean:
+            ville_detectee = "Paris"
+            for mot in question.split():
+                if mot[0].isupper() and len(mot) > 2:
+                    ville_detectee = mot
+            message_bot = get_meteo_ville(ville_detectee)
+
+        elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
+            message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
+
+        elif any(phrase in question_clean for phrase in ["quoi de neuf", "tu fais quoi", "des news"]):
+            message_bot = "Je scrute les marchés, je capte les tendances… une journée normale pour une IA boursière !"
+
+        elif any(phrase in question_clean for phrase in ["t'es qui", "tu es qui", "t'es quoi", "tu es quoi"]):
+            message_bot = "Je suis AVA, votre assistante virtuelle boursière, météo, et bien plus. Disons... une alliée du futur."
+
+        elif any(phrase in question_clean for phrase in ["tu dors", "t'es là", "tu es là"]):
+            message_bot = "Je ne dors jamais. Toujours connectée, toujours prête. Posez votre question !"
+
+        elif "salut" in question_clean or "bonjour" in question_clean:
+            message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
+
+        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac"]):
+            nom_ticker = question_clean.replace(" ", "").replace("-", "")
             if "btc" in nom_ticker:
                 nom_ticker = "btc-usd"
             elif "eth" in nom_ticker:
@@ -64,14 +96,11 @@ if question:
                 nom_ticker = "^fchi"
 
             data_path = f"data/donnees_{nom_ticker}.csv"
-
             if os.path.exists(data_path):
                 df = pd.read_csv(data_path)
                 df = ajouter_indicateurs_techniques(df)
-
                 try:
                     analyse, suggestion = analyser_signaux_techniques(df)
-
                     message_bot = (
                         f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
@@ -80,127 +109,14 @@ if question:
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
             else:
-                message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
+                message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.
+Lancez le script d'entraînement pour les générer."
 
-        # --- Actualités ---
-        elif "actu" in question.lower() or "news" in question.lower():
-            actualites = obtenir_actualites()
-            sentiment = analyser_sentiment(actualites)
-            message_bot = "🗞️ Voici les dernières actualités :\n\n"
-            for titre, url in actualites:
-                message_bot += f"- [{titre}]({url})\n"
-            message_bot += f"\n\n{sentiment}"
-
-        # --- Météo ---
-        elif "météo" in question.lower():
-            ville = "Paris"
-            for mot in question.split():
-                if mot.istitle():
-                    ville = mot
-            message_bot = obtenir_meteo(ville)
-
-        # --- Réponse générale ---
         else:
             message_bot = obtenir_reponse_ava(question)
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-# Bouton pour effacer l’historique
+# --- Effacer l'historique ---
 st.sidebar.button("🧹 Effacer l'historique", on_click=lambda: st.session_state.clear())
-
-# --- Saisie utilisateur ---
-user_input = st.text_input("🧐 Que souhaitez-vous demander à AVA ?", key="chat_input")
-
-if user_input:
-    question = user_input.lower().strip()
-    message_bot = ""
-
-    # --- Actualités ---
-    if "actualité" in question or "news" in question:
-        actus = get_general_news()
-        if isinstance(actus, str):
-            message_bot = actus
-        elif actus:
-            message_bot = "📰 Voici les actualités :\n\n" + "\n\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
-        else:
-            message_bot = "❌ Aucune actualité disponible pour le moment."
-
-    # --- Météo ---
-    elif "météo" in question or "quel temps" in question:
-        ville_detectee = "Paris"
-        for mot in question.split():
-            if mot[0].isupper() and len(mot) > 2:
-                ville_detectee = mot
-        message_bot = get_meteo_ville(ville_detectee)
-
-    # --- Réponses simples ---
-    elif any(phrase in question for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
-        message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
-
-    elif any(phrase in question for phrase in ["quoi de neuf", "tu fais quoi", "des news"]):
-        message_bot = "Je scrute les marchés, je capte les tendances… une journée normale pour une IA boursière !"
-
-    elif any(phrase in question for phrase in ["t'es qui", "tu es qui", "t'es quoi", "tu es quoi"]):
-        message_bot = "Je suis AVA, votre assistante virtuelle boursière, météo, et bien plus. Disons... une alliée du futur."
-
-    elif any(phrase in question for phrase in ["tu dors", "t'es là", "tu es là"]):
-        message_bot = "Je ne dors jamais. Toujours connectée, toujours prête. Posez votre question !"
-
-    # --- Salutations ---
-    elif "salut" in question or "bonjour" in question:
-        message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
-
-    # --- Analyse technique vivante ---
-elif any(symb in question.lower() for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac"]):
-    nom_ticker = question.replace(" ", "").replace("-", "").lower()
-
-    if "btc" in nom_ticker:
-        nom_ticker = "btc-usd"
-    elif "eth" in nom_ticker:
-        nom_ticker = "eth-usd"
-    elif "aapl" in nom_ticker:
-        nom_ticker = "aapl"
-    elif "tsla" in nom_ticker:
-        nom_ticker = "tsla"
-    elif "googl" in nom_ticker:
-        nom_ticker = "googl"
-    elif "fchi" in nom_ticker or "cac" in nom_ticker:
-        nom_ticker = "^fchi"
-
-    data_path = f"data/donnees_{nom_ticker}.csv"
-
-    if os.path.exists(data_path):
-        df = pd.read_csv(data_path)
-        df = ajouter_indicateurs_techniques(df)
-
-        try:
-            analyse, suggestion = analyser_signaux_techniques(df)
-
-            message_bot = (
-                f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
-                f"{analyse}\n\n"
-                f"🤖 *Mon intuition d'IA ?* {suggestion}"
-            )
-        except Exception as e:
-            message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
-    else:
-        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
-
-    # --- Réponse par défaut ---
-    else:
-        message_bot = "Je n'ai pas compris votre question, mais je peux vous aider avec les actualités, la météo ou une analyse technique ! 😊"
-    
-    # --- Suppression automatique de l'historique ---
-    st.session_state.historique = []
-
-    # --- Ajout dans l'historique ---
-    st.session_state.historique.append(("🧑‍💻 Vous", user_input))
-    st.session_state.historique.append(("🤖 AVA", message_bot))
-
-
-# --- Affichage de l'historique ---
-for auteur, message in st.session_state.historique:
-    with st.chat_message(auteur):
-        st.markdown(message)
-
