@@ -6,12 +6,6 @@ from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 
-# Configuration de la page Streamlit
-st.set_page_config(page_title="Chat AVA", layout="centered")
-
-st.title("🤖 AVA - Chat IA")
-st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
-
 # --- Initialisation des messages ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -50,7 +44,6 @@ if question:
         message_bot = ""
 
         # --- Actualités ---
-        from fonctions_actualites import get_general_news
         if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
@@ -64,7 +57,6 @@ if question:
 
         # --- Météo ---
         elif "météo" in question_clean or "quel temps" in question_clean:
-            from fonctions_meteo import get_meteo_ville
             ville_detectee = "Paris"
             for mot in question.split():
                 if mot and mot[0].isupper() and len(mot) > 2:
@@ -125,3 +117,4 @@ if question:
 
 # --- Bouton reset ---
 st.sidebar.button("🧹 Effacer l'historique", on_click=lambda: st.session_state.clear())
+
