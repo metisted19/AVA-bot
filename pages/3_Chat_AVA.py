@@ -6,6 +6,7 @@ from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
+import sys
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
