@@ -93,34 +93,33 @@ if question:
 
                 data_path = f"data/donnees_{nom_ticker}.csv"
 
-                if not os.path.exists(data_path):
-                    try:
-                        df = yf.download(nom_ticker, period="6mo", interval="1d")
-                        df.to_csv(data_path, index=True)  # ✅ garde les colonnes intactes
-                    except Exception as e:
-                        message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
+               if not os.path.exists(data_path):
+                  try:
+                      df = yf.download(nom_ticker, period="6mo", interval="1d")
+                      df.to_csv(data_path, index=True)  # ✅ garde les colonnes intactes
+                  except Exception as e:
+                    message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
 
+               if os.path.exists(data_path):
+                  df = pd.read_csv(data_path)
 
-
-                if os.path.exists(data_path):
-                    df = pd.read_csv(data_path)
-                      if "Close" not in df.columns:
-                         print("Colonnes disponibles :", df.columns.tolist())  # debug temporaire
-                         message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée."
-
-                        try:
-                            analyse, suggestion = analyser_signaux_techniques(df)
-                            message_bot = (
-                                f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
-                                f"{analyse}\n\n"
-                                f"🤖 *Mon intuition d'IA ?* {suggestion}"
-                            )
-                        except Exception as e:
-                            message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
-                    else:
-                        message_bot = f"⚠️ Le fichier de données ne contient pas de colonne 'Close'."
+                  if "Close" in df.columns:
+                     try:
+                        df = ajouter_indicateurs_techniques(df)
+                        analyse, suggestion = analyser_signaux_techniques(df)
+                        message_bot = (
+                            f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                            f"{analyse}\n\n"
+                            f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                        )
+                     except Exception as e:
+                        message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
                 else:
-                    message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
+                    print("Colonnes disponibles :", df.columns.tolist())  # debug temporaire
+                    message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée."
+           else:
+               message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
+
 
 else:
     message_bot = obtenir_reponse_ava(question)
