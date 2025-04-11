@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit.components.v1 import html
+from PIL import Image
 
 st.set_page_config(page_title="Bienvenue sur AVA", layout="wide")
 
@@ -23,17 +23,6 @@ st.markdown("""
             font-size: 1.4em;
             margin-bottom: 2rem;
             color: #CCCCCC;
-        }
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-        }
-        .logo-container img {
-            width: 220px;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 0 25px #00FFFF;
         }
         .button-container {
             display: flex;
@@ -62,16 +51,17 @@ st.markdown("""
 st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24 — toujours connectée, toujours prête 🤖</div>', unsafe_allow_html=True)
 
-# --- Logo centré ---
-st.markdown('<div class="logo-container"><img src="https://raw.githubusercontent.com/metisted19/ava-bot/main/assets/ava_logo.png" alt="Logo AVA"></div>', unsafe_allow_html=True)
+# --- Logo AVA local centré ---
+logo = Image.open("assets/ava_logo.png")
+st.image(logo, width=220)
 
-# --- Bouton vers Dashboard ---
-html("""
+# --- Bouton vers Dashboard (corrigé sans html) ---
+st.markdown("""
     <div class="button-container">
         <a href="/Dashboard" target="_self">
             <button class="enter-button">Entrer dans la plateforme</button>
         </a>
     </div>
-""", height=100)
+""", unsafe_allow_html=True)
 
 # AVA est de retour en beauté 😎
