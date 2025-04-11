@@ -6,23 +6,23 @@ st.set_page_config(page_title="Bienvenue sur AVA", layout="wide")
 # --- CSS personnalisé pour fond nuit stylé ---
 st.markdown("""
     <style>
-        body {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%);
-            color: #ffffff;
+        html, body, [class*="css"]  {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%) !important;
+            color: white !important;
         }
         .title {
             text-align: center;
-            font-size: 3.5em;
+            font-size: 4em;
             font-weight: bold;
-            margin-top: 3rem;
+            margin-top: 4rem;
             color: #00FFFF;
-            text-shadow: 0 0 15px #00FFFF;
+            text-shadow: 0 0 20px #00FFFF;
         }
         .subtitle {
             text-align: center;
-            font-size: 1.3em;
-            margin-bottom: 2rem;
-            color: #d0d0d0;
+            font-size: 1.4em;
+            margin-bottom: 3rem;
+            color: #CCCCCC;
         }
         .button-container {
             display: flex;
@@ -34,7 +34,7 @@ st.markdown("""
             color: #000000;
             border: none;
             padding: 1rem 2.5rem;
-            font-size: 1.2em;
+            font-size: 1.3em;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 0 20px #00FFFF;
@@ -47,11 +47,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Contenu de la page ---
+# --- Contenu principal ---
 st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Votre assistante boursière, météo et actualités 24h/24 — toujours connectée, toujours prête 🤖</div>', unsafe_allow_html=True)
 
-# --- Bouton stylé ---
+# --- Bouton vers Dashboard ---
 html("""
     <div class="button-container">
         <a href="/Dashboard" target="_self">
@@ -60,8 +60,7 @@ html("""
     </div>
 """, height=100)
 
-# Facultatif : espace pour plus tard (logo, image, animation...)
-
+# TODO : ajouter logo ou animation futuriste plus tard
 
 
 
