@@ -103,8 +103,11 @@ if question:
                 if os.path.exists(data_path):
                     df = pd.read_csv(data_path)
                     print("DEBUG Colonnes CSV :", df.columns.tolist())
-                    if "Close" in df.columns or "close" in df.columns:
+                    colonne_close = "Close" if "Close" in df.columns else "close" if "close" in df.columns else None
+
+                    if colonne_close:
                         try:
+                            df.rename(columns={colonne_close: "Close"}, inplace=True)
                             df = ajouter_indicateurs_techniques(df)
                             analyse, suggestion = analyser_signaux_techniques(df)
                             message_bot = (
