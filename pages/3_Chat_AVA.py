@@ -6,9 +6,27 @@ from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_t
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import get_general_news
 from fonctions_meteo import get_meteo_ville
+import time
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
 st.title("🤖 AVA - Chat IA")
+
+# --- Animation d'entrée ---
+st.markdown("""
+    <style>
+        .fade-in {
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+    <div class="fade-in">
+        <h4 style='text-align: center; color: #00FFFF;'>Bonjour, je suis AVA. Prête à scanner les marchés pour vous 🔍</h4>
+    </div>
+""", unsafe_allow_html=True)
+
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
 if "messages" not in st.session_state:
@@ -21,6 +39,7 @@ if question:
         st.markdown(question)
 
     with st.chat_message("assistant"):
+        st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
         question_clean = question.lower().strip()
         message_bot = ""
 
@@ -125,8 +144,10 @@ if question:
             message_bot = obtenir_reponse_ava(question)
 
         st.markdown(message_bot)
+        st.markdown("</div>", unsafe_allow_html=True)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
