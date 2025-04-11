@@ -1,25 +1,25 @@
 import streamlit as st
 import os
-import pandas as pd
 import sys
+import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 
+# Ajout du chemin parent pour accéder aux modules si on est dans /pages/
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 st.set_page_config(page_title="Chat AVA", layout="centered")
-
 st.title("🤖 AVA - Chat IA")
-
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
-# Historique de chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
 if "historique" not in st.session_state:
     st.session_state.historique = []
 
-# --- Fonction d'analyse de sentiment --- 
 def analyser_sentiment(news_list):
     mots_positifs = ["progress", "gain", "rise", "success", "growth"]
     mots_negatifs = ["fall", "loss", "drop", "crash", "recession"]
@@ -35,12 +35,11 @@ def analyser_sentiment(news_list):
     else:
         return "🟡 Le sentiment global du marché est **neutre**."
 
-# --- Affichage des messages ---
+# Affichage de l’historique
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# --- Interaction principale ---
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
 if question:
@@ -52,7 +51,6 @@ if question:
         question_clean = question.lower().strip()
         message_bot = ""
 
-        # --- Actualités ---
         if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
@@ -62,15 +60,13 @@ if question:
             else:
                 message_bot = "❌ Aucune actualité disponible pour le moment."
 
-        # --- Météo ---
         elif "météo" in question_clean or "quel temps" in question_clean:
-            ville_detectee = "Paris"
+            ville = "Paris"
             for mot in question.split():
-                if mot[0].isupper() and len(mot) > 2:
-                    ville_detectee = mot
-            message_bot = get_meteo_ville(ville_detectee)
+                if mot.istitle() and len(mot) > 2:
+                    ville = mot
+            message_bot = get_meteo_ville(ville)
 
-        # --- Réponses simples ---
         elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
             message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
 
@@ -86,7 +82,6 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        # --- Analyse technique vivante ---
         elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             if "btc" in nom_ticker:
@@ -127,10 +122,8 @@ Lancez le script d'entraînement pour les générer."
         st.session_state.historique.append(("🧑‍💻 Vous", question))
         st.session_state.historique.append(("🤖 AVA", message_bot))
 
-# --- Affichage de l'historique complémentaire ---
 for auteur, message in st.session_state.historique:
     with st.chat_message(auteur):
         st.markdown(message)
 
-# Bouton pour effacer l’historique
 st.sidebar.button("🧹 Effacer l'historique", on_click=lambda: st.session_state.clear())
