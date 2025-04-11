@@ -56,8 +56,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Logo AVA ---
-logo = Image.open("ava_logo.png")
-st.image(logo, width=220)
+from PIL import Image
+logo = Image.open("assets/ava_logo.png")
 
 # --- Contenu principal ---
 st.markdown('<div class="title">Bienvenue sur AVA</div>', unsafe_allow_html=True)
