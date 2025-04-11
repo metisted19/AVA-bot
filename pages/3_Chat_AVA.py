@@ -73,61 +73,44 @@ if question:
             elif "salut" in question_clean or "bonjour" in question_clean:
                 message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-            # --- Analyse technique ---
             elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac"]):
-                mapping = {
-                    "btc": "btc-usd",
-                    "eth": "eth-usd",
-                    "aapl": "aapl",
-                    "tsla": "tsla",
-                    "googl": "googl",
-                    "fchi": "^fchi",
-                    "cac": "^fchi"
-                }
+    mapping = {
+        "btc": "btc-usd",
+        "eth": "eth-usd",
+        "aapl": "aapl",
+        "tsla": "tsla",
+        "googl": "googl",
+        "fchi": "^fchi",
+        "cac": "^fchi"
+    }
 
-                nom_ticker = question_clean.replace(" ", "").replace("-", "")
-                for mot, ticker in mapping.items():
-                    if mot in nom_ticker:
-                        nom_ticker = ticker
-                        break
+    for symb, ticker in mapping.items():
+        if symb in question_clean:
+            nom_ticker = ticker
+            break
+    else:
+        nom_ticker = question_clean  # fallback
 
-                data_path = f"data/donnees_{nom_ticker}.csv"
+    data_path = f"data/donnees_{nom_ticker}.csv"
 
-                if not os.path.exists(data_path):
-                    try:
-                        df = yf.download(nom_ticker, period="6mo", interval="1d")
-                        df.to_csv(data_path, index=True)
-                    except Exception as e:
-                        message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
-
-                if os.path.exists(data_path):
-                    df = pd.read_csv(data_path)
-                    print("DEBUG Colonnes CSV :", df.columns.tolist())
-
-                    # Renommer les colonnes si elles sont en minuscules
-                    df.rename(columns={
-                        'close': 'Close',
-                        'open': 'Open',
-                        'high': 'High',
-                        'low': 'Low',
-                        'volume': 'Volume'
-                    }, inplace=True)
-
-                    if "Close" in df.columns:
-                        try:
-                            df = ajouter_indicateurs_techniques(df)
-                            analyse, suggestion = analyser_signaux_techniques(df)
-                            message_bot = (
-                                f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
-                                f"{analyse}\n\n"
-                                f"🤖 *Mon intuition d'IA ?* {suggestion}"
-                            )
-                        except Exception as e:
-                            message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
-                    else:
-                        message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée. (Colonnes présentes : {df.columns.tolist()})"
-                else:
-                    message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
+    if os.path.exists(data_path):
+        df = pd.read_csv(data_path)
+        if "Close" in df.columns:
+            df = ajouter_indicateurs_techniques(df)
+            try:
+                analyse, suggestion = analyser_signaux_techniques(df)
+                message_bot = (
+                    f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                    f"{analyse}\n\n"
+                    f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                )
+            except Exception as e:
+                message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+        else:
+            colonnes_dispo = ', '.join(df.columns.tolist())
+            message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée.\n(Colonnes présentes : {colonnes_dispo})"
+    else:
+        message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
 
             else:
                 try:
