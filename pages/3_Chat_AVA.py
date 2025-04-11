@@ -102,6 +102,7 @@ if question:
 
                 if os.path.exists(data_path):
                     df = pd.read_csv(data_path)
+                    print("DEBUG Colonnes CSV :", df.columns.tolist())
                     if "Close" in df.columns:
                         try:
                             df = ajouter_indicateurs_techniques(df)
@@ -114,8 +115,7 @@ if question:
                         except Exception as e:
                             message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
                     else:
-                        print("Colonnes disponibles :", df.columns.tolist())
-                        message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée."
+                        message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée. (Colonnes présentes : {df.columns.tolist()})"
                 else:
                     message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
 
