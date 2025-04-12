@@ -15,7 +15,6 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Fonction d'analyse de sentiment
-
 def analyser_sentiment(news_list):
     mots_positifs = ["progress", "gain", "rise", "success", "growth"]
     mots_negatifs = ["fall", "loss", "drop", "crash", "recession"]
@@ -83,13 +82,17 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac", "bitcoin", "ether"]):
+        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             mapping = {
-                "btc": "btc-usd", "bitcoin": "btc-usd",
-                "eth": "eth-usd", "ether": "eth-usd",
-                "aapl": "aapl", "tsla": "tsla", "googl": "googl",
-                "fchi": "^fchi", "cac": "^fchi"
+                "btc": "btc-usd",
+                "bitcoin": "btc-usd",
+                "eth": "eth-usd",
+                "aapl": "aapl",
+                "tsla": "tsla",
+                "googl": "googl",
+                "fchi": "^fchi",
+                "cac": "^fchi",
             }
             for key, value in mapping.items():
                 if key in nom_ticker:
@@ -113,10 +116,28 @@ if question:
                 else:
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
+                        idee_action = ""
+
+                        if "Rsi" in df.columns:
+                            rsi = df["Rsi"].iloc[-1]
+                            if rsi < 30:
+                                idee_action += "Le RSI est très bas, vous pouvez surveiller un possible retournement haussier."
+                            elif rsi > 70:
+                                idee_action += "Le RSI est élevé, attention à un potentiel retournement baissier."
+
+                        if "Macd" in df.columns and "Macd_signal" in df.columns:
+                            macd = df["Macd"].iloc[-1]
+                            macd_signal = df["Macd_signal"].iloc[-1]
+                            if macd > macd_signal:
+                                idee_action += " Un croisement haussier du MACD est en cours, ce qui renforce le signal."
+                            elif macd < macd_signal:
+                                idee_action += " Le MACD est en croisement baissier, prudence si vous envisagez d’acheter."
+
                         message_bot = (
                             f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                             f"{analyse}\n\n"
-                            f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                            f"🤖 *Mon intuition d'IA ?* {suggestion}\n\n"
+                            f"🧭 *Conseil d'action :* {idee_action if idee_action else 'Surveillez les indicateurs pour confirmer une tendance.'}"
                         )
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -134,5 +155,6 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
