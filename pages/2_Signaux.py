@@ -1,115 +1,55 @@
 import streamlit as st
 import pandas as pd
-import datetime
-import pytz
 import os
+from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 
-# Configuration de la page
-st.set_page_config(page_title="📊 Signaux & Alertes", layout="wide")
-st.title("📡 Détection de signaux et alertes AVA")
+st.set_page_config(page_title="📈 Signaux Techniques", layout="wide")
+st.title("📍 Signaux Techniques d'AVA")
 
-# Chargement des données
-@st.cache_data
-def charger_donnees(path):
-    df = pd.read_csv(path)
-    if 'date' not in df.columns:
-        df.reset_index(inplace=True)
-    if 'Date' in df.columns and 'date' not in df.columns:
-        df.rename(columns={'Date': 'date'}, inplace=True)
-    if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], errors='coerce')
-        df.dropna(subset=['date'], inplace=True)
-    return df
+# --- Sélection du ticker ---
+tickers_disponibles = ["BTC-USD", "ETH-USD", "AAPL", "TSLA", "GOOGL", "^FCHI"]
+ticker = st.selectbox("Sélectionnez un actif à analyser :", tickers_disponibles)
 
-# Sélection d’actif
-tickers = ["AAPL", "TSLA", "GOOGL", "BTC-USD", "ETH-USD"]
-ticker = st.selectbox("📌 Choisissez un actif :", tickers)
-data_path = f"data/donnees_{ticker.lower()}.csv"
-
-# --- Section Signaux ---
-
-st.title("📊 Signaux d'Analyse et Prédictions")
-
-# Sélectionner un actif
-ticker = st.selectbox("📌 Choisissez un actif :", tickers, key="ticker_selectbox")
-
-# Lire les données de prédiction
-prediction_path = f"predictions/prediction_{ticker.lower()}.csv"
-
-# Lire et afficher les prédictions
-if os.path.exists(prediction_path):
-    prediction_df = pd.read_csv(prediction_path)
-    last_prediction = prediction_df["prediction"].iloc[-1]
-
-    # Afficher la prédiction dans Signaux
-    st.subheader(f"Prédiction de l'IA pour {ticker} :")
-    if last_prediction == 1:
-        st.markdown("📈 Hausse prévue pour demain")
-    else:
-        st.markdown("📉 Baisse prévue pour demain")
-else:
-    st.warning(f"❌ Aucun fichier de prédiction trouvé pour {ticker}.")
-
-# Affichage des autres signaux comme RSI, etc.
-st.subheader(f"Indicateur RSI pour {ticker} :")
-# Ajoutez ici votre code pour afficher le RSI et autres signaux
-
-# Si le fichier existe
+# --- Chargement des données ---
+data_path = f"data/donnees_{ticker.lower().replace('-', '').replace('^', '')}.csv"
 if os.path.exists(data_path):
-    df = charger_donnees(data_path)
-    df = df.sort_values("date")
+    df = pd.read_csv(data_path)
+    df.columns = [col.capitalize() for col in df.columns]
+    df = ajouter_indicateurs_techniques(df)
 
-    st.subheader(f"🔍 Analyse des signaux techniques pour {ticker}")
+    try:
+        analyse, suggestion = analyser_signaux_techniques(df)
 
-    alertes = []
+        def generer_resume_signal(signaux):
+            texte = ""
+            signaux_str = " ".join(signaux).lower()
+            if "survente" in signaux_str:
+                texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
+            if "surachat" in signaux_str:
+                texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
+            if "haussier" in signaux_str:
+                texte += "📈 **Tendance haussière en cours.** Les indicateurs suggèrent un élan positif.\n"
+            if "baissier" in signaux_str:
+                texte += "📉 **Tendance baissière détectée.** Prudence sur les mouvements actuels.\n"
+            if "faible" in signaux_str:
+                texte += "😴 **Manque de tendance.** Le marché semble indécis.\n"
+            if texte == "":
+                texte = "ℹ️ Aucun signal fort détecté pour l'instant. Restez à l'affût."
+            return texte
 
-    # 🔼 Hausse ou 🔽 Baisse sur 3 jours consécutifs
-    df['delta_close'] = df['close'].diff()
-    df['direction'] = df['delta_close'].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
-    df['streak'] = df['direction'].groupby((df['direction'] != df['direction'].shift()).cumsum()).transform('size') * df['direction']
-    if df['streak'].iloc[-1] >= 3:
-        alertes.append("🔼 **Hausse sur 3 jours consécutifs** détectée !")
-    elif df['streak'].iloc[-1] <= -3:
-        alertes.append("🔽 **Baisse sur 3 jours consécutifs** détectée !")
+        signaux_list = analyse.split("\n") if analyse else []
+        resume = generer_resume_signal(signaux_list)
 
-    # 💥 Croisement SMA/EMA
-    if 'sma_10' in df.columns and 'ema_10' in df.columns:
-        if df['sma_10'].iloc[-2] < df['ema_10'].iloc[-2] and df['sma_10'].iloc[-1] > df['ema_10'].iloc[-1]:
-            alertes.append("💥 **Croisement haussier SMA/EMA** détecté !")
-        elif df['sma_10'].iloc[-2] > df['ema_10'].iloc[-2] and df['sma_10'].iloc[-1] < df['ema_10'].iloc[-1]:
-            alertes.append("💥 **Croisement baissier SMA/EMA** détecté !")
+        st.subheader(f"Analyse technique pour {ticker.upper()}")
+        st.markdown(f"{analyse}")
+        st.markdown(f"\n💡 **Résumé d'AVA :**\n{resume}")
+        st.success(f"🤖 *Intuition d'AVA :* {suggestion}")
 
-    # 🔄 RSI extrême
-    if 'rsi' in df.columns:
-        if df['rsi'].iloc[-1] > 70:
-            alertes.append("🔴 **RSI > 70 : Surachat** !")
-        elif df['rsi'].iloc[-1] < 30:
-            alertes.append("🟢 **RSI < 30 : Survente** !")
-
-    # 📉 Croisement MACD
-    if 'macd' in df.columns and 'macd_signal' in df.columns:
-        if df['macd'].iloc[-2] < df['macd_signal'].iloc[-2] and df['macd'].iloc[-1] > df['macd_signal'].iloc[-1]:
-            alertes.append("📈 **Croisement haussier MACD** détecté !")
-        elif df['macd'].iloc[-2] > df['macd_signal'].iloc[-2] and df['macd'].iloc[-1] < df['macd_signal'].iloc[-1]:
-            alertes.append("📉 **Croisement baissier MACD** détecté !")
-
-    # ⚠️ Tendance forte détectée (ADX > 25)
-    if 'adx' in df.columns:
-        if df['adx'].iloc[-1] > 25:
-            alertes.append("⚠️ **Tendance forte en cours (ADX > 25)**")
-
-    # Affichage des alertes
-    if alertes:
-        for alerte in alertes:
-            st.success(alerte)
-    else:
-        st.info("Aucune alerte technique majeure détectée aujourd'hui.")
-
-    # Affichage des dernières lignes
-    st.subheader("📄 Données récentes")
-    st.dataframe(df.tail(10), use_container_width=True)
+    except Exception as e:
+        st.error(f"Une erreur est survenue pendant l'analyse : {e}")
 else:
-    st.error(f"❌ Aucune donnée trouvée pour {ticker}. Veuillez lancer le script d'entraînement.")
+    st.warning(f"Aucune donnée trouvée pour {ticker}. Veuillez lancer l'entraînement AVA.")
+
 
 
 
