@@ -62,10 +62,19 @@ if question:
                 message_bot = f"⚠️ Une erreur est survenue lors de la récupération des actualités : {e}"
 
         elif "météo" in question_clean or "quel temps" in question_clean:
-            ville_detectee = "Paris"
-            for mot in question.split():
-                if mot and mot[0].isupper() and len(mot) > 2:
-                    ville_detectee = mot
+            import re
+            ville_detectee = None
+            pattern = re.compile(r"\b(?:à|sur|pour|de|en)\s([A-Z][a-zà-ü\-\s]{2,})")
+            match = pattern.search(question)
+            if match:
+                ville_detectee = match.group(1).strip()
+            if not ville_detectee:
+                for mot in question.split():
+                    if mot and mot[0].isupper() and len(mot) > 2:
+                        ville_detectee = mot
+                        break
+            if not ville_detectee:
+                ville_detectee = "Paris"
             message_bot = get_meteo_ville(ville_detectee)
 
         elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
@@ -83,7 +92,7 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
+        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "^fchi"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             mapping = {
                 "btc": "btc-usd",
@@ -94,6 +103,7 @@ if question:
                 "googl": "googl",
                 "fchi": "^fchi",
                 "cac": "^fchi",
+                "^fchi": "^fchi",
             }
             for key, value in mapping.items():
                 if key in nom_ticker:
@@ -137,7 +147,8 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
-st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🪑 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
