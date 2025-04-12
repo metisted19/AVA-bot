@@ -11,7 +11,7 @@ tickers_disponibles = ["BTC-USD", "ETH-USD", "AAPL", "TSLA", "GOOGL", "^FCHI"]
 ticker = st.selectbox("Sélectionnez un actif à analyser :", tickers_disponibles)
 
 # --- Chargement des données ---
-fichier_data = f"data/donnees_{ticker.lower().replace('-', '').replace('^', '')}.csv"
+data_path = f"data/donnees_{ticker.lower()}.csv"
 fichier_pred = f"predictions/prediction_{ticker.lower().replace('-', '').replace('^', '')}.csv"
 
 if os.path.exists(fichier_data):
