@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import pandas as pd
-from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques, suggerer_action
+from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import get_general_news
 from fonctions_meteo import get_meteo_ville
@@ -118,9 +118,8 @@ if question:
                             f"{analyse}\n\n"
                             f"🤖 *Mon intuition d'IA ?* {suggestion}"
                         )
-                     except Exception as e:
+                    except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
-
             else:
                 message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
 
@@ -134,7 +133,8 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
-st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🪟 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
