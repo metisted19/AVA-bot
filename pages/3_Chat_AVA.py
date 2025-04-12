@@ -8,17 +8,16 @@ from fonctions_meteo import get_meteo_ville
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
+# --- Prénom utilisateur ---
+prenom_utilisateur = st.sidebar.text_input("Entrez votre prénom", value="")
+
+# --- Titre principal ---
 st.title("🤖 AVA - Chat IA")
-st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
+if prenom_utilisateur:
+    st.markdown(f"Bienvenue **{prenom_utilisateur}**, posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
+else:
+    st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
-# --- Demande du prénom utilisateur ---
-if "nom_utilisateur" not in st.session_state:
-    st.session_state.nom_utilisateur = st.text_input("Entrez votre prénom pour commencer :", "")
-
-if st.session_state.nom_utilisateur:
-    st.markdown(f"👋 Bonjour **{st.session_state.nom_utilisateur}**, ravi de vous revoir !")
-
-# Historique de messages
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -146,6 +145,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
