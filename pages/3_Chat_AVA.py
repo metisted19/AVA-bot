@@ -47,41 +47,44 @@ if question:
         question_clean = question.lower().strip()
         message_bot = ""
 
+        if len(st.session_state.messages) == 0:
+            message_bot += "👋 Bonjour mon ami ! Je suis ravie de discuter avec vous."
+
         if "actualité" in question_clean or "news" in question_clean:
             try:
                 actus = get_general_news()
                 if isinstance(actus, str):
-                    message_bot = actus
+                    message_bot += "\n\n" + actus
                 elif actus:
-                    message_bot = "📰 Voici les actualités :\n\n" + "\n".join([
+                    message_bot += "\n\n📰 Voici les actualités :\n\n" + "\n".join([
                         f"🔹 [{titre}]({lien})" for titre, lien in actus
                     ])
                 else:
-                    message_bot = "❌ Aucune actualité disponible pour le moment."
+                    message_bot += "\n\n❌ Aucune actualité disponible pour le moment."
             except Exception as e:
-                message_bot = f"⚠️ Une erreur est survenue lors de la récupération des actualités : {e}"
+                message_bot += f"\n\n⚠️ Une erreur est survenue lors de la récupération des actualités : {e}"
 
         elif "météo" in question_clean or "quel temps" in question_clean:
             ville_detectee = "Paris"
             for mot in question.split():
                 if mot and mot[0].isupper() and len(mot) > 2:
                     ville_detectee = mot
-            message_bot = get_meteo_ville(ville_detectee)
+            message_bot += get_meteo_ville(ville_detectee)
 
         elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
-            message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
+            message_bot += "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
 
         elif any(phrase in question_clean for phrase in ["quoi de neuf", "tu fais quoi", "des news"]):
-            message_bot = "Je scrute les marchés, je capte les tendances… une journée normale pour une IA boursière !"
+            message_bot += "Je scrute les marchés, je capte les tendances… une journée normale pour une IA boursière !"
 
         elif any(phrase in question_clean for phrase in ["t'es qui", "tu es qui", "t'es quoi", "tu es quoi"]):
-            message_bot = "Je suis AVA, votre assistante virtuelle boursière, météo, et bien plus. Disons... une alliée du futur."
+            message_bot += "Je suis AVA, votre assistante virtuelle boursière, météo, et bien plus. Disons... une alliée du futur."
 
         elif any(phrase in question_clean for phrase in ["tu dors", "t'es là", "tu es là"]):
-            message_bot = "Je ne dors jamais. Toujours connectée, toujours prête. Posez votre question !"
+            message_bot += "Je ne dors jamais. Toujours connectée, toujours prête. Posez votre question !"
 
         elif "salut" in question_clean or "bonjour" in question_clean:
-            message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
+            message_bot += "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
         elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
@@ -107,45 +110,38 @@ if question:
                     df = yf.download(nom_ticker, period="6mo", interval="1d")
                     df.to_csv(data_path, index=True)
                 except Exception as e:
-                    message_bot = f"❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
+                    message_bot += f"\n\n❌ Impossible de télécharger les données pour {nom_ticker.upper()} : {e}"
 
             if os.path.exists(data_path):
                 df = pd.read_csv(data_path)
                 df.columns = [col.capitalize() for col in df.columns]
                 if "Close" not in df.columns:
-                    message_bot = f"⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée.\n(Colonnes présentes : {', '.join(df.columns)})"
+                    message_bot += f"\n\n⚠️ Les données pour {nom_ticker.upper()} sont invalides. Aucune colonne 'Close' trouvée.\n(Colonnes présentes : {', '.join(df.columns)})"
                 else:
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
-
-                        if "achat" in suggestion.lower():
-                            suggestion += " 📈 Envisagez un achat si la prochaine bougie confirme le signal."
-                        elif "vente" in suggestion.lower():
-                            suggestion += " 📉 Attendez une cassure du support avant de vendre."
-                        elif "attente" in suggestion.lower() or "neutre" in suggestion.lower():
-                            suggestion += " ⚠️ Prudence, attendez une confirmation claire."
-
-                        message_bot = (
-                            f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                        message_bot += (
+                            f"\n\n📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                             f"{analyse}\n\n"
                             f"🤖 *Mon intuition d'IA ?* {suggestion}"
                         )
                     except Exception as e:
-                        message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+                        message_bot += f"\n\n⚠️ Une erreur est survenue pendant l'analyse : {e}"
             else:
-                message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
+                message_bot += f"\n\n⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
 
         else:
             try:
-                message_bot = obtenir_reponse_ava(question)
+                message_bot += obtenir_reponse_ava(question)
             except Exception as e:
-                message_bot = f"⚠️ Une erreur est survenue lors du traitement de votre question : {e}"
+                message_bot += f"⚠️ Une erreur est survenue lors du traitement de votre question : {e}"
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
-st.sidebar.button("🪟 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
