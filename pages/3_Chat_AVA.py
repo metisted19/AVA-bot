@@ -11,6 +11,14 @@ st.set_page_config(page_title="Chat AVA", layout="centered")
 st.title("🤖 AVA - Chat IA")
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
+# --- Demande du prénom utilisateur ---
+if "nom_utilisateur" not in st.session_state:
+    st.session_state.nom_utilisateur = st.text_input("Entrez votre prénom pour commencer :", "")
+
+if st.session_state.nom_utilisateur:
+    st.markdown(f"👋 Bonjour **{st.session_state.nom_utilisateur}**, ravi de vous revoir !")
+
+# Historique de messages
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -118,9 +126,9 @@ if question:
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
                         message_bot = (
-                            f"📊 Voici ce que je détecte sur **{nom_ticker.upper()}** aujourd'hui 👇\n\n"
+                            f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                             f"{analyse}\n\n"
-                            f"🎯 *Mon conseil :* {suggestion}"
+                            f"🤖 *Mon intuition d'IA ?* {suggestion}"
                         )
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -138,6 +146,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
