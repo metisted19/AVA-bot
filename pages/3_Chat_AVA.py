@@ -5,7 +5,6 @@ from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_t
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import get_general_news
 from fonctions_meteo import get_meteo_ville
-import re
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
@@ -16,6 +15,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Fonction d'analyse de sentiment
+
 def analyser_sentiment(news_list):
     mots_positifs = ["progress", "gain", "rise", "success", "growth"]
     mots_negatifs = ["fall", "loss", "drop", "crash", "recession"]
@@ -62,10 +62,10 @@ if question:
                 message_bot = f"⚠️ Une erreur est survenue lors de la récupération des actualités : {e}"
 
         elif "météo" in question_clean or "quel temps" in question_clean:
-            match = re.search(r"météo(?: à| de)? ([a-zA-Zéèàçîïë\- ]+)", question_clean)
             ville_detectee = "Paris"
-            if match:
-                ville_detectee = match.group(1).strip().title()
+            for mot in question.split():
+                if mot and mot[0].isupper() and len(mot) > 2:
+                    ville_detectee = mot
             message_bot = get_meteo_ville(ville_detectee)
 
         elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
@@ -83,7 +83,7 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "eth", "fchi", "cac", "bitcoin"]):
+        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             mapping = {
                 "btc": "btc-usd",
@@ -118,9 +118,9 @@ if question:
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
                         message_bot = (
-                            f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                            f"📊 Voici ce que je détecte sur **{nom_ticker.upper()}** aujourd'hui 👇\n\n"
                             f"{analyse}\n\n"
-                            f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                            f"🎯 *Mon conseil :* {suggestion}"
                         )
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -138,6 +138,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🧹 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
