@@ -113,15 +113,14 @@ if question:
                 else:
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
-                        action = suggerer_action(analyse)
                         message_bot = (
                             f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                             f"{analyse}\n\n"
-                            f"🤖 *Mon intuition d'IA ?* {suggestion}\n\n"
-                            f"💡 **Action suggérée :** {action}"
+                            f"🤖 *Mon intuition d'IA ?* {suggestion}"
                         )
-                    except Exception as e:
+                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+
             else:
                 message_bot = f"⚠️ Je n’ai pas pu récupérer les données pour {nom_ticker.upper()}"
 
