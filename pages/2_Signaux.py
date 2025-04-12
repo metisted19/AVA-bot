@@ -11,13 +11,16 @@ tickers_disponibles = ["BTC-USD", "ETH-USD", "AAPL", "TSLA", "GOOGL", "^FCHI"]
 ticker = st.selectbox("Sélectionnez un actif à analyser :", tickers_disponibles)
 
 # --- Chargement des données ---
-data_path = f"data/donnees_{ticker.lower().replace('-', '').replace('^', '')}.csv"
-if os.path.exists(data_path):
-    df = pd.read_csv(data_path)
+fichier_data = f"data/donnees_{ticker.lower().replace('-', '').replace('^', '')}.csv"
+fichier_pred = f"predictions/prediction_{ticker.lower().replace('-', '').replace('^', '')}.csv"
+
+if os.path.exists(fichier_data):
+    df = pd.read_csv(fichier_data)
     df.columns = [col.capitalize() for col in df.columns]
     df = ajouter_indicateurs_techniques(df)
 
     try:
+        # --- Analyse technique ---
         analyse, suggestion = analyser_signaux_techniques(df)
 
         def generer_resume_signal(signaux):
@@ -40,15 +43,36 @@ if os.path.exists(data_path):
         signaux_list = analyse.split("\n") if analyse else []
         resume = generer_resume_signal(signaux_list)
 
-        st.subheader(f"Analyse technique pour {ticker.upper()}")
-        st.markdown(f"{analyse}")
-        st.markdown(f"\n💡 **Résumé d'AVA :**\n{resume}")
+        # --- Affichage complet ---
+        st.subheader(f"🔎 Analyse pour {ticker.upper()}")
+        st.markdown(analyse)
+        st.markdown(f"💬 **Résumé d'AVA :**\n{resume}")
         st.success(f"🤖 *Intuition d'AVA :* {suggestion}")
+
+        # --- Affichage des prédictions IA ---
+        if os.path.exists(fichier_pred):
+            df_pred = pd.read_csv(fichier_pred)
+            prediction = df_pred["prediction"].iloc[-1]
+            st.subheader("📈 Prédiction IA (demain) :")
+            st.info("📈 Hausse probable demain" if prediction == 1 else "📉 Baisse probable demain")
+        else:
+            st.warning("Aucune prédiction trouvée.")
+
+        # --- RSI ---
+        if 'Rsi' in df.columns:
+            st.subheader("📊 RSI actuel :")
+            st.metric("RSI", round(df["Rsi"].iloc[-1], 2))
+
+        # --- Affichage du tableau brut ---
+        st.subheader("📄 Données récentes")
+        st.dataframe(df.tail(10), use_container_width=True)
 
     except Exception as e:
         st.error(f"Une erreur est survenue pendant l'analyse : {e}")
+
 else:
-    st.warning(f"Aucune donnée trouvée pour {ticker}. Veuillez lancer l'entraînement AVA.")
+    st.warning(f"❌ Aucune donnée trouvée pour {ticker}. Veuillez lancer l'entraînement AVA.")
+
 
 
 
