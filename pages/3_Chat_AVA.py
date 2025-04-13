@@ -8,6 +8,15 @@ from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
 from PIL import Image
 from datetime import datetime
+# Affichage du message d'accueil avec logo personnalisé
+from PIL import Image
+
+logo_path = "assets/ava_logo.png"
+if os.path.exists(logo_path):
+    logo = Image.open(logo_path)
+    st.image(logo, width=60)
+st.markdown("<h1 style='text-align: center;'>AVA - Chat IA</h1>", unsafe_allow_html=True)
+st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
