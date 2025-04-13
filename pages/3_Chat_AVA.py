@@ -11,13 +11,12 @@ from PIL import Image
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# Affichage du message d'accueil avec logo personnalisé
-st.markdown("""
-    <div style='display: flex; align-items: center;'>
-        <img src='https://ava-bot-a8bcqxjmaej5yqe8tcrdgq.streamlit.app/assets/ava_logo.png' width='40' style='margin-right: 10px;'>
-        <h1 style='margin: 0;'>AVA - Chat IA</h1>
-    </div>
-""", unsafe_allow_html=True)
+# --- Affichage du message d'accueil avec logo local ---
+col1, col2 = st.columns([1, 8])
+with col1:
+    st.image("assets/ava_logo.png", width=50)
+with col2:
+    st.markdown("<h1 style='margin-top: 5px;'>AVA - Chat IA</h1>", unsafe_allow_html=True)
 
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
@@ -88,7 +87,7 @@ if question:
                         resultats.append(resume)
                     except:
                         continue
-                message_bot = "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5])
+                message_bot = "📈 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5])
             except Exception as e:
                 message_bot = f"❌ Erreur lors de l'analyse complète : {e}"
 
@@ -154,7 +153,7 @@ if question:
                     message_bot = (
                         f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
-                        f"🧐 *Mon intuition d'IA ?* {suggestion}"
+                        f"😎 *Mon intuition d'IA ?* {suggestion}"
                     )
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -169,6 +168,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
