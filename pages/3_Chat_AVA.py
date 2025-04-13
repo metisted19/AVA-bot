@@ -6,6 +6,7 @@ from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
+import random
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -22,6 +23,30 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+# --- Blagues, punchlines et citations ---
+def get_random_fun_content(type="blague"):
+    blagues = [
+        "Pourquoi les traders ne bronzent jamais ? Parce qu'ils restent à l'ombre des graphes !",
+        "Je connais un trader qui a vendu sa maison pour acheter du Bitcoin... Maintenant il vit dans le cloud ☁️",
+        "Pourquoi l'IA n'a jamais peur ? Parce qu'elle ne manque jamais de logique."
+    ]
+    punchlines = [
+        "Je suis AVA, l'alliée des cerveaux affûtés et des marchés en ébullition ✨",
+        "Je prédis les tendances comme un mage des temps modernes.",
+        "Aucune rumeur ne m'échappe, aucune bougie ne me ment."
+    ]
+    citations = [
+        """"Le succès appartient à ceux qui sont prêts à apprendre, chaque jour." - AVA""",
+        """"L'information, c'est le pouvoir. L'analyse, c'est la clé." - AVA""",
+        """"Reste calme quand le marché s'agite. C'est là que se créent les opportunités." - AVA"""
+    ]
+    if type == "blague":
+        return random.choice(blagues)
+    elif type == "punchline":
+        return random.choice(punchlines)
+    else:
+        return random.choice(citations)
+
 # --- Interaction principale ---
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
@@ -36,35 +61,30 @@ if question:
 
         # --- Horoscope ---
         if "horoscope" in question_clean or "signe" in question_clean or "astrologie" in question_clean:
-            signes = {
-                "bélier": "belier", "taureau": "taureau", "gémeaux": "gemeaux", "cancer": "cancer",
-                "lion": "lion", "vierge": "vierge", "balance": "balance", "scorpion": "scorpion",
-                "sagittaire": "sagittaire", "capricorne": "capricorne", "verseau": "verseau", "poissons": "poissons"
-            }
-
-            signe_detecte = None
-            for s_fr, s_url in signes.items():
-                if s_fr in question_clean:
-                    signe_detecte = s_url
-                    break
+            signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
+            signe_detecte = next((s for s in signes if s in question_clean), None)
 
             if not signe_detecte:
                 message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
             else:
                 try:
-                    url = "https://kayoo123.github.io/astroo-api/jour.json"
-                    response = requests.get(url)
+                    url = f"https://aztro.sameerkumar.website/?sign={signe_detecte}&day=today"
+                    response = requests.post(url)
                     if response.status_code == 200:
                         data = response.json()
-                        horoscope = data.get(signe_detecte)
-                        if horoscope:
-                            message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}"
-                        else:
-                            message_bot = "❌ Désolé, je n'ai pas trouvé d'horoscope pour ce signe."
+                        message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}"
                     else:
                         message_bot = "❌ Désolé, impossible d'obtenir l'horoscope pour le moment."
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue : {e}"
+
+        # --- Blagues & punchlines ---
+        elif any(mot in question_clean for mot in ["blague", "rigole", "fais-moi rire"]):
+            message_bot = get_random_fun_content("blague")
+        elif "punchline" in question_clean:
+            message_bot = get_random_fun_content("punchline")
+        elif any(mot in question_clean for mot in ["citation", "motivation", "inspire"]):
+            message_bot = get_random_fun_content("citation")
 
         # --- Actualités ---
         elif "actualité" in question_clean or "news" in question_clean:
@@ -123,7 +143,7 @@ if question:
                 try:
                     analyse, suggestion = analyser_signaux_techniques(df)
                     message_bot = (
-                        f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                        f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
                         f"🤖 *Mon intuition d'IA ?* {suggestion}"
                     )
@@ -139,7 +159,8 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
-st.sidebar.button("🧪 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
