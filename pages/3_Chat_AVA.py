@@ -84,7 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Horoscope avec JSON libre hébergé par Kayoo123
+        # Horoscope avec JSON libre Kayoo123 (corrigé pour accéder au bon champ)
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_disponibles = [
                 "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
@@ -100,7 +100,8 @@ if question:
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        horoscope = data.get(signe_detecte, {}).get("horoscope")
+                        signe_data = data.get("signes", {}).get(signe_detecte, {})
+                        horoscope = signe_data.get("horoscope")
                         if horoscope:
                             message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
                         else:
