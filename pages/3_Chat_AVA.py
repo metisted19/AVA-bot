@@ -35,23 +35,32 @@ if question:
         message_bot = ""
 
         # --- Horoscope ---
-        if "horoscope" in question_clean or "signe" in question_clean or "astrologie" in question_clean:
-            signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
-            signe_detecte = next((s for s in signes if s in question_clean), None)
+        elif "horoscope" in question_clean or "signe" in question_clean or "astrologie" in question_clean:
+           signes = {
+                "bélier": "belier", "taureau": "taureau", "gémeaux": "gemeaux", "cancer": "cancer",
+                "lion": "lion", "vierge": "vierge", "balance": "balance", "scorpion": "scorpion",
+                "sagittaire": "sagittaire", "capricorne": "capricorne", "verseau": "verseau", "poissons": "poissons"
+            }
 
-            if not signe_detecte:
-                message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
-            else:
-                try:
-                    url = f"https://ohmanda.com/api/horoscope/{signe_detecte}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        data = response.json()
-                        message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['horoscope']}"
-                    else:
-                        message_bot = "❌ Désolé, impossible d'obtenir l'horoscope pour le moment."
-                except Exception as e:
-                    message_bot = f"⚠️ Une erreur est survenue : {e}"
+            signe_detecte = None
+            for s_fr, s_url in signes.items():
+                if s_fr in question_clean:
+                   signe_detecte = s_url
+                   break
+
+        if not signe_detecte:
+           message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
+        else:
+             try:
+                 url = f"https://ohmanda.com/api/horoscope/{signe_detecte}"
+                 response = requests.get(url)
+                 if response.status_code == 200:
+                     data = response.json()
+                     message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['horoscope']}"
+                else:
+                     message_bot = "❌ Désolé, impossible d'obtenir l'horoscope pour le moment."
+            except Exception as e:
+                message_bot = f"⚠️ Une erreur est survenue : {e}"
 
         # --- Actualités ---
         elif "actualité" in question_clean or "news" in question_clean:
