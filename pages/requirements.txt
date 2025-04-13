@@ -6,3 +6,4 @@ newsapi-python
 scikit-learn
 xgboost
 yfinance
+langdetect
