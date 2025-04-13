@@ -122,7 +122,7 @@ if question:
                     except:
                         continue
                 if resultats:
-                    message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5]) + "\n\n"
+                    message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats) + "\n\n"
                     analyse_complete = True
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
@@ -202,6 +202,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
