@@ -64,7 +64,8 @@ if question:
         elif "analyse complète" in question_clean:
             import glob
             try:
-                resultats = []
+                actifs_avec_signaux = []
+                actifs_sans_signaux = []
                 fichiers = glob.glob("data/donnees_*.csv")
                 for fichier in fichiers:
                     df = pd.read_csv(fichier)
@@ -73,10 +74,13 @@ if question:
                         analyse, suggestion = analyser_signaux_techniques(df)
                         nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
                         resume = f"\n📌 **{nom}**\n{analyse}\n💡 {suggestion}"
-                        resultats.append(resume)
+                        if "aucun signal" in analyse.lower():
+                            actifs_sans_signaux.append(resume)
+                        else:
+                            actifs_avec_signaux.append(resume)
                     except:
                         continue
-                message_bot = "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5])
+                message_bot = "📊 **Analyse complète du marché :**\n" + "\n\n".join(actifs_avec_signaux + actifs_sans_signaux)
             except Exception as e:
                 message_bot = f"❌ Erreur lors de l'analyse complète : {e}"
 
@@ -87,7 +91,7 @@ if question:
                 message_bot = actus
             elif actus:
                 resume = "".join([titre for titre, _ in actus[:3]])
-                message_bot = "🕴️ Les actus bougent ! Voici un résumé :\n\n"
+                message_bot = "🧴 Les actus bougent ! Voici un résumé :\n\n"
                 message_bot += f"*En bref* : {resume[:180]}...\n\n"
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
             else:
@@ -157,6 +161,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
