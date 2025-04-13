@@ -6,7 +6,6 @@ from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
-import random
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -22,30 +21,6 @@ if "messages" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
-# --- Blagues, punchlines et citations ---
-def get_random_fun_content(type="blague"):
-    blagues = [
-        "Pourquoi les traders ne bronzent jamais ? Parce qu'ils restent à l'ombre des graphes !",
-        "Je connais un trader qui a vendu sa maison pour acheter du Bitcoin... Maintenant il vit dans le cloud ☁️",
-        "Pourquoi l'IA n'a jamais peur ? Parce qu'elle ne manque jamais de logique."
-    ]
-    punchlines = [
-        "Je suis AVA, l'alliée des cerveaux affûtés et des marchés en ébullition ✨",
-        "Je prédis les tendances comme un mage des temps modernes.",
-        "Aucune rumeur ne m'échappe, aucune bougie ne me ment."
-    ]
-    citations = [
-        """"Le succès appartient à ceux qui sont prêts à apprendre, chaque jour." - AVA""",
-        """"L'information, c'est le pouvoir. L'analyse, c'est la clé." - AVA""",
-        """"Reste calme quand le marché s'agite. C'est là que se créent les opportunités." - AVA"""
-    ]
-    if type == "blague":
-        return random.choice(blagues)
-    elif type == "punchline":
-        return random.choice(punchlines)
-    else:
-        return random.choice(citations)
 
 # --- Interaction principale ---
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
@@ -78,21 +53,16 @@ if question:
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue : {e}"
 
-        # --- Blagues & punchlines ---
-        elif any(mot in question_clean for mot in ["blague", "rigole", "fais-moi rire"]):
-            message_bot = get_random_fun_content("blague")
-        elif "punchline" in question_clean:
-            message_bot = get_random_fun_content("punchline")
-        elif any(mot in question_clean for mot in ["citation", "motivation", "inspire"]):
-            message_bot = get_random_fun_content("citation")
-
-        # --- Actualités ---
+        # --- Actualités avec résumé ---
         elif "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
                 message_bot = actus
             elif actus:
-                message_bot = "🕴️ Voici les actualités :\n\n" + "\n\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
+                resume = "".join([titre for titre, _ in actus[:3]])
+                message_bot = "🕴️ Les actus bougent ! Voici un résumé :\n\n"
+                message_bot += f"*En bref* : {resume[:180]}...\n\n"
+                message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
             else:
                 message_bot = "❌ Aucune actualité disponible pour le moment."
 
@@ -143,9 +113,9 @@ if question:
                 try:
                     analyse, suggestion = analyser_signaux_techniques(df)
                     message_bot = (
-                        f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                        f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
-                        f"🤖 *Mon intuition d'IA ?* {suggestion}"
+                        f"🧠 *Mon intuition d'IA ?* {suggestion}"
                     )
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -160,6 +130,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
