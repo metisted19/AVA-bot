@@ -84,6 +84,7 @@ if question:
         horoscope_repondu = False
         meteo_repondu = False
         actus_repondu = False
+        blague_repondu = False
 
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
@@ -153,6 +154,7 @@ if question:
                 "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
             ]
             message_bot = random.choice(blagues)
+            blague_repondu = True
 
         elif any(phrase in question_clean for phrase in ["motivation", "boost", "conseil"]):
             message_bot = "🚀 N'oubliez jamais : les plus grandes réussites partent souvent d’une simple idée… AVA en est la preuve vivante."
@@ -172,7 +174,7 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        elif not any([horoscope_repondu, meteo_repondu, actus_repondu]):
+        elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu]):
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
                 if "btc" in nom_ticker or "bitcoin" in nom_ticker:
@@ -206,17 +208,19 @@ if question:
             else:
                 message_bot = obtenir_reponse_ava(question)
 
-        try:
-            langue = detect(question)
-            if langue in ["en", "es", "de"]:
-                message_bot = traduire_texte(message_bot, langue)
-        except:
-            message_bot += "\n\n⚠️ Traduction indisponible."
+        if not blague_repondu:
+            try:
+                langue = detect(question)
+                if langue in ["en", "es", "de"]:
+                    message_bot = traduire_texte(message_bot, langue)
+            except:
+                message_bot += "\n\n⚠️ Traduction indisponible."
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
