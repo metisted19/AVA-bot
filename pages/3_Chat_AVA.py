@@ -37,13 +37,20 @@ if question:
         # --- Horoscope ---
         if "horoscope" in question_clean or "signe" in question_clean or "astrologie" in question_clean:
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
+            signes_api = {
+                "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini",
+                "cancer": "cancer", "lion": "leo", "vierge": "virgo",
+                "balance": "libra", "scorpion": "scorpio", "sagittaire": "sagittarius",
+                "capricorne": "capricorn", "verseau": "aquarius", "poissons": "pisces"
+            }
             signe_detecte = next((s for s in signes if s in question_clean), None)
 
             if not signe_detecte:
                 message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
             else:
                 try:
-                    url = f"https://aztro.sameerkumar.website/?sign={signe_detecte}&day=today"
+                    signe_api = signes_api.get(signe_detecte, "")
+                    url = f"https://aztro.sameerkumar.website/?sign={signe_api}&day=today"
                     response = requests.post(url)
                     if response.status_code == 200:
                         data = response.json()
@@ -130,6 +137,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
