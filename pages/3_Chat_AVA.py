@@ -97,7 +97,7 @@ if question:
                 horoscope_repondu = True
             else:
                 try:
-                    url ="https://kayoo123.github.io/astroo-api/jour.json"
+                    url = "https://kayoo123.github.io/astroo-api/jour.json"
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
