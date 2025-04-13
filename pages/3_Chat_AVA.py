@@ -80,6 +80,11 @@ if question:
         question_clean = question.lower().strip()
         message_bot = ""
 
+        horoscope_repondu = False
+        meteo_repondu = False
+        actus_repondu = False
+
+        # Horoscope
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
             signes_api = {
@@ -90,7 +95,7 @@ if question:
             }
             signe_detecte = next((s for s in signes if s in question_clean), None)
             if not signe_detecte:
-                message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
+                message_bot += "🔮 Pour l'horoscope, indiquez-moi votre **signe astrologique**.\n\n"
             else:
                 try:
                     signe_api = signes_api.get(signe_detecte, "")
@@ -98,50 +103,34 @@ if question:
                     response = requests.post(url)
                     if response.status_code == 200:
                         data = response.json()
-                        message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}"
-                    else:
-                        message_bot = "❌ Désolé, impossible d'obtenir l'horoscope pour le moment."
-                except Exception as e:
-                    message_bot = f"⚠️ Une erreur est survenue : {e}"
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}\n\n"
+                        horoscope_repondu = True
+                except:
+                    message_bot += "❌ Erreur lors de la récupération de l'horoscope.\n\n"
 
-        elif any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
-            import glob
-            try:
-                resultats = []
-                fichiers = glob.glob("data/donnees_*.csv")
-                for fichier in fichiers:
-                    df = pd.read_csv(fichier)
-                    df.columns = [col.capitalize() for col in df.columns]
-                    try:
-                        analyse, suggestion = analyser_signaux_techniques(df)
-                        nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
-                        resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
-                        resultats.append(resume)
-                    except:
-                        continue
-                message_bot = "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5])
-            except Exception as e:
-                message_bot = f"❌ Erreur lors de l'analyse complète : {e}"
-
-        elif "actualité" in question_clean or "news" in question_clean:
+        # Actualités
+        if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
-                message_bot = actus
+                message_bot += actus
             elif actus:
                 resume = "".join([titre for titre, _ in actus[:3]])
-                message_bot = "🧔️ Les actus bougent ! Voici un résumé :\n\n"
+                message_bot += "🧔️ Les actus bougent ! Voici un résumé :\n\n"
                 message_bot += f"*En bref* : {resume[:180]}...\n\n"
-                message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
-            else:
-                message_bot = "❌ Aucune actualité disponible pour le moment."
+                message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus]) + "\n\n"
+                actus_repondu = True
 
-        elif "météo" in question_clean or "quel temps" in question_clean:
+        # Météo
+        if "météo" in question_clean or "quel temps" in question_clean:
             ville_detectee = "Paris"
             for mot in question.split():
                 if mot and mot[0].isupper() and len(mot) > 2:
                     ville_detectee = mot
-            message_bot = get_meteo_ville(ville_detectee)
+            meteo = get_meteo_ville(ville_detectee)
+            message_bot += f"🌦️ Météo à {ville_detectee} :\n{meteo}\n\n"
+            meteo_repondu = True
 
+        # Réponses simples, blagues, motivation
         elif any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
                 "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
@@ -168,39 +157,39 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
-            nom_ticker = question_clean.replace(" ", "").replace("-", "")
-            if "btc" in nom_ticker or "bitcoin" in nom_ticker:
-                nom_ticker = "btc-usd"
-            elif "eth" in nom_ticker:
-                nom_ticker = "eth-usd"
-            elif "aapl" in nom_ticker:
-                nom_ticker = "aapl"
-            elif "tsla" in nom_ticker:
-                nom_ticker = "tsla"
-            elif "googl" in nom_ticker:
-                nom_ticker = "googl"
-            elif "fchi" in nom_ticker or "cac" in nom_ticker:
-                nom_ticker = "^fchi"
+        elif not any([horoscope_repondu, meteo_repondu, actus_repondu]):
+            if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
+                nom_ticker = question_clean.replace(" ", "").replace("-", "")
+                if "btc" in nom_ticker or "bitcoin" in nom_ticker:
+                    nom_ticker = "btc-usd"
+                elif "eth" in nom_ticker:
+                    nom_ticker = "eth-usd"
+                elif "aapl" in nom_ticker:
+                    nom_ticker = "aapl"
+                elif "tsla" in nom_ticker:
+                    nom_ticker = "tsla"
+                elif "googl" in nom_ticker:
+                    nom_ticker = "googl"
+                elif "fchi" in nom_ticker or "cac" in nom_ticker:
+                    nom_ticker = "^fchi"
 
-            data_path = f"data/donnees_{nom_ticker}.csv"
-            if os.path.exists(data_path):
-                df = pd.read_csv(data_path)
-                df.columns = [col.capitalize() for col in df.columns]
-                try:
-                    analyse, suggestion = analyser_signaux_techniques(df)
-                    message_bot = (
-                        f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
-                        f"{analyse}\n\n"
-                        f"🧐 *Mon intuition d'IA ?* {suggestion}"
-                    )
-                except Exception as e:
-                    message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+                data_path = f"data/donnees_{nom_ticker}.csv"
+                if os.path.exists(data_path):
+                    df = pd.read_csv(data_path)
+                    df.columns = [col.capitalize() for col in df.columns]
+                    try:
+                        analyse, suggestion = analyser_signaux_techniques(df)
+                        message_bot = (
+                            f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                            f"{analyse}\n\n"
+                            f"🧐 *Mon intuition d'IA ?* {suggestion}"
+                        )
+                    except Exception as e:
+                        message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
+                else:
+                    message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
             else:
-                message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
-
-        else:
-            message_bot = obtenir_reponse_ava(question)
+                message_bot = obtenir_reponse_ava(question)
 
         try:
             langue = detect(question)
@@ -214,6 +203,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
