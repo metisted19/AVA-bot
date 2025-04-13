@@ -99,9 +99,13 @@ if question:
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        signes = data.get("signes", {})
-                        # Recherche du signe de façon insensible à la casse dans les clés du JSON
-                        signe_data = next((v for k, v in signes.items() if k.lower() == signe_detecte), None)
+                        # Si la clé "signes" existe, on prend son contenu, sinon on considère le JSON entier comme le dictionnaire d'horoscopes.
+                        if "signes" in data:
+                            horoscope_dict = data.get("signes", {})
+                        else:
+                            horoscope_dict = data
+                        # Recherche du signe de façon insensible à la casse dans les clés
+                        signe_data = next((v for k, v in horoscope_dict.items() if k.lower() == signe_detecte), None)
                         if signe_data is None:
                             message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
                         else:
@@ -217,6 +221,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
