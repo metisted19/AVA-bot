@@ -84,27 +84,24 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Horoscope toujours traité en priorité
+        # Horoscope (via API alternative fiable : https://horoscope-api.vercel.app)
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
-            signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
             signes_api = {
-                "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini",
-                "cancer": "cancer", "lion": "leo", "vierge": "virgo",
-                "balance": "libra", "scorpion": "scorpio", "sagittaire": "sagittarius",
-                "capricorne": "capricorn", "verseau": "aquarius", "poissons": "pisces"
+                "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini", "cancer": "cancer",
+                "lion": "leo", "vierge": "virgo", "balance": "libra", "scorpion": "scorpio",
+                "sagittaire": "sagittarius", "capricorne": "capricorn", "verseau": "aquarius", "poissons": "pisces"
             }
-            signe_detecte = next((s for s in signes if s in question_clean), None)
+            signe_detecte = next((s for s in signes_api if s in question_clean), None)
             if not signe_detecte:
                 message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
                 horoscope_repondu = True
             else:
                 try:
-                    signe_api = signes_api.get(signe_detecte, "")
-                    url = f"https://aztro.sameerkumar.website/?sign={signe_api}&day=today"
-                    response = requests.post(url)
+                    url = f"https://horoscope-api.vercel.app/horoscope/today/{signes_api[signe_detecte]}"
+                    response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}\n\n"
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['horoscope']}\n\n"
                         horoscope_repondu = True
                     else:
                         message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
@@ -213,6 +210,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
