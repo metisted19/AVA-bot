@@ -21,19 +21,6 @@ def traduire_texte(texte, langue_dest):
     except:
         return texte  # fallback
 
-# Détection de la langue du message
-langue = detect(question)
-
-# Réponse standard par défaut
-message_bot = obtenir_reponse_ava(question)
-
-# Traduction automatique si ce n’est pas du français
-if langue in ["en", "es", "de"]:
-    try:
-        message_bot = traduire_texte(message_bot, langue)
-    except:
-        message_bot += "\n\n⚠️ Traduction indisponible."
-        
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
@@ -59,7 +46,7 @@ st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités.
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- Affichage des messages existants ---
+# Affichage des messages précédents
 for message in st.session_state.messages:
     if message["role"] == "assistant":
         with st.chat_message("assistant", avatar="assets/ava_logo.png"):
@@ -68,7 +55,7 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-# --- Interaction principale ---
+# Interaction utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
 if question:
@@ -80,8 +67,8 @@ if question:
         question_clean = question.lower().strip()
         message_bot = ""
 
-        # --- Horoscope ---
-        if "horoscope" in question_clean or "signe" in question_clean or "astrologie" in question_clean:
+        # Horoscope
+        if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
             signes_api = {
                 "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini",
@@ -90,7 +77,6 @@ if question:
                 "capricorne": "capricorn", "verseau": "aquarius", "poissons": "pisces"
             }
             signe_detecte = next((s for s in signes if s in question_clean), None)
-
             if not signe_detecte:
                 message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
             else:
@@ -106,7 +92,7 @@ if question:
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue : {e}"
 
-        # --- Commande secrète : analyse complète ou synonymes ---
+        # Analyse complète
         elif any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             import glob
             try:
@@ -126,7 +112,7 @@ if question:
             except Exception as e:
                 message_bot = f"❌ Erreur lors de l'analyse complète : {e}"
 
-        # --- Actualités avec résumé ---
+        # Actualités
         elif "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
@@ -139,7 +125,7 @@ if question:
             else:
                 message_bot = "❌ Aucune actualité disponible pour le moment."
 
-        # --- Météo ---
+        # Météo
         elif "météo" in question_clean or "quel temps" in question_clean:
             ville_detectee = "Paris"
             for mot in question.split():
@@ -147,7 +133,7 @@ if question:
                     ville_detectee = mot
             message_bot = get_meteo_ville(ville_detectee)
 
-        # --- Réponses simples ---
+        # Réponses simples
         elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
             message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
 
@@ -163,7 +149,7 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        # --- Analyse technique vivante ---
+        # Analyse technique
         elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             if "btc" in nom_ticker or "bitcoin" in nom_ticker:
@@ -197,6 +183,13 @@ if question:
 
         else:
             message_bot = obtenir_reponse_ava(question)
+
+        try:
+            langue = detect(question)
+            if langue in ["en", "es", "de"]:
+                message_bot = traduire_texte(message_bot, langue)
+        except:
+            message_bot += "\n\n⚠️ Traduction indisponible."
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
