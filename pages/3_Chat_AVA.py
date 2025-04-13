@@ -101,7 +101,7 @@ if question:
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        horoscope = data.get(signes_api[signe_detecte], {}).get("horoscope")
+                        horoscope = data.get(signe_detecte, {}).get("horoscope")
                         if horoscope:
                             message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
                         else:
