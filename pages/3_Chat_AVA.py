@@ -8,7 +8,32 @@ from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
 from PIL import Image
 from datetime import datetime
+from langdetect import detect
+import urllib.parse
 
+# Fonction de traduction via l’API gratuite MyMemory
+def traduire_texte(texte, langue_dest):
+    try:
+        texte_enc = urllib.parse.quote(texte)
+        url = f"https://api.mymemory.translated.net/get?q={texte_enc}&langpair=fr|{langue_dest}"
+        r = requests.get(url).json()
+        return r["responseData"]["translatedText"]
+    except:
+        return texte  # fallback
+
+# Détection de la langue du message
+langue = detect(question)
+
+# Réponse standard par défaut
+message_bot = obtenir_reponse_ava(question)
+
+# Traduction automatique si ce n’est pas du français
+if langue in ["en", "es", "de"]:
+    try:
+        message_bot = traduire_texte(message_bot, langue)
+    except:
+        message_bot += "\n\n⚠️ Traduction indisponible."
+        
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
