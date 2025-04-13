@@ -7,16 +7,19 @@ from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
 from PIL import Image
+import time
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
 # Affichage du message d'accueil avec logo personnalisé
-logo_path = "assets/ava_logo.png"
-if os.path.exists(logo_path):
-    logo = Image.open(logo_path)
-    st.image(logo, width=60)
-st.markdown("<h1 style='text-align: center;'>AVA - Chat IA</h1>", unsafe_allow_html=True)
+st.markdown("""
+    <div style='display: flex; align-items: center;'>
+        <img src='https://ava-bot-a8bcqxjmaej5yqe8tcrdgq.streamlit.app/assets/ava_logo.png' width='40' style='margin-right: 10px;'>
+        <h1 style='margin: 0;'>AVA - Chat IA</h1>
+    </div>
+""", unsafe_allow_html=True)
+
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
 # Initialisation de l'historique de chat
@@ -97,7 +100,7 @@ if question:
                 message_bot = actus
             elif actus:
                 resume = "".join([titre for titre, _ in actus[:3]])
-                message_bot = "🥀 Les actus bougent ! Voici un résumé :\n\n"
+                message_bot = "🧔️ Les actus bougent ! Voici un résumé :\n\n"
                 message_bot += f"*En bref* : {resume[:180]}...\n\n"
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
             else:
@@ -152,7 +155,7 @@ if question:
                     message_bot = (
                         f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
-                        f"🤔 *Mon intuition d'IA ?* {suggestion}"
+                        f"🧐 *Mon intuition d'IA ?* {suggestion}"
                     )
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -162,11 +165,17 @@ if question:
         else:
             message_bot = obtenir_reponse_ava(question)
 
-        st.markdown(message_bot)
+        # Effet "tap-tap" simulé
+        with st.empty():
+            for i in range(1, len(message_bot) + 1):
+                st.markdown(message_bot[:i])
+                time.sleep(0.01)
+
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
