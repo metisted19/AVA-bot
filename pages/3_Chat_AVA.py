@@ -97,12 +97,15 @@ if question:
                 horoscope_repondu = True
             else:
                 try:
-                    url = " https://kayoo123.github.io/astroo-api/jour.json"
+                    url = "https://kayoo123.github.io/astroo-api/jour.json"
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        horoscope = data.get(signes_api[signe_detecte], {}).get("horoscope", "Pas de donnée disponible.")
-                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                        horoscope = data.get(signes_api[signe_detecte], {}).get("horoscope")
+                        if horoscope:
+                            message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                        else:
+                            message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
                         horoscope_repondu = True
                     else:
                         message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
@@ -206,6 +209,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
