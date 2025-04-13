@@ -84,7 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Horoscope avec nouvelle API
+        # Horoscope avec API KAYOO123
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_api = {
                 "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini", "cancer": "cancer",
@@ -97,11 +97,15 @@ if question:
                 horoscope_repondu = True
             else:
                 try:
-                    url = f"https://horoscope-api.vercel.app/api/v1/get-horoscope/daily/{signes_api[signe_detecte]}"
-                    response = requests.get(url)
+                    url = f"https://kayoo123-horoscope.p.rapidapi.com/api/horoscope/daily?sign={signes_api[signe_detecte]}"
+                    headers = {
+                        "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",  # Remplace par ta clé
+                        "X-RapidAPI-Host": "kayoo123-horoscope.p.rapidapi.com"
+                    }
+                    response = requests.get(url, headers=headers)
                     if response.status_code == 200:
                         data = response.json()
-                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['horoscope']}\n\n"
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['data']['horoscope']}\n\n"
                         horoscope_repondu = True
                     else:
                         message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
@@ -205,6 +209,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
