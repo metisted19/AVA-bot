@@ -37,10 +37,8 @@ def humeur_du_jour():
     else:
         return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
 
-# Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# Message d'accueil dynamique selon l'heure
 heure_actuelle = datetime.now().hour
 if heure_actuelle < 12:
     accueil = "🌞 Bonjour ! Prêt(e) pour une nouvelle journée de trading ?"
@@ -49,7 +47,6 @@ elif 12 <= heure_actuelle < 18:
 else:
     accueil = "🌙 Bonsoir ! On termine la journée avec une petite analyse ?"
 
-# Affichage du message d'accueil avec logo personnalisé
 col1, col2 = st.columns([0.15, 0.85])
 with col1:
     st.image("assets/ava_logo.png", width=60)
@@ -85,6 +82,7 @@ if question:
         meteo_repondu = False
         actus_repondu = False
         blague_repondu = False
+        analyse_complete = False
 
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
@@ -114,18 +112,20 @@ if question:
                 resultats = []
                 fichiers = glob.glob("data/donnees_*.csv")
                 for fichier in fichiers:
+                    df = pd.read_csv(fichier)
+                    df.columns = [col.capitalize() for col in df.columns]
                     try:
-                        df = pd.read_csv(fichier)
-                        df.columns = [col.capitalize() for col in df.columns]
                         analyse, suggestion = analyser_signaux_techniques(df)
                         nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
                         resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
                         resultats.append(resume)
-                    except Exception as e:
-                        resultats.append(f"❌ Erreur dans **{fichier}** : {e}")
-                message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5]) + "\n\n"
+                    except:
+                        continue
+                if resultats:
+                    message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5]) + "\n\n"
+                    analyse_complete = True
             except Exception as e:
-                message_bot += f"❌ Erreur générale dans l'analyse complète : {e}\n\n"
+                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
         if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
@@ -156,25 +156,7 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
-        elif any(phrase in question_clean for phrase in ["motivation", "boost", "conseil"]):
-            message_bot = "🚀 N'oubliez jamais : les plus grandes réussites partent souvent d’une simple idée… AVA en est la preuve vivante."
-
-        elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
-            message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
-
-        elif any(phrase in question_clean for phrase in ["quoi de neuf", "tu fais quoi", "des news"]):
-            message_bot = "Je scrute les marchés, je capte les tendances… une journée normale pour une IA boursière !"
-
-        elif any(phrase in question_clean for phrase in ["t'es qui", "tu es qui", "t'es quoi", "tu es quoi"]):
-            message_bot = "Je suis AVA, votre assistante virtuelle boursière, météo, et bien plus. Disons... une alliée du futur."
-
-        elif any(phrase in question_clean for phrase in ["tu dors", "t'es là", "tu es là"]):
-            message_bot = "Je ne dors jamais. Toujours connectée, toujours prête. Posez votre question !"
-
-        elif "salut" in question_clean or "bonjour" in question_clean:
-            message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
-
-        elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu]):
+        elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete]):
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
                 if "btc" in nom_ticker or "bitcoin" in nom_ticker:
@@ -220,6 +202,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
