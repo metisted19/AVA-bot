@@ -100,7 +100,7 @@ if question:
                     url = f"https://kayoo123-horoscope.p.rapidapi.com/api/horoscope/daily?sign={signes_api[signe_detecte]}"
                     headers = {
                         "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",  # Remplace par ta clé
-                        "X-RapidAPI-Host": "kayoo123-horoscope.p.rapidapi.com"
+                        "X-RapidAPI-Host": "https://kayoo123.github.io/astroo-api/jour.json"
                     }
                     response = requests.get(url, headers=headers)
                     if response.status_code == 200:
