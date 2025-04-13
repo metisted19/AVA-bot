@@ -11,7 +11,14 @@ from PIL import Image
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-st.title("🤖 AVA - Chat IA")
+# Affichage du message d'accueil avec logo personnalisé
+st.markdown("""
+    <div style='display: flex; align-items: center;'>
+        <img src='https://ava-bot-a8bcqxjmaej5yqe8tcrdgq.streamlit.app/assets/ava_logo.png' width='40' style='margin-right: 10px;'>
+        <h1 style='margin: 0;'>AVA - Chat IA</h1>
+    </div>
+""", unsafe_allow_html=True)
+
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
 # Initialisation de l'historique de chat
@@ -162,6 +169,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
