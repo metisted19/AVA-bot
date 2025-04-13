@@ -87,10 +87,10 @@ if question:
         # Horoscope avec JSON libre hébergé par Kayoo123
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_api = {
-                "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini", "cancer": "cancer",
-                "lion": "leo", "vierge": "virgo", "balance": "libra", "scorpion": "scorpio",
-                "sagittaire": "sagittarius", "capricorne": "capricorn", "verseau": "aquarius", "poissons": "pisces"
-            }
+                "bélier": "bélier", "taureau": "taureau", "gémeaux": "gémeaux", "cancer": "cancer",
+                "lion": "lion", "vierge": "vierge", "balance": "balance", "scorpion": "scorpion",
+                "sagittaire": "sagittaire", "capricorne": "capricorne", "verseau": "verseau", "poissons": "poissons"
+            }}
             signe_detecte = next((s for s in signes_api if s in question_clean), None)
             if not signe_detecte:
                 message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
