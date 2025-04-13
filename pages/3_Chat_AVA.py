@@ -85,36 +85,44 @@ if question:
         analyse_complete = False
 
         # Horoscope avec JSON libre Kayoo123
-        if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
-            signes_disponibles = [
-                "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
-                "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
-            ]
-            signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
-            if not signe_detecte:
-                message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
+    signes_disponibles = [
+        "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
+        "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
+    ]
+    signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
+    if not signe_detecte:
+        message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+        horoscope_repondu = True
+    else:
+        try:
+            url = "https://kayoo123.github.io/astroo-api/jour.json"
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                signes = data.get("signes", {})
+                # Recherche insensible à la casse dans les clés du JSON
+                signe_data = next((v for k, v in signes.items() if k.lower() == signe_detecte), None)
+                if signe_data is None:
+                    message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                else:
+                    # Si signe_data est un dictionnaire on cherche la clé "horoscope", sinon on prend directement la valeur
+                    if isinstance(signe_data, dict):
+                        horoscope = signe_data.get("horoscope")
+                    else:
+                        horoscope = signe_data
+                    if horoscope:
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                    else:
+                        message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
                 horoscope_repondu = True
             else:
-                try:
-                    url = "https://kayoo123.github.io/astroo-api/jour.json"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        data = response.json()
-                        # Recherche du signe de façon insensible à la casse dans les clés du JSON
-                        signes = data.get("signes", {})
-                        signe_data = next((v for k, v in signes.items() if k.lower() == signe_detecte), {})
-                        horoscope = signe_data.get("horoscope")
-                        if horoscope:
-                            message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
-                        else:
-                            message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
-                        horoscope_repondu = True
-                    else:
-                        message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
-                        horoscope_repondu = True
-                except:
-                    message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
-                    horoscope_repondu = True
+                message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
+                horoscope_repondu = True
+        except Exception as e:
+            message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
+            horoscope_repondu = True
+
 
         if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
