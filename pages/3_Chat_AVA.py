@@ -12,12 +12,11 @@ from PIL import Image
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
 # Affichage du message d'accueil avec logo personnalisé
-st.markdown("""
-    <div style='display: flex; align-items: center; gap: 10px;'>
-        <img src='https://ava-bot-a8bcqxjmaej5yqe8tcrdgq.streamlit.app/assets/ava_logo.png' width='40' style='margin-bottom: -8px;'>
-        <h1 style='margin: 0; font-size: 2rem;'>AVA - Chat IA</h1>
-    </div>
-""", unsafe_allow_html=True)
+col1, col2 = st.columns([0.15, 0.85])
+with col1:
+    st.image("assets/ava_logo.png", width=60)
+with col2:
+    st.markdown("<h1 style='margin-top: 10px;'>AVA - Chat IA</h1>", unsafe_allow_html=True)
 
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
