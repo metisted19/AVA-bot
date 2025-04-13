@@ -34,23 +34,51 @@ if question:
         question_clean = question.lower().strip()
         message_bot = ""
 
-        # --- Horoscope (fake pour démo stable) ---
+        # --- Horoscope ---
         if "horoscope" in question_clean or "signe" in question_clean or "astrologie" in question_clean:
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
+            signes_api = {
+                "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini",
+                "cancer": "cancer", "lion": "leo", "vierge": "virgo",
+                "balance": "libra", "scorpion": "scorpio", "sagittaire": "sagittarius",
+                "capricorne": "capricorn", "verseau": "aquarius", "poissons": "pisces"
+            }
             signe_detecte = next((s for s in signes if s in question_clean), None)
 
             if not signe_detecte:
                 message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
             else:
-                # Description factice stylée
-                horoscope_faux = {
-                    "lion": "🔥 Aujourd’hui, votre charisme est à son sommet. N’hésitez pas à prendre les devants. Un projet pourrait avancer plus vite que prévu.",
-                    "bélier": "⚡ Énergie et détermination guideront votre journée. Restez à l’écoute de votre instinct.",
-                    "taureau": "🌿 Calme et stabilité. C’est le bon moment pour mettre de l’ordre dans vos idées.",
-                    "vierge": "📚 Votre sens de l’organisation paiera. Mais attention à ne pas trop en faire."
-                }
-                description = horoscope_faux.get(signe_detecte, "🌌 Une journée équilibrée s’annonce. Faites confiance à votre intuition.")
-                message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {description}"
+                try:
+                    signe_api = signes_api.get(signe_detecte, "")
+                    url = f"https://aztro.sameerkumar.website/?sign={signe_api}&day=today"
+                    response = requests.post(url)
+                    if response.status_code == 200:
+                        data = response.json()
+                        message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}"
+                    else:
+                        message_bot = "❌ Désolé, impossible d'obtenir l'horoscope pour le moment."
+                except Exception as e:
+                    message_bot = f"⚠️ Une erreur est survenue : {e}"
+
+        # --- Commande secrète : analyse complète ---
+        elif "analyse complète" in question_clean:
+            import glob
+            try:
+                resultats = []
+                fichiers = glob.glob("data/donnees_*.csv")
+                for fichier in fichiers:
+                    df = pd.read_csv(fichier)
+                    df.columns = [col.capitalize() for col in df.columns]
+                    try:
+                        analyse, suggestion = analyser_signaux_techniques(df)
+                        nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
+                        resume = f"\n📌 **{nom}**\n{analyse}\n💡 {suggestion}"
+                        resultats.append(resume)
+                    except:
+                        continue
+                message_bot = "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5])
+            except Exception as e:
+                message_bot = f"❌ Erreur lors de l'analyse complète : {e}"
 
         # --- Actualités avec résumé ---
         elif "actualité" in question_clean or "news" in question_clean:
@@ -59,7 +87,7 @@ if question:
                 message_bot = actus
             elif actus:
                 resume = "".join([titre for titre, _ in actus[:3]])
-                message_bot = "🧴 Les actus bougent ! Voici un résumé :\n\n"
+                message_bot = "🕴️ Les actus bougent ! Voici un résumé :\n\n"
                 message_bot += f"*En bref* : {resume[:180]}...\n\n"
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
             else:
@@ -128,7 +156,8 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
-st.sidebar.button("🧡 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
