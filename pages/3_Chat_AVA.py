@@ -86,12 +86,11 @@ if question:
 
         # Horoscope avec JSON libre hébergé par Kayoo123
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
-            signes_api = {
-                "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini", "cancer": "cancer",
-                "lion": "leo", "vierge": "virgo", "balance": "libra", "scorpion": "scorpio",
-                "sagittaire": "sagittarius", "capricorne": "capricorn", "verseau": "aquarius", "poissons": "pisces"
-            }
-            signe_detecte = next((s for s in signes_api if s in question_clean), None)
+            signes_disponibles = [
+                "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
+                "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
+            ]
+            signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
             if not signe_detecte:
                 message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
                 horoscope_repondu = True
@@ -209,6 +208,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
