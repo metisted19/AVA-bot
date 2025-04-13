@@ -85,7 +85,6 @@ if question:
         meteo_repondu = False
         actus_repondu = False
 
-        # Horoscope
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
             signes_api = {
@@ -109,7 +108,6 @@ if question:
                 except:
                     message_bot += "❌ Erreur lors de la récupération de l'horoscope.\n\n"
 
-        # Analyse complète
         if any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
                 resultats = []
@@ -128,7 +126,6 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-        # Actualités
         if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
@@ -140,7 +137,6 @@ if question:
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus]) + "\n\n"
                 actus_repondu = True
 
-        # Météo
         if "météo" in question_clean or "quel temps" in question_clean:
             ville_detectee = "Paris"
             for mot in question.split():
@@ -150,7 +146,6 @@ if question:
             message_bot += f"🌦️ Météo à {ville_detectee} :\n{meteo}\n\n"
             meteo_repondu = True
 
-        # Réponses simples, blagues, motivation
         elif any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
                 "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
@@ -221,8 +216,8 @@ if question:
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-# Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
