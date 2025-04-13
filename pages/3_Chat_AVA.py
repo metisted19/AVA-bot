@@ -84,6 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
+        # Horoscope avec nouvelle API
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_api = {
                 "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini", "cancer": "cancer",
@@ -96,11 +97,11 @@ if question:
                 horoscope_repondu = True
             else:
                 try:
-                    url = f"https://aztro.sameerkumar.website/?sign={signes_api[signe_detecte]}&day=today"
-                    response = requests.post(url)
+                    url = f"https://horoscope-api.vercel.app/api/v1/get-horoscope/daily/{signes_api[signe_detecte]}"
+                    response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}\n\n"
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['horoscope']}\n\n"
                         horoscope_repondu = True
                     else:
                         message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
@@ -129,6 +130,15 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
+        if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
+            ville_detectee = "Paris"
+            for mot in question.split():
+                if mot and mot[0].isupper() and len(mot) > 2:
+                    ville_detectee = mot
+            meteo = get_meteo_ville(ville_detectee)
+            message_bot += f"🌦️ Météo à {ville_detectee} :\n{meteo}\n\n"
+            meteo_repondu = True
+
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
@@ -139,15 +149,6 @@ if question:
                 message_bot += f"*En bref* : {resume[:180]}...\n\n"
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus]) + "\n\n"
                 actus_repondu = True
-
-        if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
-            ville_detectee = "Paris"
-            for mot in question.split():
-                if mot and mot[0].isupper() and len(mot) > 2:
-                    ville_detectee = mot
-            meteo = get_meteo_ville(ville_detectee)
-            message_bot += f"🌦️ Météo à {ville_detectee} :\n{meteo}\n\n"
-            meteo_repondu = True
 
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
@@ -204,6 +205,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
