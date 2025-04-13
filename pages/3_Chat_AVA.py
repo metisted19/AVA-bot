@@ -7,28 +7,16 @@ from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
 from PIL import Image
-from datetime import datetime
-# Affichage du message d'accueil avec logo personnalisé
-from PIL import Image
-
-logo_path = "assets/ava_logo.png"
-if os.path.exists(logo_path):
-    logo = Image.open(logo_path)
-    st.image(logo, width=60)
-st.markdown("<h1 style='text-align: center;'>AVA - Chat IA</h1>", unsafe_allow_html=True)
-st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
 # Affichage du message d'accueil avec logo personnalisé
-st.markdown("""
-    <div style='display: flex; align-items: center;'>
-        <img src='https://ava-bot-a8bcqxjmaej5yqe8tcrdgq.streamlit.app/assets/ava_logo.png' width='40' style='margin-right: 10px;'>
-        <h1 style='margin: 0;'>AVA - Chat IA</h1>
-    </div>
-""", unsafe_allow_html=True)
-
+logo_path = "assets/ava_logo.png"
+if os.path.exists(logo_path):
+    logo = Image.open(logo_path)
+    st.image(logo, width=60)
+st.markdown("<h1 style='text-align: center;'>AVA - Chat IA</h1>", unsafe_allow_html=True)
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
 # Initialisation de l'historique de chat
@@ -43,26 +31,6 @@ for message in st.session_state.messages:
     else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-
-# --- Fonction de rappel automatique de tendance en fin de journée ---
-def detecter_tendance_globale():
-    fichiers = [f for f in os.listdir("data") if f.endswith(".csv")]
-    tendances = []
-    for fichier in fichiers:
-        df = pd.read_csv(os.path.join("data", fichier))
-        if "Close" in df.columns:
-            if len(df) >= 2:
-                variation = df["Close"].iloc[-1] - df["Close"].iloc[-2]
-                tendances.append(variation)
-    if not tendances:
-        return None
-    moyenne = sum(tendances) / len(tendances)
-    if moyenne > 0:
-        return "📈 Aujourd’hui, la tendance générale des marchés est plutôt **haussière**."
-    elif moyenne < 0:
-        return "📉 Aujourd’hui, la tendance générale des marchés est plutôt **baissière**."
-    else:
-        return "➖ Tendance générale du jour : **stable**."
 
 # --- Interaction principale ---
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
@@ -102,7 +70,7 @@ if question:
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue : {e}"
 
-        # --- Commande secrète : analyse complète ---
+        # --- Commande secrète : analyse complète ou synonymes ---
         elif any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             import glob
             try:
@@ -129,7 +97,7 @@ if question:
                 message_bot = actus
             elif actus:
                 resume = "".join([titre for titre, _ in actus[:3]])
-                message_bot = "🧔️ Les actus bougent ! Voici un résumé :\n\n"
+                message_bot = "🥀 Les actus bougent ! Voici un résumé :\n\n"
                 message_bot += f"*En bref* : {resume[:180]}...\n\n"
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
             else:
@@ -184,18 +152,12 @@ if question:
                     message_bot = (
                         f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
-                        f"🧐 *Mon intuition d'IA ?* {suggestion}"
+                        f"🤔 *Mon intuition d'IA ?* {suggestion}"
                     )
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
             else:
                 message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
-
-        # --- Rappel de tendance automatique en fin de journée ---
-        elif "tendance générale" in question_clean or "marché aujourd'hui" in question_clean:
-            message_bot = detecter_tendance_globale()
-            if not message_bot:
-                message_bot = "❌ Impossible de déterminer la tendance globale aujourd'hui."
 
         else:
             message_bot = obtenir_reponse_ava(question)
@@ -205,6 +167,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
