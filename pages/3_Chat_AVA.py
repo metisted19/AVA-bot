@@ -7,16 +7,26 @@ from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
 from PIL import Image
+from datetime import datetime
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
+
+# Message d'accueil dynamique selon l'heure
+heure_actuelle = datetime.now().hour
+if heure_actuelle < 12:
+    accueil = "🌞 Bonjour ! Prêt(e) pour une nouvelle journée de trading ?"
+elif 12 <= heure_actuelle < 18:
+    accueil = "☀️ Bon après-midi ! Besoin d’une analyse ou d’un conseil ?"
+else:
+    accueil = "🌙 Bonsoir ! On termine la journée avec une petite analyse ?"
 
 # Affichage du message d'accueil avec logo personnalisé
 col1, col2 = st.columns([0.15, 0.85])
 with col1:
     st.image("assets/ava_logo.png", width=60)
 with col2:
-    st.markdown("<h1 style='margin-top: 10px;'>AVA - Chat IA</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='margin-top: 10px;'>AVA - Chat IA</h1><p>{accueil}</p>", unsafe_allow_html=True)
 
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
@@ -168,6 +178,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
