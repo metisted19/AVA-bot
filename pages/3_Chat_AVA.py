@@ -114,18 +114,18 @@ if question:
                 resultats = []
                 fichiers = glob.glob("data/donnees_*.csv")
                 for fichier in fichiers:
-                    df = pd.read_csv(fichier)
-                    df.columns = [col.capitalize() for col in df.columns]
                     try:
+                        df = pd.read_csv(fichier)
+                        df.columns = [col.capitalize() for col in df.columns]
                         analyse, suggestion = analyser_signaux_techniques(df)
                         nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
                         resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
                         resultats.append(resume)
-                    except:
-                        continue
+                    except Exception as e:
+                        resultats.append(f"❌ Erreur dans **{fichier}** : {e}")
                 message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5]) + "\n\n"
             except Exception as e:
-                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
+                message_bot += f"❌ Erreur générale dans l'analyse complète : {e}\n\n"
 
         if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
@@ -220,6 +220,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
