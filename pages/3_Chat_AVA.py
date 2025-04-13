@@ -84,7 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Horoscope avec API KAYOO123
+        # Horoscope avec JSON libre hébergé par Kayoo123
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_api = {
                 "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini", "cancer": "cancer",
@@ -97,15 +97,12 @@ if question:
                 horoscope_repondu = True
             else:
                 try:
-                    url = f"https://kayoo123-horoscope.p.rapidapi.com/api/horoscope/daily?sign={signes_api[signe_detecte]}"
-                    headers = {
-                        "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",  # Remplace par ta clé
-                        "X-RapidAPI-Host": "https://kayoo123.github.io/astroo-api/jour.json"
-                    }
-                    response = requests.get(url, headers=headers)
+                    url = "https://kayoo123.github.io/astroo-api/jour.json"
+                    response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['data']['horoscope']}\n\n"
+                        horoscope = data.get(signes_api[signe_detecte], {}).get("horoscope", "Pas de donnée disponible.")
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
                         horoscope_repondu = True
                     else:
                         message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
@@ -209,6 +206,8 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
+
 
 
 
