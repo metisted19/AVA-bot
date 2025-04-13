@@ -84,7 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Horoscope
+        # Horoscope toujours traité en priorité
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
             signes_api = {
@@ -96,6 +96,7 @@ if question:
             signe_detecte = next((s for s in signes if s in question_clean), None)
             if not signe_detecte:
                 message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+                horoscope_repondu = True
             else:
                 try:
                     signe_api = signes_api.get(signe_detecte, "")
@@ -107,11 +108,13 @@ if question:
                         horoscope_repondu = True
                     else:
                         message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
+                        horoscope_repondu = True
                 except:
                     message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
+                    horoscope_repondu = True
 
         # Analyse complète
-        if any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
+        if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
                 resultats = []
                 fichiers = glob.glob("data/donnees_*.csv")
@@ -132,7 +135,7 @@ if question:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
         # Actus
-        if "actualité" in question_clean or "news" in question_clean:
+        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
                 message_bot += actus
@@ -144,7 +147,7 @@ if question:
                 actus_repondu = True
 
         # Météo
-        if "météo" in question_clean or "quel temps" in question_clean:
+        if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
             ville_detectee = "Paris"
             for mot in question.split():
                 if mot and mot[0].isupper() and len(mot) > 2:
@@ -154,7 +157,7 @@ if question:
             meteo_repondu = True
 
         # Blagues
-        elif any(phrase in question_clean for phrase in ["blague", "blagues"]):
+        elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
                 "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
                 "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
@@ -163,7 +166,7 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
-        # Analyse par ticker
+        # Analyse par ticker ou fallback
         elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete]):
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
@@ -210,6 +213,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
