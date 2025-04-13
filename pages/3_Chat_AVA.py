@@ -52,11 +52,15 @@ if question:
                 message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...)."
             else:
                 try:
-                    url = f"https://ohmanda.com/api/horoscope/{signe_detecte}"
+                    url = "https://kayoo123.github.io/astroo-api/jour.json"
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['horoscope']}"
+                        horoscope = data.get(signe_detecte)
+                        if horoscope:
+                            message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}"
+                        else:
+                            message_bot = "❌ Désolé, je n'ai pas trouvé d'horoscope pour ce signe."
                     else:
                         message_bot = "❌ Désolé, impossible d'obtenir l'horoscope pour le moment."
                 except Exception as e:
@@ -68,7 +72,7 @@ if question:
             if isinstance(actus, str):
                 message_bot = actus
             elif actus:
-                message_bot = "📰 Voici les actualités :\n\n" + "\n\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
+                message_bot = "🕴️ Voici les actualités :\n\n" + "\n\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
             else:
                 message_bot = "❌ Aucune actualité disponible pour le moment."
 
@@ -119,7 +123,7 @@ if question:
                 try:
                     analyse, suggestion = analyser_signaux_techniques(df)
                     message_bot = (
-                        f"📊 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
+                        f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
                         f"🤖 *Mon intuition d'IA ?* {suggestion}"
                     )
@@ -135,7 +139,8 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 # Bouton pour effacer les messages uniquement
-st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🧪 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
