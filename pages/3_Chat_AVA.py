@@ -84,6 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
+        # Horoscope
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
             signes_api = {
@@ -94,7 +95,7 @@ if question:
             }
             signe_detecte = next((s for s in signes if s in question_clean), None)
             if not signe_detecte:
-                message_bot += "🔮 Pour l'horoscope, indiquez-moi votre **signe astrologique**.\n\n"
+                message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
             else:
                 try:
                     signe_api = signes_api.get(signe_detecte, "")
@@ -104,9 +105,12 @@ if question:
                         data = response.json()
                         message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}\n\n"
                         horoscope_repondu = True
+                    else:
+                        message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
                 except:
-                    message_bot += "❌ Erreur lors de la récupération de l'horoscope.\n\n"
+                    message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
 
+        # Analyse complète
         if any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
                 resultats = []
@@ -127,6 +131,7 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
+        # Actus
         if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
@@ -138,6 +143,7 @@ if question:
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus]) + "\n\n"
                 actus_repondu = True
 
+        # Météo
         if "météo" in question_clean or "quel temps" in question_clean:
             ville_detectee = "Paris"
             for mot in question.split():
@@ -147,6 +153,7 @@ if question:
             message_bot += f"🌦️ Météo à {ville_detectee} :\n{meteo}\n\n"
             meteo_repondu = True
 
+        # Blagues
         elif any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
                 "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
@@ -156,6 +163,7 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
+        # Analyse par ticker
         elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete]):
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
