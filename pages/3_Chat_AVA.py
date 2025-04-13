@@ -11,6 +11,7 @@ from datetime import datetime
 from langdetect import detect
 import urllib.parse
 import random
+import glob
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
@@ -108,6 +109,25 @@ if question:
                 except:
                     message_bot += "❌ Erreur lors de la récupération de l'horoscope.\n\n"
 
+        # Analyse complète
+        if any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
+            try:
+                resultats = []
+                fichiers = glob.glob("data/donnees_*.csv")
+                for fichier in fichiers:
+                    df = pd.read_csv(fichier)
+                    df.columns = [col.capitalize() for col in df.columns]
+                    try:
+                        analyse, suggestion = analyser_signaux_techniques(df)
+                        nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
+                        resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
+                        resultats.append(resume)
+                    except:
+                        continue
+                message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5]) + "\n\n"
+            except Exception as e:
+                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
+
         # Actualités
         if "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
@@ -203,6 +223,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
