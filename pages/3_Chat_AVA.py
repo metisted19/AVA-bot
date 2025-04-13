@@ -6,6 +6,7 @@ from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville
 import requests
+from PIL import Image
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -19,8 +20,12 @@ if "messages" not in st.session_state:
 
 # --- Affichage des messages existants ---
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    if message["role"] == "assistant":
+        with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+            st.markdown(message["content"])
+    else:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
 # --- Interaction principale ---
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
@@ -30,7 +35,7 @@ if question:
     with st.chat_message("user"):
         st.markdown(question)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="assets/ava_logo.png"):
         question_clean = question.lower().strip()
         message_bot = ""
 
@@ -60,12 +65,11 @@ if question:
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue : {e}"
 
-        # --- Commande secrète : analyse complète ---
-        elif "analyse complète" in question_clean:
+        # --- Commande secrète : analyse complète ou synonymes ---
+        elif any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             import glob
             try:
-                actifs_avec_signaux = []
-                actifs_sans_signaux = []
+                resultats = []
                 fichiers = glob.glob("data/donnees_*.csv")
                 for fichier in fichiers:
                     df = pd.read_csv(fichier)
@@ -73,14 +77,11 @@ if question:
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
                         nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
-                        resume = f"\n📌 **{nom}**\n{analyse}\n💡 {suggestion}"
-                        if "aucun signal" in analyse.lower():
-                            actifs_sans_signaux.append(resume)
-                        else:
-                            actifs_avec_signaux.append(resume)
+                        resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
+                        resultats.append(resume)
                     except:
                         continue
-                message_bot = "📊 **Analyse complète du marché :**\n" + "\n\n".join(actifs_avec_signaux + actifs_sans_signaux)
+                message_bot = "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats[:5])
             except Exception as e:
                 message_bot = f"❌ Erreur lors de l'analyse complète : {e}"
 
@@ -91,7 +92,7 @@ if question:
                 message_bot = actus
             elif actus:
                 resume = "".join([titre for titre, _ in actus[:3]])
-                message_bot = "🧴 Les actus bougent ! Voici un résumé :\n\n"
+                message_bot = "🧔️ Les actus bougent ! Voici un résumé :\n\n"
                 message_bot += f"*En bref* : {resume[:180]}...\n\n"
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus])
             else:
@@ -146,7 +147,7 @@ if question:
                     message_bot = (
                         f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                         f"{analyse}\n\n"
-                        f"🧠 *Mon intuition d'IA ?* {suggestion}"
+                        f"🧐 *Mon intuition d'IA ?* {suggestion}"
                     )
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -161,6 +162,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
