@@ -84,7 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Horoscope avec JSON libre Kayoo123 (corrigé pour accéder au bon champ)
+        # Horoscope avec JSON libre Kayoo123
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_disponibles = [
                 "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
@@ -100,8 +100,9 @@ if question:
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        # Utilisation de la clé avec première lettre en majuscule pour correspondre à la structure JSON.
-                        signe_data = data.get("signes", {}).get(signe_detecte.capitalize(), {})
+                        # Recherche du signe de façon insensible à la casse dans les clés du JSON
+                        signes = data.get("signes", {})
+                        signe_data = next((v for k, v in signes.items() if k.lower() == signe_detecte), {})
                         horoscope = signe_data.get("horoscope")
                         if horoscope:
                             message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
@@ -210,6 +211,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
