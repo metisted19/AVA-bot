@@ -10,6 +10,7 @@ from PIL import Image
 from datetime import datetime
 from langdetect import detect
 import urllib.parse
+import random
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
@@ -20,6 +21,20 @@ def traduire_texte(texte, langue_dest):
         return r["responseData"]["translatedText"]
     except:
         return texte  # fallback
+
+# Fonction humeur dynamique selon l'heure
+def humeur_du_jour():
+    heure = datetime.now().hour
+    if heure < 8:
+        return "😴 Pas très bavarde ce matin, mais je suis là pour vous servir !"
+    elif heure < 12:
+        return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
+    elif heure < 17:
+        return "💼 Focus total sur les marchés, on décortique tout ensemble !"
+    elif heure < 21:
+        return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
+    else:
+        return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -40,13 +55,12 @@ with col1:
 with col2:
     st.markdown(f"<h1 style='margin-top: 10px;'>AVA - Chat IA</h1><p>{accueil}</p>", unsafe_allow_html=True)
 
+st.markdown(f"<p style='font-style: italic;'>{humeur_du_jour()}</p>", unsafe_allow_html=True)
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
-# Initialisation de l'historique de chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Affichage des messages précédents
 for message in st.session_state.messages:
     if message["role"] == "assistant":
         with st.chat_message("assistant", avatar="assets/ava_logo.png"):
@@ -55,7 +69,6 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-# Interaction utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
 if question:
@@ -67,7 +80,6 @@ if question:
         question_clean = question.lower().strip()
         message_bot = ""
 
-        # Horoscope
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes = ["bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance", "scorpion", "sagittaire", "capricorne", "verseau", "poissons"]
             signes_api = {
@@ -92,7 +104,6 @@ if question:
                 except Exception as e:
                     message_bot = f"⚠️ Une erreur est survenue : {e}"
 
-        # Analyse complète
         elif any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             import glob
             try:
@@ -112,7 +123,6 @@ if question:
             except Exception as e:
                 message_bot = f"❌ Erreur lors de l'analyse complète : {e}"
 
-        # Actualités
         elif "actualité" in question_clean or "news" in question_clean:
             actus = get_general_news()
             if isinstance(actus, str):
@@ -125,7 +135,6 @@ if question:
             else:
                 message_bot = "❌ Aucune actualité disponible pour le moment."
 
-        # Météo
         elif "météo" in question_clean or "quel temps" in question_clean:
             ville_detectee = "Paris"
             for mot in question.split():
@@ -133,7 +142,17 @@ if question:
                     ville_detectee = mot
             message_bot = get_meteo_ville(ville_detectee)
 
-        # Réponses simples
+        elif any(phrase in question_clean for phrase in ["blague", "blagues"]):
+            blagues = [
+                "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
+                "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
+                "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
+            ]
+            message_bot = random.choice(blagues)
+
+        elif any(phrase in question_clean for phrase in ["motivation", "boost", "conseil"]):
+            message_bot = "🚀 N'oubliez jamais : les plus grandes réussites partent souvent d’une simple idée… AVA en est la preuve vivante."
+
         elif any(phrase in question_clean for phrase in ["ça va", "comment tu vas", "tu vas bien"]):
             message_bot = "Je vais super bien, prête à analyser le monde avec vous ! Et vous ?"
 
@@ -149,7 +168,6 @@ if question:
         elif "salut" in question_clean or "bonjour" in question_clean:
             message_bot = "👋 Bonjour ! Je suis AVA. Besoin d'une analyse ou d'un coup de pouce ? 😊"
 
-        # Analyse technique
         elif any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             if "btc" in nom_ticker or "bitcoin" in nom_ticker:
@@ -196,6 +214,7 @@ if question:
 
 # Bouton pour effacer les messages uniquement
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
