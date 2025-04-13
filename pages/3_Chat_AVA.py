@@ -84,7 +84,6 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Horoscope (via API alternative fiable : https://horoscope-api.vercel.app)
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_api = {
                 "bélier": "aries", "taureau": "taurus", "gémeaux": "gemini", "cancer": "cancer",
@@ -97,11 +96,11 @@ if question:
                 horoscope_repondu = True
             else:
                 try:
-                    url = f"https://horoscope-api.vercel.app/horoscope/today/{signes_api[signe_detecte]}"
-                    response = requests.get(url)
+                    url = f"https://aztro.sameerkumar.website/?sign={signes_api[signe_detecte]}&day=today"
+                    response = requests.post(url)
                     if response.status_code == 200:
                         data = response.json()
-                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['horoscope']}\n\n"
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {data['description']}\n\n"
                         horoscope_repondu = True
                     else:
                         message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
@@ -110,7 +109,6 @@ if question:
                     message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
                     horoscope_repondu = True
 
-        # Analyse complète
         if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
                 resultats = []
@@ -131,7 +129,6 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-        # Actus
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
@@ -143,7 +140,6 @@ if question:
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus]) + "\n\n"
                 actus_repondu = True
 
-        # Météo
         if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
             ville_detectee = "Paris"
             for mot in question.split():
@@ -153,7 +149,6 @@ if question:
             message_bot += f"🌦️ Météo à {ville_detectee} :\n{meteo}\n\n"
             meteo_repondu = True
 
-        # Blagues
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
                 "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
@@ -163,7 +158,6 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
-        # Analyse par ticker ou fallback
         elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete]):
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
@@ -210,6 +204,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
