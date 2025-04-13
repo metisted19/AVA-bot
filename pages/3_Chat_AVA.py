@@ -100,7 +100,8 @@ if question:
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        signe_data = data.get("signes", {}).get(signe_detecte, {})
+                        # Utilisation de la clé avec première lettre en majuscule pour correspondre à la structure JSON.
+                        signe_data = data.get("signes", {}).get(signe_detecte.capitalize(), {})
                         horoscope = signe_data.get("horoscope")
                         if horoscope:
                             message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
@@ -209,6 +210,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
