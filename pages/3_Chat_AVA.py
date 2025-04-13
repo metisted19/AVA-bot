@@ -27,7 +27,7 @@ def traduire_texte(texte, langue_dest):
 def humeur_du_jour():
     heure = datetime.now().hour
     if heure < 8:
-        return "😴 Pas très bavarde ce matin, mais je suis là pour vous servir !"
+        return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
     elif heure < 12:
         return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
     elif heure < 17:
@@ -202,6 +202,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
