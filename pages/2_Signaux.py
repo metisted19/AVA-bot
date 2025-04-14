@@ -21,9 +21,9 @@ nom_affichages = {
     "msft": "Microsoft",
     "amzn": "Amazon",
     "nvda": "NVIDIA",
-    "^gspc": "S&P500"
+    "^gspc": "S&P500",
     "doge-usd": "Dogecoin",
-    "ada-usd": "Cardano",
+    "ada-usd": "Cardano"
 }
 
 # --- Sélection du ticker ---
