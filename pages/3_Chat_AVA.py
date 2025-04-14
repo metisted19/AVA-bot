@@ -133,6 +133,8 @@ if question:
                 for fichier in fichiers:
                     df = pd.read_csv(fichier)
                     df.columns = [col.capitalize() for col in df.columns]
+                    df = ajouter_indicateurs_techniques(df)  # ← Important !
+                    analyse, suggestion = analyser_signaux_techniques(df)
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
                         nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
