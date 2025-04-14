@@ -190,6 +190,14 @@ if question:
                     nom_ticker = "googl"
                 elif "fchi" in nom_ticker or "cac" in nom_ticker:
                     nom_ticker = "^fchi"
+                elif "msft" in nom_ticker:
+                    nom_ticker = "msft"
+                elif "amzn" in nom_ticker:
+                    nom_ticker = "amzn"
+                elif "nvda" in nom_ticker:
+                    nom_ticker = "nvda"
+                elif "sp500" in nom_ticker or "s&p" in nom_ticker:
+                    nom_ticker = "gspc"
 
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
