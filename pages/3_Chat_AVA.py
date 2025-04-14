@@ -4,7 +4,7 @@ import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
-from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville
+from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville ici
 import requests
 from PIL import Image
 from datetime import datetime
@@ -241,27 +241,6 @@ if question:
             elif "transpire" in question_clean or "j'ai froid" in question_clean:
                 message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
 
-        # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite"]):
-            reponses_medic = {
-                "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
-                "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
-                "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
-                "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et de sensibilité à la lumière.",
-                "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
-                "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée. Elle nécessite un suivi médical et une hygiène de vie adaptée.",
-                "stress": "🧘 Pour calmer le stress : respirez profondément, prenez l'air, écoutez de la musique douce... ou parlez à AVA !",
-                "toux": "😷 Une toux sèche peut indiquer une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
-                "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
-                "douleur": "💢 Pour mieux vous répondre, précisez la localisation ou l'intensité de la douleur.",
-                "asthme": "🫁 L’asthme est une inflammation des voies respiratoires. Il provoque des difficultés à respirer, souvent soulagées par un inhalateur.",
-                "bronchite": "🫁 La bronchite est une inflammation des bronches, avec toux persistante et parfois fièvre. Buvez beaucoup et reposez-vous."
-            }
-            for cle, rep in reponses_medic.items():
-                if cle in question_clean:
-                    message_bot = rep
-                    break
-
         # --- Bloc Remèdes naturels ---
         if not message_bot and any(phrase in question_clean for phrase in [
             "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement", "tisane", "huile essentielle"
@@ -273,11 +252,32 @@ if question:
             elif "rhume" in question_clean or "nez bouché" in question_clean:
                 message_bot = "🌿 Pour le nez bouché, essayez l'inhalation de vapeur avec quelques gouttes d’huile essentielle d’eucalyptus ou de menthe poivrée."
             elif "fièvre" in question_clean:
-                message_bot = "🧊 En cas de fièvre, buvez beaucoup, reposez-vous, et utilisez un linge frais sur le front. L’infusion de saule blanc est aussi un remède ancestral."
+                message_bot = "🧊 En cas de fièvre, buvez beaucoup, reposez-vous et utilisez un linge frais sur le front. L’infusion de saule blanc est également un remède traditionnel."
             else:
-                message_bot = "🌱 Il existe plein de remèdes naturels ! Si vous me précisez votre souci (ex : toux, stress, rhume...), je vous suggérerai une solution douce."
+                message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
 
-        # --- Réponses géographiques simples ---
+        # --- Bloc Réponses médicales explicites ---
+        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite"]):
+            reponses_medic = {
+                "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
+                "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
+                "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
+                "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et d'une sensibilité à la lumière.",
+                "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
+                "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée nécessitant un suivi médical et une hygiène de vie adaptée.",
+                "stress": "🧘 Le stress peut se soulager par des techniques de relaxation ou une activité physique modérée.",
+                "toux": "😷 Une toux sèche peut être le signe d'une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
+                "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
+                "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
+                "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
+                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous."
+            }
+            for cle, rep in reponses_medic.items():
+                if cle in question_clean:
+                    message_bot = rep
+                    break
+
+        # --- Bloc Réponses géographiques simples ---
         if not any([geographie_repondu, sante_repondu, perso_repondu]) and not message_bot:
             geo_capitales = {
                 "france": "Paris", "espagne": "Madrid", "italie": "Rome", "allemagne": "Berlin", "japon": "Tokyo",
@@ -290,7 +290,7 @@ if question:
                     geographie_repondu = True
                     break
 
-        # --- Réponses personnalisées simples ---
+        # --- Bloc Réponses personnalisées simples ---
         elif not message_bot:
             if "merci" in question_clean:
                 message_bot = "Avec plaisir 😄 N'hésitez pas si vous avez d'autres questions !"
@@ -357,4 +357,5 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
