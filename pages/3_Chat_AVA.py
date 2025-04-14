@@ -4,7 +4,7 @@ import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
-from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville ci-dessous.
+from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville ici.
 import requests
 from PIL import Image
 from datetime import datetime
@@ -288,39 +288,37 @@ if question:
                 pays_detecte = match.group(1).strip().lower()
             else:
                 tokens = question_clean.split()
-            if len(tokens) >= 2:
-                # Supprimer les signes de ponctuation du dernier token
-                pays_detecte = tokens[-1].strip(" ?!.,;").lower()  # Fallback : le dernier mot nettoyé
-        capitales = {
-            "france": "Paris",
-            "espagne": "Madrid",
-            "italie": "Rome",
-            "allemagne": "Berlin",
-            "japon": "Tokyo",
-            "chine": "Pékin",
-            "brésil": "Brasilia",
-            "mexique": "Mexico",
-            "canada": "Ottawa",
-            "états-unis": "Washington",
-            "usa": "Washington",
-            "inde": "New Delhi",
-            "portugal": "Lisbonne",
-            "royaume-uni": "Londres",
-            "angleterre": "Londres",
-            "argentine": "Buenos Aires",
-            "maroc": "Rabat",
-            "algérie": "Alger",
-            "tunisie": "Tunis",
-            "turquie": "Ankara",
-            "russie": "Moscou",
-            "australie": "Canberra",
-        }
-        if pays_detecte and pays_detecte in capitales:
-            capitale = capitales[pays_detecte]
-            message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
-        else:
-            message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
-
+                if len(tokens) >= 2:
+                    pays_detecte = tokens[-1].strip(" ?!.,;").lower()  # Fallback : le dernier mot nettoyé
+            capitales = {
+                "france": "Paris",
+                "espagne": "Madrid",
+                "italie": "Rome",
+                "allemagne": "Berlin",
+                "japon": "Tokyo",
+                "chine": "Pékin",
+                "brésil": "Brasilia",
+                "mexique": "Mexico",
+                "canada": "Ottawa",
+                "états-unis": "Washington",
+                "usa": "Washington",
+                "inde": "New Delhi",
+                "portugal": "Lisbonne",
+                "royaume-uni": "Londres",
+                "angleterre": "Londres",
+                "argentine": "Buenos Aires",
+                "maroc": "Rabat",
+                "algérie": "Alger",
+                "tunisie": "Tunis",
+                "turquie": "Ankara",
+                "russie": "Moscou",
+                "australie": "Canberra",
+            }
+            if pays_detecte and pays_detecte in capitales:
+                capitale = capitales[pays_detecte]
+                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
+            else:
+                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
 
         # --- Bloc Réponses personnalisées simples ---
         elif not message_bot:
@@ -393,6 +391,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
