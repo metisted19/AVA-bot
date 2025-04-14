@@ -13,7 +13,7 @@ import urllib.parse
 import random
 import glob
 import difflib
-import re  # Pour le bloc géographie
+import re  # Déjà importé, utilisé pour le bloc sécurité et le traitement géographique
 
 # Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
 def get_meteo_ville(city):
@@ -86,7 +86,13 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
+# Récupération de la question utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
+
+# 🔒 Sécurité : détection d'entrée dangereuse
+if question and re.search(r"[<>;{}]", question):
+    st.warning("⛔ Entrée invalide détectée.")
+    st.stop()
 
 if question:
     st.session_state.messages.append({"role": "user", "content": question})
@@ -378,7 +384,7 @@ if question:
                 elif "sol" in nom_ticker or "solana" in nom_ticker:
                     nom_ticker = "sol-usd"
                 elif "gold" in nom_ticker or "or" in nom_ticker:
-                    nom_ticker = "gc=F"    
+                    nom_ticker = "gc=F"
     
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
@@ -397,12 +403,11 @@ if question:
                     message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
             else:
                 message_bot = obtenir_reponse_ava(question)
-    
+
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-    
-        # --- Bloc Traduction (seulement si la question ne correspond pas à un court mot-clé français) ---
-        # On évite de traduire si la question est "merci", par exemple.
+
+        # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
                 langue = detect(question)
@@ -411,11 +416,12 @@ if question:
             except:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
-    
+
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
-    
+
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
