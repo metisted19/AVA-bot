@@ -22,7 +22,8 @@ def charger_donnees(path):
     return df
 
 # Choix de l’actif
-tickers = ["aapl", "tsla", "googl", "btc-usd", "eth-usd", "msft", "amzn", "nvda", "^gspc"]
+tickers = ["aapl", "tsla", "googl", "btc-usd", "eth-usd", "msft", "amzn", "nvda", "^gspc","doge-usd", "ada-usd"
+]
 ticker = st.selectbox("📌 Choisissez un actif :", tickers)
 
 # Chargement des données associées
