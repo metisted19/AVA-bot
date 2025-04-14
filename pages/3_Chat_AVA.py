@@ -4,7 +4,7 @@ import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
-from fonctions_meteo import obtenir_meteo, get_meteo_ville
+from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous allons redéfinir get_meteo_ville ci-dessous.
 import requests
 from PIL import Image
 from datetime import datetime
@@ -12,7 +12,24 @@ from langdetect import detect
 import urllib.parse
 import random
 import glob
-import difflib  # Import nécessaire pour la détection approximative de la ville
+import difflib
+
+# Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
+def get_meteo_ville(city):
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid=3b2ff0b77dd65559ba4a1a69769221d5&units=metric&lang=fr"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            description = data["weather"][0]["description"].capitalize()
+            temperature = data["main"]["temp"]
+            humidity = data["main"].get("humidity", "N/A")
+            wind_speed = data["wind"].get("speed", "N/A")
+            return f"{description} avec {temperature}°C, humidité : {humidity}%, vent : {wind_speed} m/s."
+        else:
+            return "Erreur: données météo non disponibles."
+    except Exception as e:
+        return "Erreur: " + str(e)
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
@@ -76,7 +93,7 @@ if question:
         st.markdown(question)
 
     with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-        # Traitement de la question en minuscule et sans espaces superflus
+        # Traitement de la question en minuscule
         question_clean = question.lower().strip()
         message_bot = ""
         horoscope_repondu = False
@@ -85,7 +102,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
+        # Nouveaux flags pour géographie, médecine et réponses personnalisées
         geographie_repondu = False
         sante_repondu = False
         perso_repondu = False
@@ -138,7 +155,7 @@ if question:
                 for fichier in fichiers:
                     df = pd.read_csv(fichier)
                     df.columns = [col.capitalize() for col in df.columns]
-                    df = ajouter_indicateurs_techniques(df)  # ← Important !
+                    df = ajouter_indicateurs_techniques(df)
                     analyse, suggestion = analyser_signaux_techniques(df)
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
@@ -165,7 +182,6 @@ if question:
             ville_detectee = "paris"
             mots_question = question_clean.split()
             ville_proche = difflib.get_close_matches(" ".join(mots_question), villes_connues, n=1, cutoff=0.6)
-            # Essai par mot si aucun résultat
             if not ville_proche:
                 for mot in mots_question:
                     ville_proche = difflib.get_close_matches(mot, villes_connues, n=1, cutoff=0.8)
@@ -296,71 +312,3 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
