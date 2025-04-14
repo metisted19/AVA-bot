@@ -9,7 +9,7 @@ st.title("📍 Signaux Techniques d'AVA")
 # --- Tickers disponibles et noms à afficher ---
 tickers_disponibles = [
     "aapl", "tsla", "googl", "btc-usd", "eth-usd",
-    "msft", "amzn", "nvda", "^gspc"
+    "msft", "amzn", "nvda", "^gspc","doge-usd", "ada-usd"
 ]
 
 nom_affichages = {
@@ -22,6 +22,8 @@ nom_affichages = {
     "amzn": "Amazon",
     "nvda": "NVIDIA",
     "^gspc": "S&P500"
+    "doge-usd": "Dogecoin",
+    "ada-usd": "Cardano",
 }
 
 # --- Sélection du ticker ---
