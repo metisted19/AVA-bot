@@ -19,6 +19,7 @@ tickers_disponibles = [
     "nvda",
     "^gspc"
 ]
+st.selectbox("Choisissez un actif :", options=tickers, format_func=lambda x: nom_affichages[x])
 
 # --- Chargement des données ---
 fichier_data = f"data/donnees_{ticker.lower()}.csv"
