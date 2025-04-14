@@ -83,6 +83,11 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
+        # Nouveaux flags à ajouter juste après analyse_complete = False
+        geographie_repondu = False
+        sante_repondu = False
+        perso_repondu = False
+
         # Partie horoscope avec gestion insensible à la casse et adaptation du format JSON
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_disponibles = [
@@ -177,27 +182,33 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
-        # Insertion des trois blocs de fonctions avant le bloc catch-all
-        elif any(kw in question_clean for kw in ["capitale", "pays", "continent", "où se trouve", "géographie"]):
-            capitales = {
-                "france": "Paris", "espagne": "Madrid", "allemagne": "Berlin", "italie": "Rome",
-                "japon": "Tokyo", "chine": "Pékin", "brésil": "Brasilia", "canada": "Ottawa",
-                "pérou": "Lima", "australie": "Canberra", "états-unis": "Washington D.C."
+        # Insertion des blocs demandés avant le bloc catch-all
+        # --- Réponses géographiques simples ---
+        if not any([geographie_repondu, sante_repondu, perso_repondu]):
+            geo_capitales = {
+                "france": "Paris", "espagne": "Madrid", "italie": "Rome", "allemagne": "Berlin", "japon": "Tokyo",
+                "royaume-uni": "Londres", "canada": "Ottawa", "états-unis": "Washington", "norvège": "Oslo",
+                "brésil": "Brasilia", "australie": "Canberra"
             }
-            pays_trouve = next((p for p in capitales if p in question_clean), None)
-            if pays_trouve:
-                message_bot = f"📌 La capitale de **{pays_trouve.capitalize()}** est **{capitales[pays_trouve]}**."
-            else:
-                message_bot = "🌍 Posez-moi une question comme : *Quelle est la capitale du Japon ?*"
-        elif any(kw in question_clean for kw in ["maladie", "symptôme", "symptomes", "médicament", "douleur", "grippe"]):
+            for pays, capitale in geo_capitales.items():
+                if f"capitale de {pays}" in question_clean or f"{pays} a pour capitale" in question_clean:
+                    message_bot = f"📌 La capitale de {pays.capitalize()} est **{capitale}**."
+                    geographie_repondu = True
+                    break
+
+        # --- Réponses médicales simples ---
+        if not geographie_repondu and not sante_repondu:
             if "grippe" in question_clean:
                 message_bot = "🤒 Les symptômes courants de la grippe sont : fièvre, frissons, courbatures, toux sèche, fatigue intense."
+                sante_repondu = True
             elif "rhume" in question_clean:
-                message_bot = "🤧 Le rhume provoque nez qui coule, éternuements, maux de gorge légers, parfois un peu de fièvre."
-            elif "mal de tête" in question_clean:
-                message_bot = "💊 Un mal de tête peut être soulagé par du repos, de l'hydratation, et si nécessaire, un antalgique comme le paracétamol."
-            else:
-                message_bot = "🩺 Je peux vous aider à identifier des symptômes de base, mais je ne remplace pas un vrai médecin 😉"
+                message_bot = "🤧 Un rhume cause souvent nez qui coule, éternuements, toux légère et mal de gorge."
+                sante_repondu = True
+            elif "fièvre" in question_clean:
+                message_bot = "🌡️ Pour faire baisser la fièvre : repos, hydratation et surveillance de la température."
+                sante_repondu = True
+
+        # Bloc de réponses personnalisées
         elif "merci" in question_clean:
             message_bot = "Avec plaisir 😄 N'hésitez pas si vous avez d'autres questions !"
         elif "je t'aime" in question_clean:
@@ -259,6 +270,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
