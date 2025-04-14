@@ -6,20 +6,26 @@ from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_t
 st.set_page_config(page_title="📈 Signaux Techniques", layout="wide")
 st.title("📍 Signaux Techniques d'AVA")
 
-# --- Sélection du ticker ---
-tickers = ["aapl", "tsla", "googl", "btc-usd", "eth-usd", "msft", "amzn", "nvda", "^gspc"]
+# --- Tickers disponibles et noms à afficher ---
 tickers_disponibles = [
-    "aapl",
-    "tsla",
-    "googl",
-    "btc-usd",
-    "eth-usd",
-    "msft",
-    "amzn",
-    "nvda",
-    "^gspc"
+    "aapl", "tsla", "googl", "btc-usd", "eth-usd",
+    "msft", "amzn", "nvda", "^gspc"
 ]
-st.selectbox("Choisissez un actif :", options=tickers, format_func=lambda x: nom_affichages[x])
+
+nom_affichages = {
+    "aapl": "Apple",
+    "tsla": "Tesla",
+    "googl": "Google",
+    "btc-usd": "Bitcoin",
+    "eth-usd": "Ethereum",
+    "msft": "Microsoft",
+    "amzn": "Amazon",
+    "nvda": "NVIDIA",
+    "^gspc": "S&P500"
+}
+
+# --- Sélection du ticker ---
+ticker = st.selectbox("Choisissez un actif :", options=tickers_disponibles, format_func=lambda x: nom_affichages[x])
 
 # --- Chargement des données ---
 fichier_data = f"data/donnees_{ticker.lower()}.csv"
@@ -55,12 +61,12 @@ if os.path.exists(fichier_data):
         resume = generer_resume_signal(signaux_list)
 
         # --- Affichage complet ---
-        st.subheader(f"🔎 Analyse pour {ticker.upper()}")
+        st.subheader(f"🔎 Analyse pour {nom_affichages[ticker]}")
         st.markdown(analyse)
         st.markdown(f"💬 **Résumé d'AVA :**\n{resume}")
         st.success(f"🤖 *Intuition d'AVA :* {suggestion}")
 
-        # --- Affichage des prédictions IA ---
+        # --- Prédiction IA ---
         if os.path.exists(fichier_pred):
             df_pred = pd.read_csv(fichier_pred)
             prediction = df_pred["prediction"].iloc[-1]
@@ -74,7 +80,7 @@ if os.path.exists(fichier_data):
             st.subheader("📊 RSI actuel :")
             st.metric("RSI", round(df["Rsi"].iloc[-1], 2))
 
-        # --- Affichage du tableau brut ---
+        # --- Données brutes ---
         st.subheader("📄 Données récentes")
         st.dataframe(df.tail(10), use_container_width=True)
 
@@ -83,6 +89,7 @@ if os.path.exists(fichier_data):
 
 else:
     st.warning(f"❌ Aucune donnée trouvée pour {ticker}. Veuillez lancer l'entraînement AVA.")
+
 
 
 
