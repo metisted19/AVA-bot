@@ -283,7 +283,7 @@ if question:
         # --- Bloc Réponses géographiques avec extraction par regex ---
         elif any(kw in question_clean for kw in ["capitale", "capitale de", "quelle est la capitale", "capitale du", "capitale de l", "capitale des"]):
             pays_detecte = None
-            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
+            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ'-]+)\b", question_clean)
             if match:
                 pays_detecte = match.group(1).strip().lower()
             else:
@@ -391,6 +391,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
