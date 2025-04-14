@@ -12,6 +12,7 @@ from langdetect import detect
 import urllib.parse
 import random
 import glob
+import difflib  # Import ajouté pour la détection météo
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
@@ -83,7 +84,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Nouveaux flags à ajouter juste après analyse_complete = False :
+        # Nouveaux flags
         geographie_repondu = False
         sante_repondu = False
         perso_repondu = False
@@ -150,27 +151,30 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-        # --- Détection intelligente de la ville ---
+        # Nouveau bloc de détection météo amélioré
         if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
-            ville_detectee = "Paris"  # Valeur par défaut
+            # Liste élargie de villes françaises (tu peux en ajouter d'autres si besoin)
             villes_connues = [
-                "paris", "lyon", "marseille", "lille", "bordeaux", "nantes", "strasbourg", "toulouse", "rennes", "nice", "angers", "dijon", "montpellier"
+                "paris", "lyon", "marseille", "lille", "bordeaux", "nantes", "strasbourg", "toulouse", "rennes",
+                "nice", "angers", "dijon", "montpellier", "bayonne", "nancy", "reims", "clermont-ferrand", "besançon",
+                "le havre", "rouen", "poitiers", "metz", "caen", "avignon", "tours", "amiens", "perpignan"
             ]
-            for ville in villes_connues:
-                if ville in question_clean:
-                    ville_detectee = ville
-                    break
-            # Sinon tenter d'extraire la dernière ville détectée dans la question
-            if ville_detectee == "Paris":
-                mots = question_clean.split()
-                for mot in mots[::-1]:  # On regarde depuis la fin
-                    if len(mot) > 2 and mot.isalpha():
-                        ville_detectee = mot
+            # Détection approximative de la ville dans la question
+            ville_detectee = "paris"
+            mots_question = question_clean.split()
+            ville_proche = difflib.get_close_matches(" ".join(mots_question), villes_connues, n=1, cutoff=0.6)
+            # Essai par mot si aucun résultat
+            if not ville_proche:
+                for mot in mots_question:
+                    ville_proche = difflib.get_close_matches(mot, villes_connues, n=1, cutoff=0.8)
+                    if ville_proche:
                         break
+            if ville_proche:
+                ville_detectee = ville_proche[0]
             # Appel API météo
             meteo = get_meteo_ville(ville_detectee)
             if "erreur" in meteo.lower():
-                message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee}**. Essayez une autre ville."
+                message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee.capitalize()}**. Essayez une autre ville."
             else:
                 message_bot += f"🌦️ **Météo à {ville_detectee.capitalize()}** :\n{meteo}\n\n"
             meteo_repondu = True
@@ -286,6 +290,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
