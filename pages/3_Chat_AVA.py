@@ -213,7 +213,8 @@ if question:
             message_bot = "🤫 Mon secret ? J’apprends chaque jour à mieux vous comprendre... mais chut !"
 
         # Bloc catch-all pour l'analyse technique ou réponse par défaut
-        elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete]):
+        # La condition intègre désormais vos nouveaux flags
+        elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete, geographie_repondu, sante_repondu, perso_repondu]):
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
                 if "btc" in nom_ticker or "bitcoin" in nom_ticker:
@@ -272,6 +273,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
