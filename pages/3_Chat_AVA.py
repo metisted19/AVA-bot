@@ -13,7 +13,7 @@ import urllib.parse
 import random
 import glob
 import difflib
-import re  # Import pour le bloc géographie
+import re  # Pour le bloc géographie
 
 # Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
 def get_meteo_ville(city):
@@ -92,7 +92,7 @@ if question:
     st.session_state.messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
-
+        
     with st.chat_message("assistant", avatar="assets/ava_logo.png"):
         # Traitement de la question en minuscule
         question_clean = question.lower().strip()
@@ -200,17 +200,19 @@ if question:
                 message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
             meteo_repondu = True
 
-        # --- Actualités ---
+        # --- Actualités améliorées ---
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
                 message_bot += actus
-            elif actus:
-                resume = "".join([titre for titre, _ in actus[:3]])
-                message_bot += "🧔️ Les actus bougent ! Voici un résumé :\n\n"
-                message_bot += f"*En bref* : {resume[:180]}...\n\n"
-                message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus]) + "\n\n"
-                actus_repondu = True
+            elif actus and isinstance(actus, list):
+                message_bot += "📰 **Dernières actualités importantes :**\n\n"
+                for i, (titre, lien) in enumerate(actus[:5], 1):
+                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
+                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
+            else:
+                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
+            actus_repondu = True
 
         # --- Blagues ---
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
@@ -287,7 +289,7 @@ if question:
             else:
                 tokens = question_clean.split()
                 if len(tokens) >= 2:
-                    pays_detecte = tokens[-1].strip()  # Utilisation du dernier mot comme fallback
+                    pays_detecte = tokens[-1].strip()  # Fallback : le dernier mot
             capitales = {
                 "france": "Paris",
                 "espagne": "Madrid",
@@ -389,6 +391,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
