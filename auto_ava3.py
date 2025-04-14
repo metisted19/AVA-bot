@@ -10,8 +10,12 @@ from sklearn.metrics import accuracy_score
 import xgboost as xgb
 
 # --- TICKERS À TRAITER ---
-tickers = ["aapl", "tsla", "googl", "btc-usd", "eth-usd", "^fchi", "msft", "amzn", "nvda", "^gspc","doge-usd", "ada-usd"
+tickers = [
+    "aapl", "tsla", "googl", "btc-usd", "eth-usd",
+    "msft", "amzn", "nvda", "^gspc", "doge-usd", "ada-usd",
+    "sol-usd", "gc=F", "^fchi"  # <= le CAC 40 est ici
 ]
+
 
 # --- CHEMINS DE SAUVEGARDE ---
 os.makedirs("data", exist_ok=True)
