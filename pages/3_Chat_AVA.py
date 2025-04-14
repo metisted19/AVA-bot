@@ -177,8 +177,37 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
+        # Insertion des trois blocs de fonctions avant le bloc catch-all
+        elif any(kw in question_clean for kw in ["capitale", "pays", "continent", "où se trouve", "géographie"]):
+            capitales = {
+                "france": "Paris", "espagne": "Madrid", "allemagne": "Berlin", "italie": "Rome",
+                "japon": "Tokyo", "chine": "Pékin", "brésil": "Brasilia", "canada": "Ottawa",
+                "pérou": "Lima", "australie": "Canberra", "états-unis": "Washington D.C."
+            }
+            pays_trouve = next((p for p in capitales if p in question_clean), None)
+            if pays_trouve:
+                message_bot = f"📌 La capitale de **{pays_trouve.capitalize()}** est **{capitales[pays_trouve]}**."
+            else:
+                message_bot = "🌍 Posez-moi une question comme : *Quelle est la capitale du Japon ?*"
+        elif any(kw in question_clean for kw in ["maladie", "symptôme", "symptomes", "médicament", "douleur", "grippe"]):
+            if "grippe" in question_clean:
+                message_bot = "🤒 Les symptômes courants de la grippe sont : fièvre, frissons, courbatures, toux sèche, fatigue intense."
+            elif "rhume" in question_clean:
+                message_bot = "🤧 Le rhume provoque nez qui coule, éternuements, maux de gorge légers, parfois un peu de fièvre."
+            elif "mal de tête" in question_clean:
+                message_bot = "💊 Un mal de tête peut être soulagé par du repos, de l'hydratation, et si nécessaire, un antalgique comme le paracétamol."
+            else:
+                message_bot = "🩺 Je peux vous aider à identifier des symptômes de base, mais je ne remplace pas un vrai médecin 😉"
+        elif "merci" in question_clean:
+            message_bot = "Avec plaisir 😄 N'hésitez pas si vous avez d'autres questions !"
+        elif "je t'aime" in question_clean:
+            message_bot = "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !"
+        elif "un secret" in question_clean:
+            message_bot = "🤫 Mon secret ? J’apprends chaque jour à mieux vous comprendre... mais chut !"
+
+        # Bloc catch-all pour l'analyse technique ou réponse par défaut
         elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete]):
-            if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac"]):
+            if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
                 if "btc" in nom_ticker or "bitcoin" in nom_ticker:
                     nom_ticker = "btc-usd"
@@ -219,18 +248,18 @@ if question:
             else:
                 message_bot = obtenir_reponse_ava(question)
 
-        if not blague_repondu:
-            try:
-                langue = detect(question)
-                if langue in ["en", "es", "de"]:
-                    message_bot = traduire_texte(message_bot, langue)
-            except:
-                message_bot += "\n\n⚠️ Traduction indisponible."
+        try:
+            langue = detect(question)
+            if langue in ["en", "es", "de"]:
+                message_bot = traduire_texte(message_bot, langue)
+        except:
+            message_bot += "\n\n⚠️ Traduction indisponible."
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
