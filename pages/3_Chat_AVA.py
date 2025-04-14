@@ -320,14 +320,32 @@ if question:
             else:
                 message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
 
-        # --- Bloc Réponses personnalisées simples ---
-        elif not message_bot:
-            if "merci" in question_clean:
-                message_bot = "Avec plaisir 😄 N'hésitez pas si vous avez d'autres questions !"
-            elif "je t'aime" in question_clean:
-                message_bot = "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !"
-            elif "un secret" in question_clean:
-                message_bot = "🤫 Mon secret ? J’apprends chaque jour à mieux vous comprendre... mais chut !"
+        # --- Bloc Réponses personnalisées enrichies ---
+        if not message_bot:
+            reponses_perso = {
+                "merci": ["Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
+                "je t'aime": ["💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions."],
+                "un secret": ["🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…"],
+                "ça va": ["Ça va nickel, merci de demander ! Et vous ?", "En pleine forme digitale 😄", "Toujours connectée, jamais stressée !"],
+                "tu fais quoi": ["Je veille sur les marchés et je m'entraîne à devenir la meilleure IA 😎", "Je vous écoute attentivement. Que puis-je faire pour vous ?"],
+                "t'es là": ["Toujours là pour vous 💡", "Connectée et prête à analyser !", "Présente, comme une ombre... ou une IA 😉"]
+            }
+            for cle, reponses in reponses_perso.items():
+                if cle in question_clean:
+                    message_bot = random.choice(reponses)
+                    perso_repondu = True
+                    break
+
+        # --- Bloc Punchlines motivationnelles ---
+        if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
+            punchlines = [
+                "🚀 *N’attends pas les opportunités. Crée-les.*",
+                "🔥 *Chaque bougie japonaise est une chance de rebondir.*",
+                "⚡ *La discipline bat la chance sur le long terme.*",
+                "🌟 *Tu ne trades pas juste des actifs, tu construis ton avenir.*",
+                "💪 *Même dans un marché baissier, ta volonté peut monter en flèche.*"
+            ]
+            message_bot = random.choice(punchlines)
 
         # Bloc catch-all pour l'analyse technique ou réponse par défaut
         if not message_bot:
@@ -391,6 +409,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
