@@ -24,10 +24,10 @@ nom_affichages = {
     "nvda": "NVIDIA",
     "^gspc": "S&P500",
     "doge-usd": "Dogecoin",
-    "ada-usd": "Cardano"
-    "^fchi": "CAC 40"
-    "sol-usd",
-    "gc=F"
+    "ada-usd": "Cardano",
+    "^fchi": "CAC 40",
+    "sol-usd": "Solana",
+    "gc=F": "Or (Gold)"
 }
 
 # --- Sélection du ticker ---
