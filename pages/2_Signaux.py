@@ -31,11 +31,11 @@ nom_affichages = {
 }
 
 # --- Sélection du ticker ---
-ticker = st.selectbox("Choisissez un actif :", options=tickers_disponibles, format_func=lambda x: nom_affichages[x])
+ticker = st.selectbox("Choisissez un actif :", options=tickers, format_func=lambda x: nom_affichages.get(x, x))
 
 # --- Chargement des données ---
 fichier_data = f"data/donnees_{ticker.lower()}.csv"
-fichier_pred = f"predictions/prediction_{ticker.lower().replace('-', '').replace('^', '')}.csv"
+fichier_pred = f"predictions/prediction_{ticker.lower().replace('-', '').replace('^', '').replace('=','')}.csv"
 
 if os.path.exists(fichier_data):
     df = pd.read_csv(fichier_data)
@@ -67,7 +67,7 @@ if os.path.exists(fichier_data):
         resume = generer_resume_signal(signaux_list)
 
         # --- Affichage complet ---
-        st.subheader(f"🔎 Analyse pour {nom_affichages[ticker]}")
+        st.subheader(f"🔎 Analyse pour {nom_affichages.get(ticker, ticker.upper())}")
         st.markdown(analyse)
         st.markdown(f"💬 **Résumé d'AVA :**\n{resume}")
         st.success(f"🤖 *Intuition d'AVA :* {suggestion}")
@@ -95,6 +95,7 @@ if os.path.exists(fichier_data):
 
 else:
     st.warning(f"❌ Aucune donnée trouvée pour {ticker}. Veuillez lancer l'entraînement AVA.")
+
 
 
 
