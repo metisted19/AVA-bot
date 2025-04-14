@@ -7,9 +7,10 @@ st.set_page_config(page_title="📈 Signaux Techniques", layout="wide")
 st.title("📍 Signaux Techniques d'AVA")
 
 # --- Tickers disponibles et noms à afficher ---
-tickers_disponibles = [
+tickers = [
     "aapl", "tsla", "googl", "btc-usd", "eth-usd",
-    "msft", "amzn", "nvda", "^gspc","doge-usd", "ada-usd"
+    "msft", "amzn", "nvda", "^gspc", "doge-usd", "ada-usd",
+    "sol-usd", "gc=F", "^fchi"  # <= le CAC 40 est ici
 ]
 
 nom_affichages = {
@@ -24,6 +25,9 @@ nom_affichages = {
     "^gspc": "S&P500",
     "doge-usd": "Dogecoin",
     "ada-usd": "Cardano"
+    "^fchi": "CAC 40"
+    "sol-usd",
+    "gc=F"
 }
 
 # --- Sélection du ticker ---
