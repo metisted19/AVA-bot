@@ -4,7 +4,7 @@ import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
-from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville ici
+from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville ci-dessous.
 import requests
 from PIL import Image
 from datetime import datetime
@@ -13,6 +13,7 @@ import urllib.parse
 import random
 import glob
 import difflib
+import re  # Import pour le bloc géographie
 
 # Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
 def get_meteo_ville(city):
@@ -277,18 +278,41 @@ if question:
                     message_bot = rep
                     break
 
-        # --- Bloc Réponses géographiques simples ---
-        if not any([geographie_repondu, sante_repondu, perso_repondu]) and not message_bot:
-            geo_capitales = {
-                "france": "Paris", "espagne": "Madrid", "italie": "Rome", "allemagne": "Berlin", "japon": "Tokyo",
-                "royaume-uni": "Londres", "canada": "Ottawa", "états-unis": "Washington", "norvège": "Oslo",
-                "brésil": "Brasilia", "australie": "Canberra"
+        # --- Bloc Réponses géographiques avec extraction par regex ---
+        elif any(kw in question_clean for kw in ["capitale", "capitale de", "quelle est la capitale", "capitale du", "capitale de l", "capitale des"]):
+            pays_detecte = None
+            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
+            if match:
+                pays_detecte = match.group(1).strip()
+            capitales = {
+                "france": "Paris",
+                "espagne": "Madrid",
+                "italie": "Rome",
+                "allemagne": "Berlin",
+                "japon": "Tokyo",
+                "chine": "Pékin",
+                "brésil": "Brasilia",
+                "mexique": "Mexico",
+                "canada": "Ottawa",
+                "états-unis": "Washington",
+                "usa": "Washington",
+                "inde": "New Delhi",
+                "portugal": "Lisbonne",
+                "royaume-uni": "Londres",
+                "angleterre": "Londres",
+                "argentine": "Buenos Aires",
+                "maroc": "Rabat",
+                "algérie": "Alger",
+                "tunisie": "Tunis",
+                "turquie": "Ankara",
+                "russie": "Moscou",
+                "australie": "Canberra",
             }
-            for pays, capitale in geo_capitales.items():
-                if pays in question_clean and "capitale" in question_clean:
-                    message_bot = f"📌 La capitale de {pays.capitalize()} est **{capitale}**."
-                    geographie_repondu = True
-                    break
+            if pays_detecte and pays_detecte in capitales:
+                capitale = capitales[pays_detecte]
+                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
+            else:
+                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
 
         # --- Bloc Réponses personnalisées simples ---
         elif not message_bot:
@@ -326,7 +350,7 @@ if question:
                 elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
                     nom_ticker = "doge-usd"
                 elif "ada" in nom_ticker or "cardano" in nom_ticker:
-                    nom_ticker = "ada-usd"
+                    nom_ticker = "ada-usd"    
 
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
