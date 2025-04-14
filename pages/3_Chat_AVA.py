@@ -288,37 +288,39 @@ if question:
                 pays_detecte = match.group(1).strip().lower()
             else:
                 tokens = question_clean.split()
-                if len(tokens) >= 2:
-                    pays_detecte = tokens[-1].strip().lower()  # Fallback : le dernier mot
-            capitales = {
-                "france": "Paris",
-                "espagne": "Madrid",
-                "italie": "Rome",
-                "allemagne": "Berlin",
-                "japon": "Tokyo",
-                "chine": "Pékin",
-                "brésil": "Brasilia",
-                "mexique": "Mexico",
-                "canada": "Ottawa",
-                "états-unis": "Washington",
-                "usa": "Washington",
-                "inde": "New Delhi",
-                "portugal": "Lisbonne",
-                "royaume-uni": "Londres",
-                "angleterre": "Londres",
-                "argentine": "Buenos Aires",
-                "maroc": "Rabat",
-                "algérie": "Alger",
-                "tunisie": "Tunis",
-                "turquie": "Ankara",
-                "russie": "Moscou",
-                "australie": "Canberra",
-            }
-            if pays_detecte and pays_detecte in capitales:
-                capitale = capitales[pays_detecte]
-                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
-            else:
-                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+            if len(tokens) >= 2:
+                # Supprimer les signes de ponctuation du dernier token
+                pays_detecte = tokens[-1].strip(" ?!.,;").lower()  # Fallback : le dernier mot nettoyé
+        capitales = {
+            "france": "Paris",
+            "espagne": "Madrid",
+            "italie": "Rome",
+            "allemagne": "Berlin",
+            "japon": "Tokyo",
+            "chine": "Pékin",
+            "brésil": "Brasilia",
+            "mexique": "Mexico",
+            "canada": "Ottawa",
+            "états-unis": "Washington",
+            "usa": "Washington",
+            "inde": "New Delhi",
+            "portugal": "Lisbonne",
+            "royaume-uni": "Londres",
+            "angleterre": "Londres",
+            "argentine": "Buenos Aires",
+            "maroc": "Rabat",
+            "algérie": "Alger",
+            "tunisie": "Tunis",
+            "turquie": "Ankara",
+            "russie": "Moscou",
+            "australie": "Canberra",
+        }
+        if pays_detecte and pays_detecte in capitales:
+            capitale = capitales[pays_detecte]
+            message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
+        else:
+            message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+
 
         # --- Bloc Réponses personnalisées simples ---
         elif not message_bot:
