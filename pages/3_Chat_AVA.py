@@ -4,7 +4,7 @@ import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_actualites import obtenir_actualites, get_general_news
-from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous allons redéfinir get_meteo_ville ci-dessous.
+from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville
 import requests
 from PIL import Image
 from datetime import datetime
@@ -102,7 +102,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Nouveaux flags pour géographie, médecine et réponses personnalisées
+        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
         geographie_repondu = False
         sante_repondu = False
         perso_repondu = False
@@ -155,7 +155,7 @@ if question:
                 for fichier in fichiers:
                     df = pd.read_csv(fichier)
                     df.columns = [col.capitalize() for col in df.columns]
-                    df = ajouter_indicateurs_techniques(df)
+                    df = ajouter_indicateurs_techniques(df)  # ← Important !
                     analyse, suggestion = analyser_signaux_techniques(df)
                     try:
                         analyse, suggestion = analyser_signaux_techniques(df)
@@ -221,8 +221,64 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
+        # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
+        if not message_bot and any(phrase in question_clean for phrase in [
+            "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
+            "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
+        ]):
+            if "tête" in question_clean:
+                message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
+            elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
+                message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
+            elif "gorge" in question_clean:
+                message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
+            elif "ventre" in question_clean:
+                message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
+            elif "toux" in question_clean or "je tousse" in question_clean:
+                message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
+            elif "nez" in question_clean:
+                message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
+            elif "transpire" in question_clean or "j'ai froid" in question_clean:
+                message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
+
+        # --- Bloc Réponses médicales explicites ---
+        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite"]):
+            reponses_medic = {
+                "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
+                "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
+                "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
+                "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et de sensibilité à la lumière.",
+                "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
+                "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée. Elle nécessite un suivi médical et une hygiène de vie adaptée.",
+                "stress": "🧘 Pour calmer le stress : respirez profondément, prenez l'air, écoutez de la musique douce... ou parlez à AVA !",
+                "toux": "😷 Une toux sèche peut indiquer une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
+                "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
+                "douleur": "💢 Pour mieux vous répondre, précisez la localisation ou l'intensité de la douleur.",
+                "asthme": "🫁 L’asthme est une inflammation des voies respiratoires. Il provoque des difficultés à respirer, souvent soulagées par un inhalateur.",
+                "bronchite": "🫁 La bronchite est une inflammation des bronches, avec toux persistante et parfois fièvre. Buvez beaucoup et reposez-vous."
+            }
+            for cle, rep in reponses_medic.items():
+                if cle in question_clean:
+                    message_bot = rep
+                    break
+
+        # --- Bloc Remèdes naturels ---
+        if not message_bot and any(phrase in question_clean for phrase in [
+            "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement", "tisane", "huile essentielle"
+        ]):
+            if "stress" in question_clean:
+                message_bot = "🧘 Pour soulager le stress naturellement, pensez aux tisanes de camomille, à la respiration profonde ou à quelques minutes de méditation."
+            elif "mal de gorge" in question_clean or "gorge" in question_clean:
+                message_bot = "🍯 Un mal de gorge ? Une cuillère de miel dans une infusion au citron ou au thym peut faire des merveilles."
+            elif "rhume" in question_clean or "nez bouché" in question_clean:
+                message_bot = "🌿 Pour le nez bouché, essayez l'inhalation de vapeur avec quelques gouttes d’huile essentielle d’eucalyptus ou de menthe poivrée."
+            elif "fièvre" in question_clean:
+                message_bot = "🧊 En cas de fièvre, buvez beaucoup, reposez-vous, et utilisez un linge frais sur le front. L’infusion de saule blanc est aussi un remède ancestral."
+            else:
+                message_bot = "🌱 Il existe plein de remèdes naturels ! Si vous me précisez votre souci (ex : toux, stress, rhume...), je vous suggérerai une solution douce."
+
         # --- Réponses géographiques simples ---
-        if not any([geographie_repondu, sante_repondu, perso_repondu]):
+        if not any([geographie_repondu, sante_repondu, perso_repondu]) and not message_bot:
             geo_capitales = {
                 "france": "Paris", "espagne": "Madrid", "italie": "Rome", "allemagne": "Berlin", "japon": "Tokyo",
                 "royaume-uni": "Londres", "canada": "Ottawa", "états-unis": "Washington", "norvège": "Oslo",
@@ -234,28 +290,17 @@ if question:
                     geographie_repondu = True
                     break
 
-        # --- Réponses médicales simples ---
-        if not geographie_repondu and not sante_repondu:
-            if "grippe" in question_clean:
-                message_bot = "🤒 Les symptômes courants de la grippe sont : fièvre, frissons, courbatures, toux sèche, fatigue intense."
-                sante_repondu = True
-            elif "rhume" in question_clean:
-                message_bot = "🤧 Un rhume cause souvent nez qui coule, éternuements, toux légère et mal de gorge."
-                sante_repondu = True
-            elif "fièvre" in question_clean:
-                message_bot = "🌡️ Pour faire baisser la fièvre : repos, hydratation et surveillance de la température."
-                sante_repondu = True
-
         # --- Réponses personnalisées simples ---
-        elif "merci" in question_clean:
-            message_bot = "Avec plaisir 😄 N'hésitez pas si vous avez d'autres questions !"
-        elif "je t'aime" in question_clean:
-            message_bot = "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !"
-        elif "un secret" in question_clean:
-            message_bot = "🤫 Mon secret ? J’apprends chaque jour à mieux vous comprendre... mais chut !"
+        elif not message_bot:
+            if "merci" in question_clean:
+                message_bot = "Avec plaisir 😄 N'hésitez pas si vous avez d'autres questions !"
+            elif "je t'aime" in question_clean:
+                message_bot = "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !"
+            elif "un secret" in question_clean:
+                message_bot = "🤫 Mon secret ? J’apprends chaque jour à mieux vous comprendre... mais chut !"
 
         # Bloc catch-all pour l'analyse technique ou réponse par défaut
-        elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete, geographie_repondu, sante_repondu, perso_repondu]):
+        if not message_bot:
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
                 if "btc" in nom_ticker or "bitcoin" in nom_ticker:
@@ -312,3 +357,4 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
