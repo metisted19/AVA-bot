@@ -7,7 +7,7 @@ st.set_page_config(page_title="📈 Signaux Techniques", layout="wide")
 st.title("📍 Signaux Techniques d'AVA")
 
 # --- Sélection du ticker ---
-tickers_disponibles = ["BTC-USD", "ETH-USD", "AAPL", "TSLA", "GOOGL", "^FCHI"]
+tickers = ["aapl", "tsla", "googl", "btc-usd", "eth-usd", "msft", "amzn", "nvda", "^gspc"]
 ticker = st.selectbox("Sélectionnez un actif à analyser :", tickers_disponibles)
 
 # --- Chargement des données ---
