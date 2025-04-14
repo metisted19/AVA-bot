@@ -92,7 +92,7 @@ if question:
     st.session_state.messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
-        
+
     with st.chat_message("assistant", avatar="assets/ava_logo.png"):
         # Traitement de la question en minuscule
         question_clean = question.lower().strip()
@@ -285,11 +285,11 @@ if question:
             pays_detecte = None
             match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
             if match:
-                pays_detecte = match.group(1).strip()
+                pays_detecte = match.group(1).strip().lower()
             else:
                 tokens = question_clean.split()
                 if len(tokens) >= 2:
-                    pays_detecte = tokens[-1].strip()  # Fallback : le dernier mot
+                    pays_detecte = tokens[-1].strip().lower()  # Fallback : le dernier mot
             capitales = {
                 "france": "Paris",
                 "espagne": "Madrid",
