@@ -375,6 +375,10 @@ if question:
                     nom_ticker = "doge-usd"
                 elif "ada" in nom_ticker or "cardano" in nom_ticker:
                     nom_ticker = "ada-usd"
+                elif "sol" in nom_ticker or "solana" in nom_ticker:
+                    nom_ticker = "sol-usd"
+                elif "gold" in nom_ticker or "or" in nom_ticker:
+                    nom_ticker = "gc=F"    
     
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
