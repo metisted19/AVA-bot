@@ -150,13 +150,29 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
+        # --- Détection intelligente de la ville ---
         if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
-            ville_detectee = "Paris"
-            for mot in question.split():
-                if mot and mot[0].isupper() and len(mot) > 2:
-                    ville_detectee = mot
+            ville_detectee = "Paris"  # Valeur par défaut
+            villes_connues = [
+                "paris", "lyon", "marseille", "lille", "bordeaux", "nantes", "strasbourg", "toulouse", "rennes", "nice", "angers", "dijon", "montpellier"
+            ]
+            for ville in villes_connues:
+                if ville in question_clean:
+                    ville_detectee = ville
+                    break
+            # Sinon tenter d'extraire la dernière ville détectée dans la question
+            if ville_detectee == "Paris":
+                mots = question_clean.split()
+                for mot in mots[::-1]:  # On regarde depuis la fin
+                    if len(mot) > 2 and mot.isalpha():
+                        ville_detectee = mot
+                        break
+            # Appel API météo
             meteo = get_meteo_ville(ville_detectee)
-            message_bot += f"🌦️ Météo à {ville_detectee} :\n{meteo}\n\n"
+            if "erreur" in meteo.lower():
+                message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee}**. Essayez une autre ville."
+            else:
+                message_bot += f"🌦️ **Météo à {ville_detectee.capitalize()}** :\n{meteo}\n\n"
             meteo_repondu = True
 
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
@@ -213,7 +229,6 @@ if question:
             message_bot = "🤫 Mon secret ? J’apprends chaque jour à mieux vous comprendre... mais chut !"
 
         # Bloc catch-all pour l'analyse technique ou réponse par défaut
-        # La condition intègre désormais vos nouveaux flags
         elif not any([horoscope_repondu, meteo_repondu, actus_repondu, blague_repondu, analyse_complete, geographie_repondu, sante_repondu, perso_repondu]):
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
@@ -256,11 +271,9 @@ if question:
             else:
                 message_bot = obtenir_reponse_ava(question)
 
-        # Si aucun bloc n'a fourni de réponse, on définit une réponse par défaut
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
-        # Appel à la traduction seulement si message_bot n'est pas vide
         try:
             langue = detect(question)
             if langue in ["en", "es", "de"] and message_bot.strip():
@@ -273,6 +286,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
