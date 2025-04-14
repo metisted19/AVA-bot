@@ -375,7 +375,7 @@ if question:
                     nom_ticker = "doge-usd"
                 elif "ada" in nom_ticker or "cardano" in nom_ticker:
                     nom_ticker = "ada-usd"
-
+    
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
                     df = pd.read_csv(data_path)
@@ -393,22 +393,26 @@ if question:
                     message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
             else:
                 message_bot = obtenir_reponse_ava(question)
-
+    
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-
-        try:
-            langue = detect(question)
-            if langue in ["en", "es", "de"] and message_bot.strip():
-                message_bot = traduire_texte(message_bot, langue)
-        except:
-            if message_bot.strip():
-                message_bot += "\n\n⚠️ Traduction indisponible."
-
+    
+        # --- Bloc Traduction (seulement si la question ne correspond pas à un court mot-clé français) ---
+        # On évite de traduire si la question est "merci", par exemple.
+        if question_clean not in ["merci", "merci beaucoup"]:
+            try:
+                langue = detect(question)
+                if langue in ["en", "es", "de"]:
+                    message_bot = traduire_texte(message_bot, langue)
+            except:
+                if message_bot.strip():
+                    message_bot += "\n\n⚠️ Traduction indisponible."
+    
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
-
+    
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
