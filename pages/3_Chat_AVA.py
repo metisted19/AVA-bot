@@ -12,7 +12,7 @@ from langdetect import detect
 import urllib.parse
 import random
 import glob
-import difflib  # Import ajouté pour la détection météo
+import difflib  # Import nécessaire pour la détection approximative de la ville
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
@@ -76,6 +76,7 @@ if question:
         st.markdown(question)
 
     with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+        # Traitement de la question en minuscule et sans espaces superflus
         question_clean = question.lower().strip()
         message_bot = ""
         horoscope_repondu = False
@@ -84,12 +85,12 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Nouveaux flags
+        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
         geographie_repondu = False
         sante_repondu = False
         perso_repondu = False
 
-        # Partie horoscope avec gestion insensible à la casse et adaptation du format JSON
+        # --- Partie Horoscope ---
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_disponibles = [
                 "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
@@ -129,6 +130,7 @@ if question:
                     message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
                     horoscope_repondu = True
 
+        # --- Analyse complète / technique ---
         if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
                 resultats = []
@@ -151,9 +153,9 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-        # Nouveau bloc de détection météo amélioré
+        # --- Bloc météo amélioré ---
         if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
-            # Liste élargie de villes françaises (tu peux en ajouter d'autres si besoin)
+            # Liste élargie de villes françaises
             villes_connues = [
                 "paris", "lyon", "marseille", "lille", "bordeaux", "nantes", "strasbourg", "toulouse", "rennes",
                 "nice", "angers", "dijon", "montpellier", "bayonne", "nancy", "reims", "clermont-ferrand", "besançon",
@@ -171,14 +173,17 @@ if question:
                         break
             if ville_proche:
                 ville_detectee = ville_proche[0]
+            # Capitaliser le nom de la ville pour l'appel API
+            ville_detectee_cap = ville_detectee.capitalize()
             # Appel API météo
-            meteo = get_meteo_ville(ville_detectee)
+            meteo = get_meteo_ville(ville_detectee_cap)
             if "erreur" in meteo.lower():
-                message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee.capitalize()}**. Essayez une autre ville."
+                message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville."
             else:
-                message_bot += f"🌦️ **Météo à {ville_detectee.capitalize()}** :\n{meteo}\n\n"
+                message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
             meteo_repondu = True
 
+        # --- Actualités ---
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
@@ -190,6 +195,7 @@ if question:
                 message_bot += "🔖 Articles à lire :\n" + "\n".join([f"🔹 [{titre}]({lien})" for titre, lien in actus]) + "\n\n"
                 actus_repondu = True
 
+        # --- Blagues ---
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
                 "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
@@ -290,6 +296,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
