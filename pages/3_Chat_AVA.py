@@ -83,7 +83,7 @@ if question:
         blague_repondu = False
         analyse_complete = False
 
-        # Nouveaux flags à ajouter juste après analyse_complete = False
+        # Nouveaux flags à ajouter juste après analyse_complete = False :
         geographie_repondu = False
         sante_repondu = False
         perso_repondu = False
@@ -104,17 +104,14 @@ if question:
                     response = requests.get(url)
                     if response.status_code == 200:
                         data = response.json()
-                        # Si la clé "signes" existe, on prend son contenu, sinon on considère le JSON entier comme le dictionnaire d'horoscopes.
                         if "signes" in data:
                             horoscope_dict = data.get("signes", {})
                         else:
                             horoscope_dict = data
-                        # Recherche du signe de façon insensible à la casse dans les clés
                         signe_data = next((v for k, v in horoscope_dict.items() if k.lower() == signe_detecte), None)
                         if signe_data is None:
                             message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
                         else:
-                            # Si la donnée est un dictionnaire, on récupère la clé "horoscope", sinon on prend la valeur directement
                             if isinstance(signe_data, dict):
                                 horoscope = signe_data.get("horoscope")
                             else:
@@ -182,7 +179,6 @@ if question:
             message_bot = random.choice(blagues)
             blague_repondu = True
 
-        # Insertion des blocs demandés avant le bloc catch-all
         # --- Réponses géographiques simples ---
         if not any([geographie_repondu, sante_repondu, perso_repondu]):
             geo_capitales = {
@@ -191,7 +187,7 @@ if question:
                 "brésil": "Brasilia", "australie": "Canberra"
             }
             for pays, capitale in geo_capitales.items():
-                if f"capitale de {pays}" in question_clean or f"{pays} a pour capitale" in question_clean:
+                if pays in question_clean and "capitale" in question_clean:
                     message_bot = f"📌 La capitale de {pays.capitalize()} est **{capitale}**."
                     geographie_repondu = True
                     break
@@ -208,7 +204,7 @@ if question:
                 message_bot = "🌡️ Pour faire baisser la fièvre : repos, hydratation et surveillance de la température."
                 sante_repondu = True
 
-        # Bloc de réponses personnalisées
+        # --- Réponses personnalisées simples ---
         elif "merci" in question_clean:
             message_bot = "Avec plaisir 😄 N'hésitez pas si vous avez d'autres questions !"
         elif "je t'aime" in question_clean:
@@ -259,17 +255,24 @@ if question:
             else:
                 message_bot = obtenir_reponse_ava(question)
 
+        # Si aucun bloc n'a fourni de réponse, on définit une réponse par défaut
+        if not message_bot.strip():
+            message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
+
+        # Appel à la traduction seulement si message_bot n'est pas vide
         try:
             langue = detect(question)
-            if langue in ["en", "es", "de"]:
+            if langue in ["en", "es", "de"] and message_bot.strip():
                 message_bot = traduire_texte(message_bot, langue)
         except:
-            message_bot += "\n\n⚠️ Traduction indisponible."
+            if message_bot.strip():
+                message_bot += "\n\n⚠️ Traduction indisponible."
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
