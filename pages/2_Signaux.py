@@ -8,7 +8,17 @@ st.title("📍 Signaux Techniques d'AVA")
 
 # --- Sélection du ticker ---
 tickers = ["aapl", "tsla", "googl", "btc-usd", "eth-usd", "msft", "amzn", "nvda", "^gspc"]
-ticker = st.selectbox("Sélectionnez un actif à analyser :", tickers_disponibles)
+tickers_disponibles = [
+    "aapl",
+    "tsla",
+    "googl",
+    "btc-usd",
+    "eth-usd",
+    "msft",
+    "amzn",
+    "nvda",
+    "^gspc"
+]
 
 # --- Chargement des données ---
 fichier_data = f"data/donnees_{ticker.lower()}.csv"
