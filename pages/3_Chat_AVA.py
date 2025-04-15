@@ -281,15 +281,13 @@ if question:
                 "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
                 "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
                 "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
-                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous."
-            }
-            reponses_medic.update({
+                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous.",
                 "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
                 "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
                 "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
                 "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
                 "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques."
-            })
+            }
             for cle, rep in reponses_medic.items():
                 if cle in question_clean:
                     message_bot = rep
@@ -330,6 +328,7 @@ if question:
                 "tunisie"          : "Tunis",
                 "turquie"          : "Ankara",
                 "russie"           : "Moscou",
+                "russe"            : "Moscou",
                 "australie"        : "Canberra",
                 "corée du sud"     : "Séoul",
                 "corée"            : "Séoul",
@@ -408,8 +407,6 @@ if question:
                 "équateur"         : "Quito",
                 "venezuela"        : "Caracas"
             }
-
-        
             if pays_detecte and pays_detecte in capitales:
                 message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
             else:
@@ -511,29 +508,31 @@ if question:
                     message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
             else:
                 message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
-        
+
         # --- Bloc Calcul (simple expression mathématique ou phrase) ---
-if not message_bot:
-    question_calc = question_clean.replace(",", ".")
-    # Suppression du mot-clé "calcul" ou "calcule" en début de chaîne
-    question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
-    try:
-        # Si la question contient explicitement un calcul via des opérateurs
-        if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
-            try:
-                result = eval(question_calc)
-                message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-            except Exception:
-                pass
-        # Sinon, extraire l'expression après des mots-clés
         if not message_bot:
-            match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
-            if match:
-                expression = match.group(1).strip()
-                result = eval(expression)
-                message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-    except:
-        pass                                                                                                                                                               # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+            question_calc = question_clean.replace(",", ".")
+            # Suppression du mot-clé "calcul" ou "calcule" en début de chaîne
+            question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
+            try:
+                # Si la question contient explicitement un calcul via des opérateurs
+                if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
+                    try:
+                        result = eval(question_calc)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+                    except Exception:
+                        pass
+                # Sinon, extraire l'expression après des mots-clés
+                if not message_bot:
+                    match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
+                    if match:
+                        expression = match.group(1).strip()
+                        result = eval(expression)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+            except:
+                pass
+        
+        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             reponses_ava = [
                 "Je suis là pour vous aider, mais j'aurais besoin d’un peu plus de précision 🤖",
@@ -542,10 +541,10 @@ if not message_bot:
                 "Hmm... Ce n'est pas dans ma base pour l’instant. Essayez une autre formulation ou tapez 'analyse complète' pour un bilan des marchés 📊"
             ]
             message_bot = random.choice(reponses_ava)
-
+        
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-
+        
         # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
@@ -555,7 +554,7 @@ if not message_bot:
             except:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
-
+        
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
