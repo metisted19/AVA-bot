@@ -371,7 +371,8 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "clf", "pétrole": "clf", "petrole": "clf",   # Remarquez "clf" sans "="
+                "cl": "clf", "pétrole": "clf", "petrole": "clf",
+                "cl=f": "clf",  # Ajout pour gérer "cl=f"
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
                 "bnb": "bnb-usd"
@@ -486,6 +487,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
