@@ -45,16 +45,16 @@ def get_general_news():
     try:
         api_key = "681120bace124ee99d390cc059e6aca5"
         newsapi = NewsApiClient(api_key=api_key)
-        # Utilisation de "everything" avec language en anglais et un mot-clé général (ici "technology", par exemple)
-        data = newsapi.get_everything(q="technology", language="en", sort_by="publishedAt", page_size=10)
-        if not data or "articles" not in data:
+        top_headlines = newsapi.get_top_headlines(country="us", page_size=10)
+        if not top_headlines:
             return "❌ No data received from NewsAPI. Check your API key and connection."
-        articles = data.get("articles")
+        articles = top_headlines.get("articles")
         if not articles:
             return "❌ No articles found for this query."
         return [(article["title"], article["url"]) for article in articles if "title" in article and "url" in article]
     except Exception as e:
         return f"❌ Error fetching news via NewsApiClient: {e}"
+
 
 
 # Fonction de traduction via l’API gratuite MyMemory
