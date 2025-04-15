@@ -209,18 +209,21 @@ if question:
             meteo_repondu = True
 
         # --- Actualités améliorées ---
-        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
-            actus = get_general_news()
-            if isinstance(actus, str):
-                message_bot += actus
-            elif actus and isinstance(actus, list):
-                message_bot += "📰 **Dernières actualités importantes :**\n\n"
-                for i, (titre, lien) in enumerate(actus[:8], 1):
-                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
-                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
-            else:
-                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
-            actus_repondu = True
+        def get_general_news():
+            try:
+                api_key = "681120bace124ee99d390cc059e6aca5"  # ← Remplace ici par ta vraie clé NewsAPI
+                url = f"https://newsapi.org/v2/top-headlines?language=fr&pageSize=10&apiKey={api_key}"
+                response = requests.get(url)
+                data = response.json()
+
+                if "articles" in data:
+                    articles = data["articles"]
+                    return [(article["title"], article["url"]) for article in articles if "title" in article and "url" in article]
+                else:
+                    return "⚠️ Impossible de récupérer les actualités."
+            except Exception as e:
+                return f"❌ Erreur lors de la récupération des actus : {e}"
+
 
         # --- Blagues ---
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
