@@ -46,7 +46,7 @@ def get_general_news():
         # Définir la clé API directement ici
         api_key = "681120bace124ee99d390cc059e6aca5"
         newsapi = NewsApiClient(api_key=api_key)
-        top_headlines = newsapi.get_top_headlines(country="fr", page_size=10)
+        data = newsapi.get_everything(q="technology", language="en", sort_by="publishedAt", page_size=10)
         if not top_headlines:
             return "❌ Aucune donnée reçue de NewsAPI. Vérifiez votre clé API et votre connexion."
         articles = top_headlines.get("articles")
