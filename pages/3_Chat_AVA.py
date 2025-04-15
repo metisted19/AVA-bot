@@ -528,12 +528,10 @@ if question:
         # --- Bloc Traduction Automatique ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
-                # Si la question est une salutation en français, forcer la langue à français, 
+                # Listes de salutations
                 english_salutations = {"hello", "hi", "hey", "good morning", "good afternoon"}
                 french_salutations = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
-                if any(s in question_clean for s in english_salutations)
-                    langue = "en"
-                # Sinon, si la question contient une salutation française, on force "fr"
+                # Si la question contient une salutation anglaise, on force la langue à "en"
                 elif any(s in question_clean for s in french_salutations):    
                     langue = "fr"
                 else:
