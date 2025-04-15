@@ -3,7 +3,8 @@ import os
 import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
-from fonctions_actualites import obtenir_actualites, get_general_news
+# Remplacez cette importation par l'appel à la nouvelle version
+#from fonctions_actualites import obtenir_actualites, get_general_news
 from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville ici.
 import requests
 from PIL import Image
@@ -37,6 +38,21 @@ def get_meteo_ville(city):
             return "Erreur: données météo non disponibles."
     except Exception as e:
         return "Erreur: " + str(e)
+
+# Nouvelle fonction get_general_news() avec la modification pour NewsAPI
+def get_general_news():
+    try:
+        api_key = "681120bace124ee99d390cc059e6aca5"  
+        url = f"https://newsapi.org/v2/top-headlines?language=fr&pageSize=10&apiKey={api_key}"
+        response = requests.get(url)
+        data = response.json()
+        if "articles" in data:
+            articles = data["articles"]
+            return [(article["title"], article["url"]) for article in articles if "title" in article and "url" in article]
+        else:
+            return "⚠️ Impossible de récupérer les actualités."
+    except Exception as e:
+        return f"❌ Erreur lors de la récupération des actus : {e}"
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
@@ -104,7 +120,6 @@ if question:
     st.session_state.messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
-
     with st.chat_message("assistant", avatar="assets/ava_logo.png"):
         # Traitement de la question en minuscule
         question_clean = question.lower().strip()
@@ -209,21 +224,18 @@ if question:
             meteo_repondu = True
 
         # --- Actualités améliorées ---
-        def get_general_news():
-            try:
-                api_key = "681120bace124ee99d390cc059e6aca5"  # ← Remplace ici par ta vraie clé NewsAPI
-                url = f"https://newsapi.org/v2/top-headlines?language=fr&pageSize=10&apiKey={api_key}"
-                response = requests.get(url)
-                data = response.json()
-
-                if "articles" in data:
-                    articles = data["articles"]
-                    return [(article["title"], article["url"]) for article in articles if "title" in article and "url" in article]
-                else:
-                    return "⚠️ Impossible de récupérer les actualités."
-            except Exception as e:
-                return f"❌ Erreur lors de la récupération des actus : {e}"
-
+        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
+            actus = get_general_news()
+            if isinstance(actus, str):
+                message_bot += actus
+            elif actus and isinstance(actus, list):
+                message_bot += "📰 **Dernières actualités importantes :**\n\n"
+                for i, (titre, lien) in enumerate(actus[:5], 1):
+                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
+                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
+            else:
+                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
+            actus_repondu = True
 
         # --- Blagues ---
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
@@ -514,6 +526,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
                                                                                         
 
