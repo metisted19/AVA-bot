@@ -447,7 +447,7 @@ if question:
             ]
             message_bot = random.choice(punchlines)
 
-        # --- Bloc Culture Générale (questions simples) ---
+        # --- Bloc Culture Générale
         if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
             base_connaissances = {
                 "qui a inventé internet": "🌐 Internet a été développé principalement par Vinton Cerf et Robert Kahn dans les années 1970.",
@@ -461,10 +461,12 @@ if question:
                 "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin (chinois)** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
                 "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie."
             }
+
             for question_cle, reponse in base_connaissances.items():
                 if question_cle in question_clean:
                     message_bot = reponse
                     break
+
 
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
