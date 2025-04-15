@@ -535,6 +535,30 @@ if question:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
 
+
+        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+        if not message_bot:
+            reponses_ava = [
+                "Je suis là pour vous aider, mais j'aurais besoin d’un peu plus de précision 🤖",
+                "Je n’ai pas bien compris, mais je suis prête à apprendre ! Reformulez votre question 😊",
+                "Ce sujet est encore flou pour moi... mais je peux vous parler d’analyse technique, météo, actualités et bien plus !",
+                "Hmm... Ce n'est pas dans ma base pour l’instant. Essayez une autre formulation ou tapez 'analyse complète' pour un bilan des marchés 📊"
+            ]
+            message_bot = random.choice(reponses_ava)
+
+        if not message_bot.strip():
+            message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
+
+        # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
+        if question_clean not in ["merci", "merci beaucoup"]:
+            try:
+                langue = detect(question)
+                if langue in ["en", "es", "de"]:
+                    message_bot = traduire_texte(message_bot, langue)
+            except:
+                if message_bot.strip():
+                    message_bot += "\n\n⚠️ Traduction indisponible."
+
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
