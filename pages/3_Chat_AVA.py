@@ -514,22 +514,16 @@ if question:
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
-        # --- Bloc Réponses personnalisées pour salutations en français ---
-        salutations_fr = {"bonjour", "salut", "hello", "coucou", "ça va", "comment ça va", "comment vas-tu"}
-        if any(s in question_clean for s in salutations_fr):
-            # Réponse fixée en français
-            message_bot = "Bonjour ! Je vais très bien, merci. Et vous, comment allez-vous ?"
-
         # --- Bloc Traduction Automatique ---
-        if question_clean not in ["merci", "merci beaucoup"]:
+        salutations_fr = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
+        if len(question_clean) < 5 or any(s in question_clean for s in salutations_fr):
+            langue = "fr"
+        else:    
             try:
-                salutations = {"bonjour", "salut", "hello", "coucou", "ça va", "comment ça va", "comment vas-tu"}
-                if any(s in question_clean for s in salutations):
-                    langue = "fr"
+                if not any(char in question for char in "éèàùç"):
+                     langue = detect(question)
                 else:
-                    langue = detect(question)
-                if langue != "fr":        
-                    message_bot = traduire_texte(message_bot, langue)
+                    langue = "fr"
             except Exception as e:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
