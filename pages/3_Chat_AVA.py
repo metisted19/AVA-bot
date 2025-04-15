@@ -25,7 +25,7 @@ def remove_accents(input_str):
 
 # Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
 def get_meteo_ville(city):
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid=3b2ff0b77dd65559ba4a1a69769221d5&units=metric&lang=fr"
+    url = f"https://newsapi.org/v2/top-headlines?country=fr&pageSize=10&apiKey={api_key}"
     try:
         response = requests.get(url)
         if response.status_code == 200:
