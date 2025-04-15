@@ -362,7 +362,7 @@ if question:
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
             nom_simple = question_clean.replace("analyse", "").strip()
-            # Normalisation pour supprimer les accents (exemple "pétrole" devient "petrole")
+            # Suppression des accents pour normaliser la chaîne (exemple : "pétrole" -> "petrole")
             nom_simple_norm = remove_accents(nom_simple)
             correspondances = {
                 "btc": "btc-usd", "bitcoin": "btc-usd",
@@ -379,8 +379,8 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "clf", "pétrole": "clf", "petrole": "clf",   # "clf" sans "="
-                "cl=f": "clf",  # Pour gérer "cl=f"
+                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F",  # Remarquez que "pétrole" et "petrole" sont mappés à "cl=F"
+                "cl=f": "cl=F",  # Pour gérer "cl=f"
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
                 "bnb": "bnb-usd"
@@ -495,6 +495,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
