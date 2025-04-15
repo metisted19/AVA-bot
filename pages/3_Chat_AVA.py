@@ -523,13 +523,12 @@ if question:
         # --- Bloc Traduction Automatique ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
-                # Si le texte n'inclut pas les caractères typiques du français, tenter de détecter la langue
-                if not any(char in question for char in "éèàùç"):
-                    langue = detect(question)
-                else:
+                salutations = {"bonjour", "salut", "hello", "coucou", "ça va", "comment ça va", "comment vas-tu"}
+                if any(s in question_clean for s in salutations):
                     langue = "fr"
-                # Traduire uniquement si la langue détectée est différente du français
-                if langue != "fr":
+                else:
+                    langue = detect(question)
+                if langue != "fr":        
                     message_bot = traduire_texte(message_bot, langue)
             except Exception as e:
                 if message_bot.strip():
