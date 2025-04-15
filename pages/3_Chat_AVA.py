@@ -440,6 +440,14 @@ if question:
                     nom_ticker = "sol-usd"
                 elif "gold" in nom_ticker or "or" in nom_ticker:
                     nom_ticker = "gc=F"
+                elif "xrp" in nom_ticker or "ripple" in nom_ticker:
+                    nom_ticker = "xrp-usd"
+                elif "bnb" in nom_ticker:
+                    nom_ticker = "bnb-usd"
+                elif "pétrole" in nom_ticker or "petrole" in nom_ticker or "oil" in nom_ticker:
+                    nom_ticker = "cl=F"
+                elif "argent" in nom_ticker or "silver" in nom_ticker:
+                    nom_ticker = "si=F"    
         
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
