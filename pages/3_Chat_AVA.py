@@ -13,7 +13,13 @@ import urllib.parse
 import random
 import glob
 import difflib
-import re  # Pour le bloc sécurité, le traitement géographique et le nouveau bloc analyse
+import re  # Pour le bloc sécurité, le traitement géographique et l'analyse
+import unicodedata  # Pour supprimer les accents
+
+# Fonction pour supprimer les accents d'une chaîne de caractères
+def remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 # Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
 def get_meteo_ville(city):
@@ -356,6 +362,8 @@ if question:
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
             nom_simple = question_clean.replace("analyse", "").strip()
+            # Normalisation pour supprimer les accents (exemple "pétrole" devient "petrole")
+            nom_simple_norm = remove_accents(nom_simple)
             correspondances = {
                 "btc": "btc-usd", "bitcoin": "btc-usd",
                 "eth": "eth-usd", "ethereum": "eth-usd",
@@ -371,13 +379,13 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "clf", "pétrole": "clf", "petrole": "clf",
-                "cl=f": "clf",  # Ajout pour gérer "cl=f"
+                "cl": "clf", "pétrole": "clf", "petrole": "clf",   # "clf" sans "="
+                "cl=f": "clf",  # Pour gérer "cl=f"
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
                 "bnb": "bnb-usd"
             }
-            nom_ticker = correspondances.get(nom_simple)
+            nom_ticker = correspondances.get(nom_simple_norm)
             if nom_ticker:
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
@@ -487,6 +495,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
