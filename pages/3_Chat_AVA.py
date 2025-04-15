@@ -514,17 +514,17 @@ if question:
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
         
-        # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
-        if question_clean not in ["merci", "merci beaucoup"]:
-            try:
-                langue = detect(question)
-                if langue in ["en", "es", "de"]:
-                    message_bot = traduire_texte(message_bot, langue)
-            except:
-                if message_bot.strip():
-                    message_bot += "\n\n⚠️ Traduction indisponible."
+        # --- Bloc Traduction Automatique ---
+        try:
+            langue = detect(question)
+            if langue != "fr" and message_bot.strip():
+                message_bot = traduire_texte(message_bot, langue)
+        except:
+            if message_bot.strip():
+                message_bot += "\n\n⚠️ Traduction automatique indisponible."
+
         
-        st.markdown(message_bot)
+            st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
