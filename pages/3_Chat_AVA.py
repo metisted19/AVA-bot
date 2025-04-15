@@ -517,12 +517,12 @@ if question:
         # --- Bloc Traduction Automatique ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
-               langue = detect(question)
+                langue = detect(question)
                 if langue != "fr":
                     message_bot = traduire_texte(message_bot, langue)
-        except Exception as e:
-            if message_bot.strip():
-                message_bot += "\n\n⚠️ Traduction indisponible."
+            except Exception as e:
+                if message_bot.strip():
+                   message_bot += "\n\n⚠️ Traduction indisponible."
         
             st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
