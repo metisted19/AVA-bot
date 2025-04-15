@@ -371,7 +371,7 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F",
+                "cl": "clf", "pétrole": "clf", "petrole": "clf",   # Remarquez "clf" sans "="
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
                 "bnb": "bnb-usd"
@@ -468,10 +468,10 @@ if question:
                     message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
             else:
                 message_bot = obtenir_reponse_ava(question)
-    
+
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-    
+
         # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
@@ -481,11 +481,12 @@ if question:
             except:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
-    
+
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
