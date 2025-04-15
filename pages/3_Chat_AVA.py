@@ -526,15 +526,13 @@ if question:
                 message_bot = "Bonjour ! Je vais très bien, merci. Et vous, comment allez-vous ?"
 
         # --- Bloc Traduction Automatique ---
-        if question_clean not in ["merci", "merci beaucoup"]:
+        # Ne traduire que si aucun message n'a déjà été défini
+        if not message_bot and question_clean not in ["merci", "merci beaucoup"]:
             try:
-                # Listes de salutations
-                english_salutations = {"hello", "hi", "hey", "good morning", "good afternoon"}
-                french_salutations = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
-                # Si la question contient une salutation anglaise, on force la langue à "en"
+                # Pour les entrées de salutations anglaises, forcer "en"
                 if any(s in question_clean for s in english_salutations):
                     langue = "en"
-                # Si la question contient une salutation française, on force la langue à "fr"
+                # Pour les autres, utiliser la détection automatique ou forcer en français si on détecte des accents
                 elif any(s in question_clean for s in french_salutations):    
                     langue = "fr"
                 else:
