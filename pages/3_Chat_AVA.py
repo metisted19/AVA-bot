@@ -511,31 +511,29 @@ if question:
                     message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
             else:
                 message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
-
+        
         # --- Bloc Calcul (simple expression mathématique ou phrase) ---
-        if not message_bot:
-            question_calc = question_clean.replace(",", ".")
-            # Suppression du mot-clé "calcul" ou "calcule" en début de chaîne
-            question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
+if not message_bot:
+    question_calc = question_clean.replace(",", ".")
+    # Suppression du mot-clé "calcul" ou "calcule" en début de chaîne
+    question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
+    try:
+        # Si la question contient explicitement un calcul via des opérateurs
+        if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
             try:
-                # Si la question contient explicitement un calcul via des opérateurs
-                if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
-                    try:
-                        result = eval(question_calc)
-                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-                   except Exception:
-                       pass
-                # Sinon, extraire l'expression après des mots-clés
-                if not message_bot:
-                    match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
-                    if match:
-                        expression = match.group(1).strip()
-                        result = eval(expression)
-                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-        except:
-            pass
-
-        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+                result = eval(question_calc)
+                message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+            except Exception:
+                pass
+        # Sinon, extraire l'expression après des mots-clés
+        if not message_bot:
+            match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
+            if match:
+                expression = match.group(1).strip()
+                result = eval(expression)
+                message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+    except:
+        pass                                                                                                                                                               # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             reponses_ava = [
                 "Je suis là pour vous aider, mais j'aurais besoin d’un peu plus de précision 🤖",
@@ -561,4 +559,4 @@ if question:
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", [])) 
+st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
