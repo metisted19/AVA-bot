@@ -515,15 +515,15 @@ if question:
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
         # --- Bloc Traduction Automatique ---
-        salutations_fr = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
-        if len(question_clean) < 5 or any(s in question_clean for s in salutations_fr):
-            langue = "fr"
-        else:    
+        if question_clean not in ["merci", "merci beaucoup"]    
             try:
-                if not any(char in question for char in "éèàùç"):
-                     langue = detect(question)
+                salutations_en = {"hello", "hi", "good morning"}
+                if any(s in question_clean for s in salutations_en):
+                    langue = "en"
                 else:
-                    langue = "fr"
+                    langue = detect(question)
+                if langue != "fr":
+                    message_bot = traduire_texte(message_bot, langue)        
             except Exception as e:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
