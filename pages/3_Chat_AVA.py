@@ -517,11 +517,9 @@ if question:
         # --- Bloc Traduction Automatique ---
         try:
             langue = detect(question)
-            if langue != "fr" and message_bot.strip():
-                message_bot = traduire_texte(message_bot, langue)
-        except:
-            if message_bot.strip():
-                message_bot += "\n\n⚠️ Traduction automatique indisponible."
+            st.write("Langue détectée:", langue)
+        except Exception as e:
+            st.write("Erreur de détection de langue :", e)
 
         
             st.markdown(message_bot)
