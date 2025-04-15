@@ -518,6 +518,10 @@ if question:
         try:
             langue = detect(question)
             st.write("Langue détectée:", langue)
+            if len(question.strip()) < 5 or question.lower().strip() in ["hello", "hi", "hey"]:
+                langue = "en"
+            else:
+                langue = detect(question)
         except Exception as e:
             st.write("Erreur de détection de langue :", e)
 
