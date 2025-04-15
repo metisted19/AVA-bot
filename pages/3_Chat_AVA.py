@@ -514,33 +514,28 @@ if question:
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
-# --- Bloc Réponses personnalisées pour salutations en français ---
-salutations_fr = {"bonjour", "salut", "hello", "coucou", "ça va", "comment ça va", "comment vas-tu"}
-if any(s in question_clean for s in salutations_fr):
-    # Réponse fixée en français
-    message_bot = "Bonjour ! Je vais très bien, merci. Et vous, comment allez-vous ?"
+        # --- Bloc Réponses personnalisées pour salutations en français ---
+        salutations_fr = {"bonjour", "salut", "hello", "coucou", "ça va", "comment ça va", "comment vas-tu"}
+        if any(s in question_clean for s in salutations_fr):
+            # Réponse fixée en français
+            message_bot = "Bonjour ! Je vais très bien, merci. Et vous, comment allez-vous ?"
 
         # --- Bloc Traduction Automatique ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
+                # Si le texte n'inclut pas les caractères typiques du français, tenter de détecter la langue
                 if not any(char in question for char in "éèàùç"):
-                     langue = detect(question)
+                    langue = detect(question)
                 else:
                     langue = "fr"
+                # Traduire uniquement si la langue détectée est différente du français
                 if langue != "fr":
-                    message_bot = traduire_texte(message_bot, langue)   
+                    message_bot = traduire_texte(message_bot, langue)
             except Exception as e:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
-        
-            st.markdown(message_bot)
+
+        st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
-
-
-
-
-                                                                                        
-
-
+        st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
