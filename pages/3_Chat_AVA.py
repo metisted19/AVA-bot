@@ -529,9 +529,13 @@ if question:
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
                 # Si la question est une salutation en français, forcer la langue à français, 
-                salutations_en = {"hello", "hi", "hey", "good morning", "good afternoon"}
-                if any(s in question_clean for s in salutations_fr):
+                english_salutations = {"hello", "hi", "hey", "good morning", "good afternoon"}
+                french_salutations = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
+                if any(s in question_clean for s in english_salutations)
                     langue = "en"
+                # Sinon, si la question contient une salutation française, on force "fr"
+                elif any(s in question_clean for s in french_salutations):    
+                    langue = "fr"
                 else:
                     langue = detect(question)
                 # Traduire seulement si la langue n'est pas le français
