@@ -46,7 +46,7 @@ def get_general_news():
         # Définir la clé API directement ici
         api_key = "681120bace124ee99d390cc059e6aca5"
         newsapi = NewsApiClient(api_key=api_key)
-        top_headlines = newsapi.get_top_headlines(country="us", page_size=10)
+        top_headlines = newsapi.get_top_headlines(country="fr", page_size=10)
         if not top_headlines:
             return "❌ Aucune donnée reçue de NewsAPI. Vérifiez votre clé API et votre connexion."
         articles = top_headlines.get("articles")
@@ -513,38 +513,18 @@ if question:
         
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-
-        # --- Bloc Réponses personnalisées pour salutations ---
-        salutations_fr = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
-        if any(s in question_clean for s in salutations_fr):
-            # Si l'entrée contient "hello", "hi", "good morning", "buenos dias", on renvoie la réponse en anglais
-            salutations_en = {"hello", "hi", "good morning"}
-            if any(s in question_clean for s in salutations_en):
-                message_bot = "Hello! I'm here and ready to help. How are you today?"
-            else:
-                # Si l'entrée contient une salutation française (par exemple "bonjour")
-                message_bot = "Bonjour ! Je vais très bien, merci. Et vous, comment allez-vous ?"
-
-        # --- Bloc Traduction Automatique ---
-        # Ne traduire que si aucun message n'a déjà été défini
-        if not message_bot and question_clean not in ["merci", "merci beaucoup"]:
+        
+        # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
+        if question_clean not in ["merci", "merci beaucoup"]:
             try:
-                # Pour les entrées de salutations anglaises, forcer "en"
-                if any(s in question_clean for s in english_salutations):
-                    langue = "en"
-                # Pour les autres, utiliser la détection automatique ou forcer en français si on détecte des accents
-                elif any(s in question_clean for s in french_salutations):    
-                    langue = "fr"
-                else:
-                    langue = detect(question)
-                # Traduire seulement si la langue n'est pas le français
-                if langue != "fr":
+                langue = detect(question)
+                if langue in ["en", "es", "de"]:
                     message_bot = traduire_texte(message_bot, langue)
-            except Exception as e:
+            except:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
-
+        
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-        st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
