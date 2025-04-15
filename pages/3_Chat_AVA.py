@@ -215,7 +215,7 @@ if question:
                 message_bot += actus
             elif actus and isinstance(actus, list):
                 message_bot += "📰 **Dernières actualités importantes :**\n\n"
-                for i, (titre, lien) in enumerate(actus[:5], 1):
+                for i, (titre, lien) in enumerate(actus[:8], 1):
                     message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
                 message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
             else:
