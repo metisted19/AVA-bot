@@ -517,9 +517,13 @@ if question:
         # --- Bloc Traduction Automatique ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
-                langue = detect(question)
-                if langue != "fr":
-                    message_bot = traduire_texte(message_bot, langue)
+                salutations = {"hello", "hi", "hey", "salut", "bonjour"}
+                if question.lower().strip() in salutations:
+                    langue = "en"
+                else:
+                    langue = detect(question)
+                 if langue != "fr":
+                    message_bot = traduire_texte(message_bot, langue)   
             except Exception as e:
                 if message_bot.strip():
                    message_bot += "\n\n⚠️ Traduction indisponible."
