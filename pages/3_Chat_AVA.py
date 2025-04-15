@@ -52,9 +52,9 @@ def get_general_news():
         articles = top_headlines.get("articles")
         if not articles:
             return "❌ La réponse de NewsAPI ne contient pas d'articles."
-         return [(article["title"], article["url"]) for article in articles if "title" in article and "url" in article]    
+        return [(article["title"], article["url"]) for article in articles if "title" in article and "url" in article]
     except Exception as e:
-        return f"❌ Erreur lors de la récupération des actus via NewsApiClient : {e}"               
+        return f"❌ Erreur lors de la récupération des actus via NewsApiClient : {e}"
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
@@ -528,6 +528,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
