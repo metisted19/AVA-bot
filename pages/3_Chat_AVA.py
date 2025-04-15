@@ -185,13 +185,11 @@ if question:
 
         # --- Bloc météo amélioré ---
         if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
-            # Liste élargie de villes françaises
             villes_connues = [
                 "paris", "lyon", "marseille", "lille", "bordeaux", "nantes", "strasbourg", "toulouse", "rennes",
                 "nice", "angers", "dijon", "montpellier", "bayonne", "nancy", "reims", "clermont-ferrand", "besançon",
                 "le havre", "rouen", "poitiers", "metz", "caen", "avignon", "tours", "amiens", "perpignan"
             ]
-            # Détection approximative de la ville dans la question
             ville_detectee = "paris"
             mots_question = question_clean.split()
             ville_proche = difflib.get_close_matches(" ".join(mots_question), villes_connues, n=1, cutoff=0.6)
@@ -202,9 +200,7 @@ if question:
                         break
             if ville_proche:
                 ville_detectee = ville_proche[0]
-            # Capitaliser le nom de la ville pour l'appel API
             ville_detectee_cap = ville_detectee.capitalize()
-            # Appel API météo
             meteo = get_meteo_ville(ville_detectee_cap)
             if "erreur" in meteo.lower():
                 message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville."
@@ -287,50 +283,52 @@ if question:
                 "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
                 "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous."
             }
+            # Mise à jour avec de nouveaux termes médicaux
+            reponses_medic.update({
+                "eczéma": "🩹 L’eczéma est une inflammation de la peau causant des démangeaisons et rougeurs. Une hydratation régulière et des crèmes apaisantes sont recommandées.",
+                "diabète": "🩸 Le diabète est un trouble de la régulation du sucre dans le sang. Il existe plusieurs types, souvent gérés par un suivi médical et une alimentation équilibrée.",
+                "cholestérol": "🥚 Le cholestérol en excès peut boucher les artères. Une alimentation saine et de l’activité physique peuvent aider à le réguler.",
+                "acné": "💢 L’acné est fréquente chez les ados et les jeunes adultes. Un nettoyage doux du visage et parfois un traitement local peuvent l’apaiser.",
+                "ulcère": "🩻 Un ulcère est une plaie interne, souvent dans l’estomac, liée au stress ou à certaines bactéries. Il faut consulter un médecin."
+            })
             for cle, rep in reponses_medic.items():
                 if cle in question_clean:
                     message_bot = rep
                     break
 
-        # --- Bloc Réponses géographiques avec extraction par regex ---
-        elif any(kw in question_clean for kw in ["capitale", "capitale de", "quelle est la capitale", "capitale du", "capitale de l", "capitale des"]):
+        # --- Bloc Réponses géographiques enrichi ---
+        elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville capitale", "ville principale", "ville de"]):
             pays_detecte = None
-            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ'-]+)\b", question_clean)
+            # Recherche via expressions régulières plus souples
+            match = re.search(r"(?:capitale (?:de|du|des|d[’']))\s*([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
+            if not match:
+                match = re.search(r"(?:où se trouve|ville principale|ville de)\s*([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
             if match:
-                pays_detecte = match.group(1).strip().lower()
+                pays_detecte = match.group(1).strip()
+            if pays_detecte:
+                capitales = {
+                    "france": "Paris", "espagne": "Madrid", "italie": "Rome", "allemagne": "Berlin",
+                    "japon": "Tokyo", "chine": "Pékin", "brésil": "Brasilia", "canada": "Ottawa",
+                    "états-unis": "Washington", "usa": "Washington", "united states": "Washington",
+                    "inde": "New Delhi", "portugal": "Lisbonne", "royaume-uni": "Londres", "angleterre": "Londres",
+                    "argentine": "Buenos Aires", "maroc": "Rabat", "algérie": "Alger", "tunisie": "Tunis",
+                    "turquie": "Ankara", "russie": "Moscou", "australie": "Canberra", "mexique": "Mexico",
+                    "suisse": "Berne", "corée du sud": "Séoul", "corée": "Séoul", "norvège": "Oslo",
+                    "suède": "Stockholm", "pays-bas": "Amsterdam", "grèce": "Athènes", "pologne": "Varsovie",
+                    "belgique": "Bruxelles", "islande": "Reykjavik", "finlande": "Helsinki", "irlande": "Dublin",
+                    "israël": "Jérusalem", "ukraine": "Kyiv", "hongrie": "Budapest", "tchéquie": "Prague",
+                    "autriche": "Vienne", "colombie": "Bogota", "pérou": "Lima", "chili": "Santiago",
+                    "sénégal": "Dakar", "côte d’ivoire": "Yamoussoukro", "congo": "Brazzaville",
+                    "arabie saoudite": "Riyad", "iran": "Téhéran", "irak": "Bagdad", "pakistan": "Islamabad"
+                }
+                pays_detecte_clean = pays_detecte.lower().replace("’", "'").replace("é", "e").strip()
+                capitale = capitales.get(pays_detecte_clean)
+                if capitale:
+                    message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
+                else:
+                    message_bot = f"🌍 Je ne connais pas encore la capitale de {pays_detecte.capitalize()}... mais je m’améliore chaque jour !"
             else:
-                tokens = question_clean.split()
-                if len(tokens) >= 2:
-                    pays_detecte = tokens[-1].strip(" ?!.,;").lower()  # Fallback : le dernier mot nettoyé
-            capitales = {
-                "france": "Paris",
-                "espagne": "Madrid",
-                "italie": "Rome",
-                "allemagne": "Berlin",
-                "japon": "Tokyo",
-                "chine": "Pékin",
-                "brésil": "Brasilia",
-                "mexique": "Mexico",
-                "canada": "Ottawa",
-                "états-unis": "Washington",
-                "usa": "Washington",
-                "inde": "New Delhi",
-                "portugal": "Lisbonne",
-                "royaume-uni": "Londres",
-                "angleterre": "Londres",
-                "argentine": "Buenos Aires",
-                "maroc": "Rabat",
-                "algérie": "Alger",
-                "tunisie": "Tunis",
-                "turquie": "Ankara",
-                "russie": "Moscou",
-                "australie": "Canberra",
-            }
-            if pays_detecte and pays_detecte in capitales:
-                capitale = capitales[pays_detecte]
-                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
-            else:
-                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+                message_bot = "🌍 Vous pouvez me demander : *capitale du Japon*, *où se trouve Oslo ?*, *ville principale de la Grèce*..."
 
         # --- Bloc Réponses personnalisées enrichies ---
         if not message_bot:
@@ -370,8 +368,7 @@ if question:
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
             nom_simple = question_clean.replace("analyse", "").strip()
-            # Suppression des accents pour normaliser (exemple : "pétrole" devient "petrole")
-            nom_simple_norm = remove_accents(nom_simple)
+            nom_simple_norm = remove_accents(nom_simple)  # Normalisation sans accents
             correspondances = {
                 "btc": "btc-usd", "bitcoin": "btc-usd",
                 "eth": "eth-usd", "ethereum": "eth-usd",
@@ -457,6 +454,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
