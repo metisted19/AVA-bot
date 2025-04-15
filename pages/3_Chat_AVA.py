@@ -283,7 +283,6 @@ if question:
                 "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
                 "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous."
             }
-            # Mise à jour avec de nouveaux termes
             reponses_medic.update({
                 "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
                 "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
@@ -296,39 +295,72 @@ if question:
                     message_bot = rep
                     break
 
-        # --- Bloc Réponses géographiques enrichi ---
+        # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
         elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
             pays_detecte = None
-            match = re.search(r"(?:capitale (?:de|du|des|d[’']))\s*([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
-            if not match:
-                match = re.search(r"(?:où se trouve|ville principale|ville de)\s*([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
+            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
             if match:
-                pays_detecte = match.group(1).strip()
-            if pays_detecte:
-                capitales = {
-                    "france": "Paris", "espagne": "Madrid", "italie": "Rome", "allemagne": "Berlin",
-                    "japon": "Tokyo", "chine": "Pékin", "brésil": "Brasilia", "canada": "Ottawa",
-                    "états-unis": "Washington", "usa": "Washington", "united states": "Washington",
-                    "inde": "New Delhi", "portugal": "Lisbonne", "royaume-uni": "Londres",
-                    "angleterre": "Londres", "argentine": "Buenos Aires", "maroc": "Rabat",
-                    "algérie": "Alger", "tunisie": "Tunis", "turquie": "Ankara", "russie": "Moscou",
-                    "australie": "Canberra", "mexique": "Mexico", "suisse": "Berne", "corée du sud": "Séoul",
-                    "corée": "Séoul", "norvège": "Oslo", "suède": "Stockholm", "pays-bas": "Amsterdam",
-                    "grèce": "Athènes", "pologne": "Varsovie", "belgique": "Bruxelles",
-                    "islande": "Reykjavik", "finlande": "Helsinki", "irlande": "Dublin", "israël": "Jérusalem",
-                    "ukraine": "Kyiv", "hongrie": "Budapest", "tchéquie": "Prague", "autriche": "Vienne",
-                    "colombie": "Bogota", "pérou": "Lima", "chili": "Santiago", "sénégal": "Dakar",
-                    "côte d’ivoire": "Yamoussoukro", "congo": "Brazzaville", "arabie saoudite": "Riyad",
-                    "iran": "Téhéran", "irak": "Bagdad", "pakistan": "Islamabad"
-                }
-                pays_detecte_clean = pays_detecte.lower().replace("’", "'").strip()
-                capitale = capitales.get(pays_detecte_clean)
-                if capitale:
-                    message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
-                else:
-                    message_bot = f"🌍 Je ne connais pas encore la capitale de {pays_detecte.capitalize()}... mais je m’améliore chaque jour !"
+                pays_detecte = match.group(1).strip().lower()
             else:
-                message_bot = "🌍 Vous pouvez me demander : *capitale du Japon*, *où se trouve Oslo ?*, *ville principale de la Grèce*..."
+                tokens = question_clean.split()
+                if len(tokens) >= 2:
+                    pays_detecte = tokens[-1].strip(" ?!.,;").lower()
+            # Ancien dictionnaire enrichi avec des pays supplémentaires
+            capitales = {
+                "france": "Paris",
+                "espagne": "Madrid",
+                "italie": "Rome",
+                "allemagne": "Berlin",
+                "japon": "Tokyo",
+                "chine": "Pékin",
+                "brésil": "Brasilia",
+                "mexique": "Mexico",
+                "canada": "Ottawa",
+                "états-unis": "Washington",
+                "usa": "Washington",
+                "united states": "Washington",
+                "inde": "New Delhi",
+                "portugal": "Lisbonne",
+                "royaume-uni": "Londres",
+                "angleterre": "Londres",
+                "argentine": "Buenos Aires",
+                "maroc": "Rabat",
+                "algérie": "Alger",
+                "tunisie": "Tunis",
+                "turquie": "Ankara",
+                "russie": "Moscou",
+                "australie": "Canberra",
+                "corée du sud": "Séoul",
+                "corée": "Séoul",
+                "norvège": "Oslo",
+                "suède": "Stockholm",
+                "pays-bas": "Amsterdam",
+                "grèce": "Athènes",
+                "pologne": "Varsovie",
+                "belgique": "Bruxelles",
+                "islande": "Reykjavik",
+                "finlande": "Helsinki",
+                "irlande": "Dublin",
+                "israël": "Jérusalem",
+                "ukraine": "Kyiv",
+                "hongrie": "Budapest",
+                "tchéquie": "Prague",
+                "autriche": "Vienne",
+                "colombie": "Bogota",
+                "pérou": "Lima",
+                "chili": "Santiago",
+                "sénégal": "Dakar",
+                "côte d'ivoire": "Yamoussoukro",
+                "congo": "Brazzaville",
+                "arabie saoudite": "Riyad",
+                "iran": "Téhéran",
+                "irak": "Bagdad",
+                "pakistan": "Islamabad"
+            }
+            if pays_detecte and pays_detecte in capitales:
+                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
+            else:
+                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
 
         # --- Bloc Réponses personnalisées enrichies ---
         if not message_bot:
@@ -454,6 +486,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
