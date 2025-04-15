@@ -378,9 +378,9 @@ if question:
             }
             nom_ticker = correspondances.get(nom_simple)
             if nom_ticker:
-                chemin = f"data/donnees_{nom_ticker}.csv"
-                if os.path.exists(chemin):
-                    df = pd.read_csv(chemin)
+                data_path = f"data/donnees_{nom_ticker}.csv"
+                if os.path.exists(data_path):
+                    df = pd.read_csv(data_path)
                     df.columns = [col.capitalize() for col in df.columns]
                     df = ajouter_indicateurs_techniques(df)
                     analyse, suggestion = analyser_signaux_techniques(df)
@@ -411,7 +411,9 @@ if question:
                     )
                 else:
                     message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
-        
+            else:
+                message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
+
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p"]):
@@ -448,10 +450,6 @@ if question:
                     nom_ticker = "xrp-usd"
                 elif "bnb" in nom_ticker:
                     nom_ticker = "bnb-usd"
-                elif "pétrole" in nom_ticker or "petrole" in nom_ticker or "oil" in nom_ticker:
-                    nom_ticker = "cl=F"
-                elif "argent" in nom_ticker or "silver" in nom_ticker:
-                    nom_ticker = "si=F"    
         
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
@@ -462,7 +460,7 @@ if question:
                         message_bot = (
                             f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
                             f"{analyse}\n\n"
-                            f"🧐 *Mon intuition d'IA ?* {suggestion}"
+                            f"🧐 *Mon intuition d'AVA ?* {suggestion}"
                         )
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
@@ -470,10 +468,10 @@ if question:
                     message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
             else:
                 message_bot = obtenir_reponse_ava(question)
-
+    
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-
+    
         # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
@@ -483,11 +481,12 @@ if question:
             except:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
-
+    
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
