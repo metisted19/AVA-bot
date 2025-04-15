@@ -25,7 +25,7 @@ def charger_donnees(path):
 tickers = [
     "aapl", "tsla", "googl", "btc-usd", "eth-usd",
     "msft", "amzn", "nvda", "^gspc", "doge-usd", "ada-usd",
-    "sol-usd", "gc=F", "^fchi"  # <= le CAC 40 est ici
+    "sol-usd", "gc=F", "^fchi,"xrp-usd", "bnb-usd", "cl=F", "si=F"
 ]
 
 ticker = st.selectbox("📌 Choisissez un actif :", tickers)
