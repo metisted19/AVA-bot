@@ -513,15 +513,24 @@ if question:
         
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
+        # --- Bloc Réponses personnalisées pour salutations ---
+        salutations_fr = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
+        if any(s in question_clean for s in salutations_fr):
+            # Si l'entrée contient "hello", "hi", "good morning", "buenos dias", on renvoie la réponse en anglais
+            salutations_en = {"hello", "hi", "good morning"}
+            if any(s in question_clean for s in salutations_en):
+                message_bot = "Hello! I'm here and ready to help. How are you today?"
+            else:
+                # Si l'entrée contient une salutation française (par exemple "bonjour")
+                message_bot = "Bonjour ! Je vais très bien, merci. Et vous, comment allez-vous ?"
 
         # --- Bloc Traduction Automatique ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
-                # Si la question est une salutation et contient un mot en anglais, 
-                # on peut choisir de forcer la langue à "en" pour la traduction, sinon "fr".
-                salutations_en = {"hello", "hi", "good morning"}
-                if any(s in question_clean for s in salutations_en):
-                    langue = "en"
+                # Si la question est une salutation en français, forcer la langue à français, 
+                salutations_fr = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
+                if any(s in question_clean for s in salutations_fr):
+                    langue = "fr"
                 else:
                     langue = detect(question)
                 # Traduire seulement si la langue n'est pas le français
