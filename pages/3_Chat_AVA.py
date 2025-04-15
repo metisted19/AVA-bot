@@ -512,29 +512,27 @@ if question:
             else:
                 message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
 
-        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+        # --- Bloc Calcul (simple expression mathématique ou phrase) ---
         if not message_bot:
-            reponses_ava = [
-                "Je suis là pour vous aider, mais j'aurais besoin d’un peu plus de précision 🤖",
-                "Je n’ai pas bien compris, mais je suis prête à apprendre ! Reformulez votre question 😊",
-                "Ce sujet est encore flou pour moi... mais je peux vous parler d’analyse technique, météo, actualités et bien plus !",
-                "Hmm... Ce n'est pas dans ma base pour l’instant. Essayez une autre formulation ou tapez 'analyse complète' pour un bilan des marchés 📊"
-            ]
-            message_bot = random.choice(reponses_ava)
-
-        if not message_bot.strip():
-            message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-
-        # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
-        if question_clean not in ["merci", "merci beaucoup"]:
+            question_calc = question_clean.replace(",", ".")
             try:
-                langue = detect(question)
-                if langue in ["en", "es", "de"]:
-                    message_bot = traduire_texte(message_bot, langue)
+                # Si la question contient explicitement un calcul
+                if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
+                    # Tenter d'évaluer directement si possible (attention aux erreurs de syntaxe)
+                    try:
+                        result = eval(question_calc)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+                    except Exception:
+                        pass
+                # Sinon, extraire l'expression après des mots-clés
+                if not message_bot:
+                    match = re.search(r"(?:combien font|combien|calcule|résultat de)\s*(.*)", question_calc)
+                    if match:
+                        expression = match.group(1).strip()
+                        result = eval(expression)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
             except:
-                if message_bot.strip():
-                    message_bot += "\n\n⚠️ Traduction indisponible."
-
+                pass
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
@@ -562,23 +560,4 @@ if question:
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", [])) 
