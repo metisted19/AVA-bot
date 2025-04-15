@@ -513,6 +513,7 @@ if question:
         
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
+            
         # --- Bloc Réponses personnalisées pour salutations ---
         salutations_fr = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
         if any(s in question_clean for s in salutations_fr):
