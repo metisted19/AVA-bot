@@ -371,10 +371,10 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
+                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F",
+                "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
-                "bnb": "bnb-usd",
-                "oil": "cl=F", "pétrole": "cl=F", "petrole": "cl=F",
-                "silver": "si=F", "argent": "si=F"
+                "bnb": "bnb-usd"
             }
             nom_ticker = correspondances.get(nom_simple)
             if nom_ticker:
