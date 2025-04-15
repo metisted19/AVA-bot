@@ -25,7 +25,7 @@ def remove_accents(input_str):
 
 # Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
 def get_meteo_ville(city):
-    url = f"https://newsapi.org/v2/top-headlines?country=fr&pageSize=10&apiKey={api_key}"
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid=3b2ff0b77dd65559ba4a1a69769221d5&units=metric&lang=fr"
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -44,7 +44,7 @@ def get_meteo_ville(city):
 def get_general_news():
     try:
         api_key = "681120bace124ee99d390cc059e6aca5"  
-        url = f"https://newsapi.org/v2/top-headlines?language=fr&pageSize=10&apiKey={api_key}"
+        url = f"https://newsapi.org/v2/top-headlines?country=fr&pageSize=10&apiKey={api_key}"
         response = requests.get(url)
         data = response.json()
         if "articles" in data:
@@ -527,6 +527,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
                                                                                         
