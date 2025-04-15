@@ -13,7 +13,7 @@ import urllib.parse
 import random
 import glob
 import difflib
-import re  # Déjà importé, utilisé pour le bloc sécurité et le traitement géographique
+import re  # Pour le bloc sécurité, le traitement géographique et le nouveau bloc analyse
 
 # Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
 def get_meteo_ville(city):
@@ -353,7 +353,62 @@ if question:
             ]
             message_bot = random.choice(punchlines)
 
-        # Bloc catch-all pour l'analyse technique ou réponse par défaut
+        # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
+        if not message_bot and question_clean.startswith("analyse "):
+            nom_simple = question_clean.replace("analyse", "").strip()
+            correspondances = {
+                "btc": "btc-usd", "bitcoin": "btc-usd",
+                "eth": "eth-usd", "ethereum": "eth-usd",
+                "aapl": "aapl", "apple": "aapl",
+                "tsla": "tsla", "tesla": "tsla",
+                "googl": "googl", "google": "googl",
+                "msft": "msft", "microsoft": "msft",
+                "amzn": "amzn", "amazon": "amzn",
+                "nvda": "nvda", "nvidia": "nvda",
+                "doge": "doge-usd", "dogecoin": "doge-usd",
+                "ada": "ada-usd", "cardano": "ada-usd",
+                "sol": "sol-usd", "solana": "sol-usd",
+                "gold": "gc=F", "or": "gc=F",
+                "sp500": "^gspc", "s&p": "^gspc",
+                "cac": "^fchi", "cac40": "^fchi"
+            }
+            nom_ticker = correspondances.get(nom_simple)
+            if nom_ticker:
+                chemin = f"data/donnees_{nom_ticker}.csv"
+                if os.path.exists(chemin):
+                    df = pd.read_csv(chemin)
+                    df.columns = [col.capitalize() for col in df.columns]
+                    df = ajouter_indicateurs_techniques(df)
+                    analyse, suggestion = analyser_signaux_techniques(df)
+                    
+                    def generer_resume_signal(signaux):
+                        texte = ""
+                        signaux_str = " ".join(signaux).lower()
+                        if "survente" in signaux_str:
+                            texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
+                        if "surachat" in signaux_str:
+                            texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
+                        if "haussier" in signaux_str:
+                            texte += "📈 **Tendance haussière détectée.**\n"
+                        if "baissier" in signaux_str:
+                            texte += "📉 **Tendance baissière détectée.**\n"
+                        if "faible" in signaux_str:
+                            texte += "😴 **Tendance faible.** Le marché semble indécis.\n"
+                        return texte if texte else "ℹ️ Aucun signal fort détecté."
+                    
+                    signaux = analyse.split("\n") if analyse else []
+                    resume = generer_resume_signal(signaux)
+                    
+                    message_bot = (
+                        f"📊 **Analyse pour {nom_simple.upper()}**\n\n"
+                        f"{analyse}\n\n"
+                        f"💬 **Résumé d'AVA :**\n{resume}\n\n"
+                        f"🤖 *Intuition d'AVA :* {suggestion}"
+                    )
+                else:
+                    message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
+        
+        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p"]):
                 nom_ticker = question_clean.replace(" ", "").replace("-", "")
@@ -385,7 +440,7 @@ if question:
                     nom_ticker = "sol-usd"
                 elif "gold" in nom_ticker or "or" in nom_ticker:
                     nom_ticker = "gc=F"
-    
+        
                 data_path = f"data/donnees_{nom_ticker}.csv"
                 if os.path.exists(data_path):
                     df = pd.read_csv(data_path)
@@ -421,6 +476,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
