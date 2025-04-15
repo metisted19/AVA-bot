@@ -370,7 +370,7 @@ if question:
                 "sol": "sol-usd", "solana": "sol-usd",
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
-                "cac": "^fchi", "cac40": "^fchi"
+                "cac": "^fchi", "cac40": "^fchi",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
                 "bnb": "bnb-usd",
                 "oil": "cl=F", "pétrole": "cl=F", "petrole": "cl=F",
