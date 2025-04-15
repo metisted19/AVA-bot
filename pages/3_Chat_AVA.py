@@ -379,7 +379,7 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F",  # Remarquez que "pétrole" et "petrole" sont mappés à "cl=F"
+                "cl": "clf", "pétrole": "clf", "petrole": "clf", "cl=f": "clf", # Remarquez que "pétrole" et "petrole" sont mappés à "cl=F"
                 "cl=f": "cl=F",  # Pour gérer "cl=f"
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
