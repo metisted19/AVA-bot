@@ -16,6 +16,7 @@ import glob
 import difflib
 import re  # Pour le bloc sécurité, le traitement géographique et l'analyse
 import unicodedata  # Pour supprimer les accents
+from newsapi import NewsApiClient
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
