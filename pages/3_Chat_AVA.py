@@ -515,29 +515,25 @@ if question:
         # --- Bloc Calcul (simple expression mathématique ou phrase) ---
         if not message_bot:
             question_calc = question_clean.replace(",", ".")
+            # Suppression du mot-clé "calcul" ou "calcule" en début de chaîne
+            question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
             try:
-                # --- Bloc Calcul (simple expression mathématique ou phrase) ---
-                if not message_bot:
-                    question_calc = question_clean.replace(",", ".")
-                    # Suppression du mot-clé "calcul" ou "calcule" en début de chaîne
-                    question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
+                # Si la question contient explicitement un calcul via des opérateurs
+                if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
                     try:
-                        # Si la question contient explicitement un calcul via des opérateurs
-                        if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
-                            try:
-                                result = eval(question_calc)
-                                message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-                            except Exception:
-                                pass
-                        # Sinon, extraire l'expression après des mots-clés
-                        if not message_bot:
-                            match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
-                            if match:
-                                expression = match.group(1).strip()
-                                result = eval(expression)
-                                message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-            except:
-                pass
+                        result = eval(question_calc)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+                   except Exception:
+                       pass
+                # Sinon, extraire l'expression après des mots-clés
+                if not message_bot:
+                    match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
+                    if match:
+                        expression = match.group(1).strip()
+                        result = eval(expression)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+        except:
+            pass
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
