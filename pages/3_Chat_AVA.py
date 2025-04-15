@@ -511,6 +511,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
-                                                                                                          voici le script actuel fonctionnel , fait attention de bien prendre en compte la modification que j'ai fait dans le bloc médecine . peux tu incorporé se bloc dans mon script ? en faisant attention que le reste soit bien identique à se que je viens de t'envoyer . 🌍 Bloc à insérer : Culture Générale (questions simples)
+
+                                                                                        
 
 
