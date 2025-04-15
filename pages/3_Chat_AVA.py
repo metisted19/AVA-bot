@@ -532,6 +532,9 @@ if question:
                 english_salutations = {"hello", "hi", "hey", "good morning", "good afternoon"}
                 french_salutations = {"bonjour", "salut", "coucou", "ça va", "comment ça va", "comment vas-tu"}
                 # Si la question contient une salutation anglaise, on force la langue à "en"
+                if any(s in question_clean for s in english_salutations):
+                    langue = "en"
+                # Si la question contient une salutation française, on force la langue à "fr"
                 elif any(s in question_clean for s in french_salutations):    
                     langue = "fr"
                 else:
