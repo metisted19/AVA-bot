@@ -515,16 +515,14 @@ if question:
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
         
         # --- Bloc Traduction Automatique ---
-        try:
-            langue = detect(question)
-            st.write("Langue détectée:", langue)
-            if len(question.strip()) < 5 or question.lower().strip() in ["hello", "hi", "hey"]:
-                langue = "en"
-            else:
-                langue = detect(question)
+        if question_clean not in ["merci", "merci beaucoup"]:
+            try:
+               langue = detect(question)
+                if langue != "fr":
+                    message_bot = traduire_texte(message_bot, langue)
         except Exception as e:
-            st.write("Erreur de détection de langue :", e)
-
+            if message_bot.strip():
+                message_bot += "\n\n⚠️ Traduction indisponible."
         
             st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
