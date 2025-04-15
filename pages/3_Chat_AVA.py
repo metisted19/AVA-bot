@@ -447,6 +447,25 @@ if question:
             ]
             message_bot = random.choice(punchlines)
 
+        # --- Bloc Culture Générale (questions simples) ---
+        if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
+            base_connaissances = {
+                "qui a inventé internet": "🌐 Internet a été développé principalement par Vinton Cerf et Robert Kahn dans les années 1970.",
+                "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de Tesla.",
+                "combien y a-t-il de pays dans le monde": "🌍 Il y a actuellement **195 pays reconnus** dans le monde.",
+                "quelle est la capitale de la france": "📍 La capitale de la France est **Paris**.",
+                "quel est le plus grand océan": "🌊 L'océan Pacifique est le plus grand au monde.",
+                "quelle est la distance entre la terre et la lune": "🌕 En moyenne, la distance est de **384 400 km** entre la Terre et la Lune.",
+                "quel est l’élément chimique o": "🧪 L'élément chimique 'O' est **l'oxygène**.",
+                "qui a écrit roméo et juliette": "🎭 C'est **William Shakespeare** qui a écrit Roméo et Juliette.",
+                "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin (chinois)** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
+                "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie."
+            }
+            for question_cle, reponse in base_connaissances.items():
+                if question_cle in question_clean:
+                    message_bot = reponse
+                    break
+
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
             nom_simple = question_clean.replace("analyse", "").strip()
@@ -558,4 +577,6 @@ if question:
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))                                                                                                             voici le script actuel fonctionnel , fait attention de bien prendre en compte la modification que j'ai fait dans le bloc médecine . peux tu incorporé se bloc dans mon script ? en faisant attention que le reste soit bien identique à se que je viens de t'envoyer . 🌍 Bloc à insérer : Culture Générale (questions simples)
+
+
