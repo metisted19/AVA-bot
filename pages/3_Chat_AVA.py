@@ -283,13 +283,13 @@ if question:
                 "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
                 "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous."
             }
-            # Mise à jour avec de nouveaux termes médicaux
+            # Mise à jour avec de nouveaux termes
             reponses_medic.update({
-                "eczéma": "🩹 L’eczéma est une inflammation de la peau causant des démangeaisons et rougeurs. Une hydratation régulière et des crèmes apaisantes sont recommandées.",
-                "diabète": "🩸 Le diabète est un trouble de la régulation du sucre dans le sang. Il existe plusieurs types, souvent gérés par un suivi médical et une alimentation équilibrée.",
-                "cholestérol": "🥚 Le cholestérol en excès peut boucher les artères. Une alimentation saine et de l’activité physique peuvent aider à le réguler.",
-                "acné": "💢 L’acné est fréquente chez les ados et les jeunes adultes. Un nettoyage doux du visage et parfois un traitement local peuvent l’apaiser.",
-                "ulcère": "🩻 Un ulcère est une plaie interne, souvent dans l’estomac, liée au stress ou à certaines bactéries. Il faut consulter un médecin."
+                "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
+                "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
+                "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
+                "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
+                "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques."
             })
             for cle, rep in reponses_medic.items():
                 if cle in question_clean:
@@ -297,9 +297,8 @@ if question:
                     break
 
         # --- Bloc Réponses géographiques enrichi ---
-        elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville capitale", "ville principale", "ville de"]):
+        elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
             pays_detecte = None
-            # Recherche via expressions régulières plus souples
             match = re.search(r"(?:capitale (?:de|du|des|d[’']))\s*([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
             if not match:
                 match = re.search(r"(?:où se trouve|ville principale|ville de)\s*([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
@@ -310,18 +309,19 @@ if question:
                     "france": "Paris", "espagne": "Madrid", "italie": "Rome", "allemagne": "Berlin",
                     "japon": "Tokyo", "chine": "Pékin", "brésil": "Brasilia", "canada": "Ottawa",
                     "états-unis": "Washington", "usa": "Washington", "united states": "Washington",
-                    "inde": "New Delhi", "portugal": "Lisbonne", "royaume-uni": "Londres", "angleterre": "Londres",
-                    "argentine": "Buenos Aires", "maroc": "Rabat", "algérie": "Alger", "tunisie": "Tunis",
-                    "turquie": "Ankara", "russie": "Moscou", "australie": "Canberra", "mexique": "Mexico",
-                    "suisse": "Berne", "corée du sud": "Séoul", "corée": "Séoul", "norvège": "Oslo",
-                    "suède": "Stockholm", "pays-bas": "Amsterdam", "grèce": "Athènes", "pologne": "Varsovie",
-                    "belgique": "Bruxelles", "islande": "Reykjavik", "finlande": "Helsinki", "irlande": "Dublin",
-                    "israël": "Jérusalem", "ukraine": "Kyiv", "hongrie": "Budapest", "tchéquie": "Prague",
-                    "autriche": "Vienne", "colombie": "Bogota", "pérou": "Lima", "chili": "Santiago",
-                    "sénégal": "Dakar", "côte d’ivoire": "Yamoussoukro", "congo": "Brazzaville",
-                    "arabie saoudite": "Riyad", "iran": "Téhéran", "irak": "Bagdad", "pakistan": "Islamabad"
+                    "inde": "New Delhi", "portugal": "Lisbonne", "royaume-uni": "Londres",
+                    "angleterre": "Londres", "argentine": "Buenos Aires", "maroc": "Rabat",
+                    "algérie": "Alger", "tunisie": "Tunis", "turquie": "Ankara", "russie": "Moscou",
+                    "australie": "Canberra", "mexique": "Mexico", "suisse": "Berne", "corée du sud": "Séoul",
+                    "corée": "Séoul", "norvège": "Oslo", "suède": "Stockholm", "pays-bas": "Amsterdam",
+                    "grèce": "Athènes", "pologne": "Varsovie", "belgique": "Bruxelles",
+                    "islande": "Reykjavik", "finlande": "Helsinki", "irlande": "Dublin", "israël": "Jérusalem",
+                    "ukraine": "Kyiv", "hongrie": "Budapest", "tchéquie": "Prague", "autriche": "Vienne",
+                    "colombie": "Bogota", "pérou": "Lima", "chili": "Santiago", "sénégal": "Dakar",
+                    "côte d’ivoire": "Yamoussoukro", "congo": "Brazzaville", "arabie saoudite": "Riyad",
+                    "iran": "Téhéran", "irak": "Bagdad", "pakistan": "Islamabad"
                 }
-                pays_detecte_clean = pays_detecte.lower().replace("’", "'").replace("é", "e").strip()
+                pays_detecte_clean = pays_detecte.lower().replace("’", "'").strip()
                 capitale = capitales.get(pays_detecte_clean)
                 if capitale:
                     message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitale}."
@@ -454,6 +454,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
