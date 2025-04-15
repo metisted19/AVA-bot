@@ -334,19 +334,27 @@ if question:
 
         # --- Bloc Réponses personnalisées enrichies ---
         if not message_bot:
-            reponses_perso = {
-                "merci": ["Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
-                "je t'aime": ["💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions."],
-                "un secret": ["🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…"],
-                "ça va": ["Ça va nickel, merci de demander ! Et vous ?", "En pleine forme digitale 😄", "Toujours connectée, jamais stressée !"],
-                "tu fais quoi": ["Je veille sur les marchés et je m'entraîne à devenir la meilleure IA 😎", "Je vous écoute attentivement. Que puis-je faire pour vous ?"],
-                "t'es là": ["Toujours là pour vous 💡", "Connectée et prête à analyser !", "Présente, comme une ombre... ou une IA 😉"]
-            }
-            for cle, reponses in reponses_perso.items():
-                if cle in question_clean:
-                    message_bot = random.choice(reponses)
-                    perso_repondu = True
-                    break
+            if any(phrase in question_clean for phrase in ["ça va", "tu vas bien", "comment tu vas"]):
+                message_bot = "✨ Toujours opérationnelle et prête à analyser les marchés ! Et vous, tout roule ?"
+            elif "tu fais quoi" in question_clean:
+                message_bot = "🤖 J’analyse en silence, je prévois des tendances, je veille sur les marchés... et j’attends vos questions avec impatience !"
+            elif "tu es qui" in question_clean:
+                message_bot = "Je suis AVA, votre assistante IA futuriste, connectée aux marchés et aux infos pour vous guider chaque jour 🌐📊"
+            elif "tu dors" in question_clean or "tu es réveillée" in question_clean:
+                message_bot = "🌙 Dormir ? Jamais ! Je suis toujours en veille, prête à analyser, même à 3h du matin !"
+            elif "dis bonjour" in question_clean:
+                message_bot = "👋 Bonjour ! Ravie de vous voir connecté(e). Une analyse ? Une blague ? Je suis dispo pour tout ça !"
+            else:
+                reponses_perso = {
+                    "merci": ["Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
+                    "je t'aime": ["💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions"],
+                    "un secret": ["🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…"]
+                }
+                for cle, reponses in reponses_perso.items():
+                    if cle in question_clean:
+                        message_bot = random.choice(reponses)
+                        perso_repondu = True
+                        break
 
         # --- Bloc Punchlines motivationnelles ---
         if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
@@ -362,7 +370,7 @@ if question:
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
             nom_simple = question_clean.replace("analyse", "").strip()
-            # Suppression des accents pour normaliser la chaîne (exemple : "pétrole" -> "petrole")
+            # Suppression des accents pour normaliser (exemple : "pétrole" devient "petrole")
             nom_simple_norm = remove_accents(nom_simple)
             correspondances = {
                 "btc": "btc-usd", "bitcoin": "btc-usd",
@@ -379,8 +387,7 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "clf", "pétrole": "clf", "petrole": "clf", "cl=f": "clf", # Remarquez que "pétrole" et "petrole" sont mappés à "cl=F"
-                "cl=f": "cl=F",  # Pour gérer "cl=f"
+                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F", "cl=f": "cl=F",
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
                 "bnb": "bnb-usd"
@@ -425,58 +432,13 @@ if question:
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
-            if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p"]):
-                nom_ticker = question_clean.replace(" ", "").replace("-", "")
-                if "btc" in nom_ticker or "bitcoin" in nom_ticker:
-                    nom_ticker = "btc-usd"
-                elif "eth" in nom_ticker:
-                    nom_ticker = "eth-usd"
-                elif "aapl" in nom_ticker:
-                    nom_ticker = "aapl"
-                elif "tsla" in nom_ticker:
-                    nom_ticker = "tsla"
-                elif "googl" in nom_ticker:
-                    nom_ticker = "googl"
-                elif "fchi" in nom_ticker or "cac" in nom_ticker:
-                    nom_ticker = "^fchi"
-                elif "msft" in nom_ticker:
-                    nom_ticker = "msft"
-                elif "amzn" in nom_ticker:
-                    nom_ticker = "amzn"
-                elif "nvda" in nom_ticker:
-                    nom_ticker = "nvda"
-                elif "sp500" in nom_ticker or "s&p" in nom_ticker:
-                    nom_ticker = "gspc"
-                elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
-                    nom_ticker = "doge-usd"
-                elif "ada" in nom_ticker or "cardano" in nom_ticker:
-                    nom_ticker = "ada-usd"
-                elif "sol" in nom_ticker or "solana" in nom_ticker:
-                    nom_ticker = "sol-usd"
-                elif "gold" in nom_ticker or "or" in nom_ticker:
-                    nom_ticker = "gc=F"
-                elif "xrp" in nom_ticker or "ripple" in nom_ticker:
-                    nom_ticker = "xrp-usd"
-                elif "bnb" in nom_ticker:
-                    nom_ticker = "bnb-usd"
-        
-                data_path = f"data/donnees_{nom_ticker}.csv"
-                if os.path.exists(data_path):
-                    df = pd.read_csv(data_path)
-                    df.columns = [col.capitalize() for col in df.columns]
-                    try:
-                        analyse, suggestion = analyser_signaux_techniques(df)
-                        message_bot = (
-                            f"📈 Voici mon analyse technique pour **{nom_ticker.upper()}** :\n\n"
-                            f"{analyse}\n\n"
-                            f"🧐 *Mon intuition d'AVA ?* {suggestion}"
-                        )
-                    except Exception as e:
-                        message_bot = f"⚠️ Une erreur est survenue pendant l'analyse : {e}"
-                else:
-                    message_bot = f"⚠️ Je n’ai pas trouvé les données pour {nom_ticker.upper()}.\nLancez le script d'entraînement pour les générer."
-            else:
-                message_bot = obtenir_reponse_ava(question)
+            reponses_ava = [
+                "Je suis là pour vous aider, mais j'aurais besoin d’un peu plus de précision 🤖",
+                "Je n’ai pas bien compris, mais je suis prête à apprendre ! Reformulez votre question 😊",
+                "Ce sujet est encore flou pour moi... mais je peux vous parler d’analyse technique, météo, actualités et bien plus !",
+                "Hmm... Ce n'est pas dans ma base pour l’instant. Essayez une autre formulation ou tapez 'analyse complète' pour un bilan des marchés 📊"
+            ]
+            message_bot = random.choice(reponses_ava)
 
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
@@ -495,6 +457,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
