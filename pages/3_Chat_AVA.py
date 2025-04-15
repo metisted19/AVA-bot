@@ -43,12 +43,15 @@ def get_meteo_ville(city):
 # Nouvelle fonction get_general_news() avec la modification pour NewsAPI
 def get_general_news():
     try:
-        newsapi = NewsApiClient(api_key="681120bace124ee99d390cc059e6aca5") 
+        # Définir la clé API directement ici
+        api_key = "681120bace124ee99d390cc059e6aca5"
+        articles = top_headlines.get("articles", [])
+        newsapi = NewsApiClient(api_key=api_key)
         top_headlines = newsapi.get_top_headlines(country="fr", page_size=10)
         articles = top_headlines.get("articles", [])
         return [(article["title"], article["url"]) for article in articles if "title" in article and "url" in article]
     except Exception as e:
-        return f"❌ Erreur lors de la récupération des actus via NewsApiClient : {e}"             
+        return f"❌ Erreur lors de la récupération des actus via NewsApiClient : {e}"               
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
