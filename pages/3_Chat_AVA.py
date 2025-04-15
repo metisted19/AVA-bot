@@ -268,7 +268,7 @@ if question:
                 message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite","eczéma","diabète","cholestérol","acné","ulcère"]):
+        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère"]):
             reponses_medic = {
                 "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
                 "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
@@ -281,14 +281,15 @@ if question:
                 "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
                 "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
                 "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
-                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous.",
+                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous."
+            }
+            reponses_medic.update({
                 "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
                 "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
                 "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
                 "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
                 "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques."
-                }
-            
+            })
             for cle, rep in reponses_medic.items():
                 if cle in question_clean:
                     message_bot = rep
@@ -304,13 +305,14 @@ if question:
                 tokens = question_clean.split()
                 if len(tokens) >= 2:
                     pays_detecte = tokens[-1].strip(" ?!.,;").lower()
-            # Ancien dictionnaire enrichi avec des pays supplémentaires
+            # Dictionnaire enrichi avec des synonymes et pays supplémentaires
             capitales = {
                 "france": "Paris",
                 "espagne": "Madrid",
                 "italie": "Rome",
                 "allemagne": "Berlin",
                 "japon": "Tokyo",
+                "japonaise": "Tokyo",
                 "chine": "Pékin",
                 "brésil": "Brasilia",
                 "mexique": "Mexico",
@@ -328,6 +330,7 @@ if question:
                 "tunisie": "Tunis",
                 "turquie": "Ankara",
                 "russie": "Moscou",
+                "russe": "Moscou",
                 "australie": "Canberra",
                 "corée du sud": "Séoul",
                 "corée": "Séoul",
