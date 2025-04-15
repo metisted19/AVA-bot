@@ -42,6 +42,7 @@ def get_meteo_ville(city):
 
 # Nouvelle fonction get_general_news() avec la modification pour NewsAPI
 def get_general_news():
+    top_headlines = None  # Initialisation de la variable
     try:
         # Définir la clé API directement ici
         api_key = "681120bace124ee99d390cc059e6aca5"
