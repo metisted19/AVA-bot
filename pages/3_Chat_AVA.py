@@ -271,18 +271,37 @@ if question:
 
         # --- Bloc Remèdes naturels ---
         if not message_bot and any(phrase in question_clean for phrase in [
-            "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement", "tisane", "huile essentielle"
+                "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
+                "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
         ]):
             if "stress" in question_clean:
-                message_bot = "🧘 Pour soulager le stress naturellement, pensez aux tisanes de camomille, à la respiration profonde ou à quelques minutes de méditation."
+                message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
             elif "mal de gorge" in question_clean or "gorge" in question_clean:
-                message_bot = "🍯 Un mal de gorge ? Une cuillère de miel dans une infusion au citron ou au thym peut faire des merveilles."
+                message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
             elif "rhume" in question_clean or "nez bouché" in question_clean:
-                message_bot = "🌿 Pour le nez bouché, essayez l'inhalation de vapeur avec quelques gouttes d’huile essentielle d’eucalyptus ou de menthe poivrée."
+                message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
             elif "fièvre" in question_clean:
-                message_bot = "🧊 En cas de fièvre, buvez beaucoup, reposez-vous et utilisez un linge frais sur le front. L’infusion de saule blanc est également un remède traditionnel."
+                message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
+            elif "digestion" in question_clean or "ventre" in question_clean:
+                message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
+            elif "toux" in question_clean:
+                message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
+            elif "insomnie" in question_clean or "sommeil" in question_clean:
+                message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
+            elif "brûlure d'estomac" in question_clean or "reflux" in question_clean:
+                message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
+            elif "peau" in question_clean or "acné" in question_clean:
+                message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
+            elif "fatigue" in question_clean:
+                message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
+            elif "maux de tête" in question_clean or "migraine" in question_clean:
+                message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
+            elif "nausée" in question_clean:
+                message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
+            elif "crampes" in question_clean:
+                message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
             else:
-                message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
+                message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
 
         # --- Bloc Réponses médicales explicites ---
         elif not message_bot and any(mot in question_clean for mot in [    "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
