@@ -775,7 +775,10 @@ if question:
             lang_question = detect(question)
             # Si la langue de la question n'est pas le français et que le message_bot n'est pas vide, on traduit.
             if lang_question != "fr" and message_bot.strip():
-                message_bot = traduire_deepl(message_bot, langue_cible=lang_question.upper())
+                traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
+                # Si la traduction ne renvoie pas un message d'erreur, on met à jour message_bot
+                if not traduction.startswith("❌"):
+                    message_bot = traduction
         except Exception as e:
             if message_bot.strip():
                 message_bot += "\n\n⚠️ Traduction indisponible."
