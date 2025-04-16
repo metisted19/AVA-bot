@@ -729,7 +729,18 @@ if question:
                 nom_ticker = "uni-usd"
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
-
+        
+        # --- Bloc Salutations Simples ---
+        if not message_bot and any(mot in question_clean for mot in ["salut", "bonjour", "bonsoir", "yo", "coucou", "hey"]):
+            reponses_salut = [
+                "👋 Salut à vous ! Besoin d’un coup de main ?",
+                "🌞 Bonjour ! Je suis prête à vous assister.",
+                "👾 Hey ! Moi c’est AVA, votre copilote futuriste.",
+                "🎯 Toujours connectée ! Que puis-je faire pour vous ?",
+                "🧠 Présente et prête à analyser les signaux !",
+                "😎 Yo ! Prêt pour une session d’analyse ou un peu de culture ?"
+            ]
+            message_bot = random.choice(reponses_salut)
         
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
@@ -743,17 +754,7 @@ if question:
                     "Hmm... That's not in my database yet. Try another phrasing or type 'complete analysis' for a market overview 📊"
                 ]
                 message_bot = random.choice(reponses_ava)
-        # --- Bloc Salutations Simples ---
-        if not message_bot and any(mot in question_clean for mot in ["salut", "bonjour", "bonsoir", "yo", "coucou", "hey"]):
-            reponses_salut = [
-                "👋 Salut à vous ! Besoin d’un coup de main ?",
-                "🌞 Bonjour ! Je suis prête à vous assister.",
-                "👾 Hey ! Moi c’est AVA, votre copilote futuriste.",
-                "🎯 Toujours connectée ! Que puis-je faire pour vous ?",
-                "🧠 Présente et prête à analyser les signaux !",
-                "😎 Yo ! Prêt pour une session d’analyse ou un peu de culture ?"
-            ]
-            message_bot = random.choice(reponses_salut)
+        
 
         # --- Bloc Traduction corrigé ---
         def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
