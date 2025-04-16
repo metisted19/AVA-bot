@@ -761,12 +761,19 @@ if question:
             }
             response = requests.post(url, data=params)
             if response.status_code == 200:
-                return response.json()["translations"][0]["text"]
+                json_data = response.json()
+                # Si la réponse contient des traductions, retourne la première, sinon retourne le texte original
+                if "translations" in json_data and len(json_data["translations"]) > 0:
+                    return json_data["translations"][0]["text"]
+                else:
+                    return texte
             else:
-                return "❌ Erreur lors de la traduction."
+                # En cas d'erreur, retourne le texte original pour éviter d'afficher un message d'erreur non souhaité
+                return texte
 
         try:
             lang_question = detect(question)
+            # Si la langue de la question n'est pas le français et que le message_bot n'est pas vide, on traduit.
             if lang_question != "fr" and message_bot.strip():
                 message_bot = traduire_deepl(message_bot, langue_cible=lang_question.upper())
         except Exception as e:
