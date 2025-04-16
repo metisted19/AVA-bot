@@ -254,7 +254,6 @@ if question:
             "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
             "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
         ]):
-            # On filtre pour éviter de dupliquer la réponse du bloc médical
             if "tête" in question_clean:
                 message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
             elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
@@ -305,14 +304,13 @@ if question:
                 message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in [    "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
+        elif not message_bot and any(mot in question_clean for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
             "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
             "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
             "ballonnements", "brûlures d’estomac", "brûlure d'estomac", "saignement de nez", "mal de dos", "entorse", "tendinite",
             "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
             "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne"
             ]):
-
             reponses_medic = {
                 "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
                 "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
@@ -361,7 +359,6 @@ if question:
                 "lombalgie": "🧍‍♂️ Douleur en bas du dos ? Évitez les charges lourdes, dormez sur une surface ferme.",
                 "périarthrite": "🦴 Inflammation autour d’une articulation. Froid local, repos, et anti-inflammatoires si besoin.",
                 "hallux valgus": "👣 Déformation du gros orteil ? Port de chaussures larges, semelles spéciales ou chirurgie selon le cas."
-
             }
             for cle, rep in reponses_medic.items():
                 if cle in question_clean:
@@ -622,17 +619,14 @@ if question:
         # --- Bloc Calcul (simple expression mathématique ou phrase) ---
         if not message_bot:
             question_calc = question_clean.replace(",", ".")
-            # Suppression du mot-clé "calcul" ou "calcule" en début de chaîne
             question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
             try:
-                # Si la question contient explicitement un calcul via des opérateurs
                 if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
                     try:
                         result = eval(question_calc)
                         message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
                     except Exception:
                         pass
-                # Sinon, extraire l'expression après des mots-clés
                 if not message_bot:
                     match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
                     if match:
@@ -645,14 +639,12 @@ if question:
         # --- Bloc Convertisseur intelligent ---
         if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
             try:
-                # Utilisation de l'API ExchangeRate-API
                 phrase = question_clean.replace(",", ".")
                 match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
                 if match:
                     montant = float(match.group(1))
                     from_cur = match.group(3).upper()
                     to_cur = match.group(5).upper()
-                    # Requête vers l'API ExchangeRate-API
                     url = f"https://v6.exchangerate-api.com/v6/dab2bba4f43a99445158d9ae/latest/{from_cur}"
                     response = requests.get(url, timeout=10)
                     data = response.json()
@@ -751,7 +743,7 @@ if question:
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
-        # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
+        # --- Bloc Traduction corrigé ---
         def traduire_deepl(texte, langue_cible="EN", api_key="19A8LSUiX2TDU1UHy"):
             url = "https://api-free.deepl.com/v2/translate"
             params = {
@@ -759,20 +751,22 @@ if question:
                 "text": texte,
                 "target_lang": langue_cible
             }
-            response = requests.post(url, data=params)
-            if response.status_code == 200:
+            try:
+                response = requests.post(url, data=params)
+                response.raise_for_status()  # Lève une exception en cas d'erreur HTTP
                 json_data = response.json()
                 if "translations" in json_data and len(json_data["translations"]) > 0:
                     return json_data["translations"][0]["text"]
-            # En cas d'erreur dans l'appel ou une réponse inattendue, retourner le texte original
+            except Exception as e:
+                st.write("Erreur lors de la traduction DeepL :", e)
             return texte
 
         try:
             lang_question = detect(question)  # Détecte la langue de la question de l'utilisateur
         except Exception as e:
-            lang_question = "fr"  # Par défaut, on considère le français en cas d'erreur
+            lang_question = "fr"  # Par défaut, le français
 
-        # Si la langue de la question n'est pas le français et que le message généré par l'IA n'est pas vide, on traduit.
+        # Si la langue détectée n'est pas le français et le message n'est pas vide, on traduit
         if lang_question.lower() != "fr" and message_bot.strip():
             traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
             message_bot = traduction
@@ -780,3 +774,4 @@ if question:
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
         st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
