@@ -784,6 +784,18 @@ if question:
                 "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !"
             ]
             message_bot = random.choice(faits_insolites)
+        # --- Bloc Recettes rapides ---
+        elif any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+            recettes = [
+                "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
+                "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
+                "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
+                "🥗 **Salade express** : tomates cerises, mozzarella, roquette, huile d’olive, vinaigre balsamique.",
+                "🌯 **Wrap poulet-crudités** : galette + restes de poulet + salade + sauce yaourt.",
+                "🥔 **Pommes de terre sautées** : en cubes, à la poêle avec ail et persil. Parfait avec des œufs !",
+                "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes."
+            ]
+            message_bot = f"🍽️ Une petite faim ? Voici une idée :\n\n{random.choice(recettes)}"
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
