@@ -254,6 +254,7 @@ if question:
             "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
             "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
         ]):
+            # On filtre pour éviter de dupliquer la réponse du bloc médical
             if "tête" in question_clean:
                 message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
             elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
