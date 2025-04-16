@@ -752,14 +752,18 @@ if question:
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
         # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
-        if question_clean not in ["merci", "merci beaucoup"]:
-            try:
-                langue = detect(question)
-                if langue in ["en", "es", "de"]:
-                    message_bot = traduire_texte(message_bot, langue)
-            except:
-                if message_bot.strip():
-                    message_bot += "\n\n⚠️ Traduction indisponible."
+        def traduire_deepl(texte, langue_cible="EN", api_key="VOTRE_CLE_API"):
+            url = "https://api-free.deepl.com/v2/translate"
+            params = {
+                 "auth_key": api_key,
+                 "text": texte,
+                 "target_lang": langue_cible
+            }
+            response = requests.post(url, data=params)
+            if response.status_code == 200:
+                return response.json()["translations"][0]["text"]
+            else:
+                return "❌ Erreur lors de la traduction."
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
