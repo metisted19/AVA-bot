@@ -524,16 +524,30 @@ if question:
         # --- Bloc Culture Générale (questions simples) ---
         if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
             base_connaissances = {
-                "qui a inventé internet": "🌐 Internet a été développé principalement par Vinton Cerf et Robert Kahn dans les années 1970.",
-                "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de Tesla.",
-                "combien y a-t-il de pays dans le monde": "🌍 Il y a actuellement **195 pays reconnus** dans le monde.",
-                "quelle est la capitale de la france": "📍 La capitale de la France est **Paris**.",
-                "quel est le plus grand océan": "🌊 L'océan Pacifique est le plus grand au monde.",
-                "quelle est la distance entre la terre et la lune": "🌕 En moyenne, la distance est de **384 400 km** entre la Terre et la Lune.",
-                "quel est l’élément chimique o": "🧪 L'élément chimique 'O' est **l'oxygène**.",
-                "qui a écrit roméo et juliette": "🎭 C'est **William Shakespeare** qui a écrit Roméo et Juliette.",
-                "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin (chinois)** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
-                "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie."
+                    "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
+                    "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de **Tesla**.",
+                    "combien y a-t-il de pays dans le monde": "🌍 Il y a actuellement **195 pays reconnus** dans le monde.",
+                    "quelle est la capitale de la france": "📍 La capitale de la France est **Paris**.",
+                    "quel est le plus grand océan": "🌊 L'océan Pacifique est le plus grand au monde.",
+                    "quelle est la distance entre la terre et la lune": "🌕 En moyenne, la distance est de **384 400 km** entre la Terre et la Lune.",
+                    "quel est l’élément chimique o": "🧪 L'élément chimique 'O' est **l'oxygène**.",
+                    "qui a écrit roméo et juliette": "🎭 C'est **William Shakespeare** qui a écrit *Roméo et Juliette*.",
+                    "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
+                    "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+                    "qui a marché sur la lune en premier": "👨‍🚀 **Neil Armstrong** a été le premier homme à marcher sur la Lune en 1969.",
+                    "quelle est la plus haute montagne du monde": "🏔️ L’**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+                    "combien y a-t-il d’os dans le corps humain": "🦴 Le corps humain adulte compte **206 os**.",
+                    "qui a peint la joconde": "🖼️ C’est **Léonard de Vinci** qui a peint *La Joconde*.",
+                    "quelle est la capitale du japon": "🏙️ La capitale du Japon est **Tokyo**.",
+                    "quelle planète est la plus proche du soleil": "☀️ **Mercure** est la planète la plus proche du Soleil.",
+                    "qui a inventé l’électricité": "⚡ L'électricité n’a pas été inventée, mais **Benjamin Franklin** et **Thomas Edison** ont été des figures clés dans sa compréhension et son exploitation.",
+                    "qu’est-ce que l’adn": "🧬 L’**ADN** est le support de l’information génétique chez tous les êtres vivants.",
+                    "quelle est la plus grande forêt du monde": "🌳 L’**Amazonie** est la plus grande forêt tropicale du monde.",
+                    "quel est l’animal terrestre le plus rapide": "🐆 Le **guépard** peut atteindre jusqu’à 110 km/h en vitesse de pointe.",
+                    "qui a écrit harry potter": "📚 C’est **J.K. Rowling** qui a écrit la saga *Harry Potter*.",
+                    "quelle est la température de l’eau qui bout": "💧 L’eau bout à **100°C** à pression atmosphérique normale.",
+                    "quel est le pays le plus peuplé": "👥 **La Chine** est actuellement le pays le plus peuplé du monde.",
+                    "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone."
             }
             for question_cle, reponse in base_connaissances.items():
                 if question_cle in question_clean:
