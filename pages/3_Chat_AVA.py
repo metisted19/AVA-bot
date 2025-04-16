@@ -730,18 +730,6 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
 
-        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
-        if not message_bot:
-            reponses_ava = [
-                "Je suis là pour vous aider, mais j'aurais besoin d’un peu plus de précision 🤖",
-                "Je n’ai pas bien compris, mais je suis prête à apprendre ! Reformulez votre question 😊",
-                "Ce sujet est encore flou pour moi... mais je peux vous parler d’analyse technique, météo, actualités et bien plus !",
-                "Hmm... Ce n'est pas dans ma base pour l’instant. Essayez une autre formulation ou tapez 'analyse complète' pour un bilan des marchés 📊"
-            ]
-            message_bot = random.choice(reponses_ava)
-
-        if not message_bot.strip():
-            message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
         
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
@@ -755,7 +743,7 @@ if question:
                     "Hmm... That's not in my database yet. Try another phrasing or type 'complete analysis' for a market overview 📊"
                 ]
                 message_bot = random.choice(reponses_ava)
-                
+
         # --- Bloc Traduction corrigé ---
         def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
             url = "https://api-free.deepl.com/v2/translate"
