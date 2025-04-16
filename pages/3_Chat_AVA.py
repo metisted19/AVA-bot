@@ -762,8 +762,8 @@ if question:
             response = requests.post(url, data=params)
             if response.status_code == 200:
                 json_data = response.json()
-            if "translations" in json_data and len(json_data["translations"]) > 0:
-               return json_data["translations"][0]["text"]
+                if "translations" in json_data and len(json_data["translations"]) > 0:
+                    return json_data["translations"][0]["text"]
             # En cas d'erreur dans l'appel ou une réponse inattendue, retourner le texte original
             return texte
 
