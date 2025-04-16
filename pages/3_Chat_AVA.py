@@ -18,6 +18,8 @@ import re  # Pour le bloc sécurité, le traitement géographique et l'analyse
 import unicodedata  # Pour supprimer les accents
 from newsapi import NewsApiClient
 from forex_python.converter import CurrencyRates, CurrencyCodes  # Ces imports peuvent rester si vous en avez besoin pour d'autres parties
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarit
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -1041,6 +1043,34 @@ if question:
                     message_bot = reponse_base
                     break
 
+        # --- Bloc d'intelligence sémantique locale ---
+        if not message_bot:
+            base_savoir = {
+                # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
+                "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
+                "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
+                "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
+                "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
+                "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
+                "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+                "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
+                "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
+                "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
+                "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
+                "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1."
+            }
+
+            questions_connues = list(base_savoir.keys())
+            vecteurs_base = model_semantic.encode(questions_connues)
+            vecteur_question = model_semantic.encode([question_clean])
+            similarites = cosine_similarity([vecteur_question[0]], vecteurs_base)[0]
+
+            meilleure_correspondance = max(zip(questions_connues, similarites), key=lambda x: x[1])
+
+            if meilleure_correspondance[1] > 0.7:
+                message_bot = base_savoir[meilleure_correspondance[0]]
+
+        
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
