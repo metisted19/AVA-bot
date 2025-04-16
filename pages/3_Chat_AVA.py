@@ -796,6 +796,22 @@ if question:
                 "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes."
             ]
             message_bot = f"🍽️ Une petite faim ? Voici une idée :\n\n{random.choice(recettes)}"
+        # --- Bloc Mini base générale (culture quotidienne) ---
+        if not message_bot:
+            base_generale = {
+                "combien de temps cuire des pâtes": "⏱️ En général, les pâtes cuisent entre 8 et 12 minutes selon le type. Vérifiez sur le paquet pour être sûr.",
+                "quelle est la vitesse de la lumière": "⚡ La lumière voyage à environ **299 792 km par seconde** dans le vide.",
+                "qui est le président de la france": "🇫🇷 Le président actuel de la France est **Emmanuel Macron** (2025).",
+                "quelle est la durée d’une grossesse": "👶 Une grossesse humaine dure environ **9 mois** ou **40 semaines**.",
+                "quel est l’animal le plus rapide du monde": "🐆 C’est le guépard ! Il peut atteindre les **110 km/h** sur de courtes distances.",
+                "à quelle température bout l’eau": "💧 L’eau bout à **100°C** au niveau de la mer, mais cette température varie selon l’altitude.",
+                "qu’est-ce qu’un arc-en-ciel": "🌈 Un arc-en-ciel est un phénomène optique causé par la **réfraction et réflexion de la lumière** dans les gouttes d’eau."
+            }
+
+            for question_base, reponse_base in base_generale.items():
+            if question_base in question_clean:
+                message_bot = reponse_base
+                break
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
