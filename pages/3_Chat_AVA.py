@@ -773,8 +773,8 @@ if question:
             if message_bot.strip():
                 message_bot += "\n\n⚠️ Traduction indisponible."
 
-st.markdown(message_bot)
-st.session_state.messages.append({"role": "assistant", "content": message_bot})
+     st.markdown(message_bot)
+     st.session_state.messages.append({"role": "assistant", "content": message_bot})
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
 
 
