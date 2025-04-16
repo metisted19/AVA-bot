@@ -285,11 +285,12 @@ if question:
                 message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in [    "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
+        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
             "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
             "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
-            "mal de dos", "brûlure d'estomac", "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne"]):
-            
+            "mal de dos", "brûlure d'estomac", "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne"
+            ]):
+
             reponses_medic = {
                 "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
                 "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
