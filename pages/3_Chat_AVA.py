@@ -768,6 +768,7 @@ if question:
             else:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
+
         # --- Bloc Faits Insolites ---
         # À insérer juste avant le bloc catch-all final
         if not message_bot and any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
@@ -800,45 +801,42 @@ if question:
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
             base_generale = {
-                base_generale = {
-                    # 🌍 Météo & nature
-                    "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
-                    "qu'est-ce qu'un ouragan": "🌀 Un ouragan est une tempête tropicale très puissante, formée au-dessus des océans chauds.",
-                    "comment se forme un arc-en-ciel": "🌈 Un arc-en-ciel se forme par la réfraction, la réflexion et la dispersion de la lumière dans les gouttelettes d'eau.",
+                # 🌍 Météo & nature
+                "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
+                "qu'est-ce qu'un ouragan": "🌀 Un ouragan est une tempête tropicale très puissante, formée au-dessus des océans chauds.",
+                "comment se forme un arc-en-ciel": "🌈 Un arc-en-ciel se forme par la réfraction, la réflexion et la dispersion de la lumière dans les gouttelettes d'eau.",
     
-                    # 🐾 Animaux
-                    "combien de cœurs a une pieuvre": "🐙 Une pieuvre a **trois cœurs** ! Deux pour les branchies et un pour le corps.",
-                    "quel est l’animal le plus rapide du monde": "🐆 Le guépard est l’animal terrestre le plus rapide, avec une pointe à 112 km/h.",
-                    "quel animal pond des œufs mais allaite": "🦘 L’ornithorynque ! Un mammifère unique qui pond des œufs et allaite ses petits.",
+                # 🐾 Animaux
+                "combien de cœurs a une pieuvre": "🐙 Une pieuvre a **trois cœurs** ! Deux pour les branchies et un pour le corps.",
+                "quel est l’animal le plus rapide du monde": "🐆 Le guépard est l’animal terrestre le plus rapide, avec une pointe à 112 km/h.",
+                "quel animal pond des œufs mais allaite": "🦘 L’ornithorynque ! Un mammifère unique qui pond des œufs et allaite ses petits.",
     
-                    # 🔬 Science
-                    "qu'est-ce que la gravité": "🌌 La gravité est une force qui attire deux masses l'une vers l'autre, comme la Terre attire les objets vers elle.",
-                    "combien de planètes dans le système solaire": "🪐 Il y a 8 planètes : Mercure, Vénus, Terre, Mars, Jupiter, Saturne, Uranus, Neptune.",
-                    "quelle est la plus petite particule": "⚛️ Le quark est l'une des plus petites particules connues dans la physique quantique.",
+                # 🔬 Science
+                "qu'est-ce que la gravité": "🌌 La gravité est une force qui attire deux masses l'une vers l'autre, comme la Terre attire les objets vers elle.",
+                "combien de planètes dans le système solaire": "🪐 Il y a 8 planètes : Mercure, Vénus, Terre, Mars, Jupiter, Saturne, Uranus, Neptune.",
+                "quelle est la plus petite particule": "⚛️ Le quark est l'une des plus petites particules connues dans la physique quantique.",
     
-                    # 📚 Histoire
-                    "qui était napoléon": "👑 Napoléon Bonaparte était un empereur français du XIXe siècle, célèbre pour ses conquêtes militaires.",
-                    "en quelle année la tour eiffel a été construite": "🗼 Elle a été achevée en **1889** pour l'Exposition universelle de Paris.",
-                    "quelle guerre a eu lieu en 1914": "⚔️ La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918.",
+                # 📚 Histoire
+                "qui était napoléon": "👑 Napoléon Bonaparte était un empereur français du XIXe siècle, célèbre pour ses conquêtes militaires.",
+                "en quelle année la tour eiffel a été construite": "🗼 Elle a été achevée en **1889** pour l'Exposition universelle de Paris.",
+                "quelle guerre a eu lieu en 1914": "⚔️ La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918.",
     
-                    # 🧠 Connaissances générales
-                    "quelle est la langue officielle du brésil": "🇧🇷 C’est le **portugais**.",
-                    "combien de dents a un adulte": "🦷 Un adulte possède généralement **32 dents**.",
-                    "qu'est-ce que le code morse": "📡 C’est un système de communication utilisant des points et des tirets.",
+                # 🧠 Connaissances générales
+                "quelle est la langue officielle du brésil": "🇧🇷 C’est le **portugais**.",
+                "combien de dents a un adulte": "🦷 Un adulte possède généralement **32 dents**.",
+                "qu'est-ce que le code morse": "📡 C’est un système de communication utilisant des points et des tirets.",
     
-                    # 🧮 Maths & Logique
-                    "quelle est la racine carrée de 144": "🧮 La racine carrée de 144 est **12**.",
-                    "combien font 12 fois 8": "📊 12 multiplié par 8 égale **96**.",
+                # 🧮 Maths & Logique
+                "quelle est la racine carrée de 144": "🧮 La racine carrée de 144 est **12**.",
+                "combien font 12 fois 8": "📊 12 multiplié par 8 égale **96**.",
     
-                    # 🗺️ Géographie bonus
-                    "quel est le plus long fleuve du monde": "🌊 Le Nil et l’Amazone se disputent le titre, mais l’Amazone est souvent considéré comme le plus long.",
-                    "quel est le pays le plus peuplé": "👥 La Chine est le pays le plus peuplé, avec plus d’1,4 milliard d’habitants.",
+                # 🗺️ Géographie bonus
+                "quel est le plus long fleuve du monde": "🌊 Le Nil et l’Amazone se disputent le titre, mais l’Amazone est souvent considéré comme le plus long.",
+                "quel est le pays le plus peuplé": "👥 La Chine est le pays le plus peuplé, avec plus d’1,4 milliard d’habitants.",
     
-                    # ⏰ Temps & Calendrier
-                     "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
-                    "quels sont les mois de l'été": "☀️ En France, l'été comprend **juin, juillet et août**."
-                }
-
+                # ⏰ Temps & Calendrier
+                "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
+                "quels sont les mois de l'été": "☀️ En France, l'été comprend **juin, juillet et août**."
             }
 
             for question_base, reponse_base in base_generale.items():
