@@ -733,8 +733,6 @@ if question:
         # --- Bloc Salutations Simples ---
         if not message_bot and any(mot in question_clean for mot in ["salut", "bonjour", "bonsoir", "yo", "coucou", "hey"]):
             reponses_salut = [
-                "👋 Salut à vous ! Besoin d’un coup de main ?",
-                "🌞 Bonjour ! Je suis prête à vous assister.",
                 "👾 Hey ! Moi c’est AVA, votre copilote futuriste.",
                 "🎯 Toujours connectée ! Que puis-je faire pour vous ?",
                 "🧠 Présente et prête à analyser les signaux !",
