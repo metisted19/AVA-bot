@@ -743,7 +743,19 @@ if question:
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
         
-
+        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+        if not message_bot:
+            if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
+                message_bot = "Hello! I'm here and ready to help. How can I assist you today?"
+            else:
+                reponses_ava = [
+                    "I'm here to help, but I need a bit more detail 🤖",
+                    "I didn't quite understand that; could you please rephrase?",
+                    "This subject is still a bit unclear to me... I can talk about technical analysis, weather, news, and much more!",
+                    "Hmm... That's not in my database yet. Try another phrasing or type 'complete analysis' for a market overview 📊"
+                ]
+                message_bot = random.choice(reponses_ava)
+                
         # --- Bloc Traduction corrigé ---
         def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
             url = "https://api-free.deepl.com/v2/translate"
@@ -757,27 +769,10 @@ if question:
             try:
                 lang_question = detect(question)
             except Exception as e:
-                lang_question = "fr"  # Valeur par défaut
-            st.write("Langue détectée:", lang_question)
-            st.write("Réponse avant traduction:", message_bot)
-
-            # Si la langue détectée n'est pas le français et que le message n'est pas vide, tenter la traduction.
+                lang_question = "fr"
             if lang_question.lower() != "fr" and message_bot.strip():
                 traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
-                st.write("Réponse après traduction:", traduction)
                 message_bot = traduction
-            if not message_bot:
-                if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
-                    message_bot = "Hello! I'm here and ready to help. How can I assist you today?"
-                else:
-                    reponses_ava = [
-                        "I'm here to help, but I need a bit more detail 🤖",
-                        "I didn't quite understand that; could you please rephrase?",
-                        "This subject is still a bit unclear to me... I can talk about technical analysis, weather, news, and much more!",
-                        "Hmm... That's not in my database yet. Try another phrasing or type 'complete analysis' for a market overview 📊"
-                    ]
-                    message_bot = random.choice(reponses_ava)
-
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
