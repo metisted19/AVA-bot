@@ -18,7 +18,6 @@ import re  # Pour le bloc sécurité, le traitement géographique et l'analyse
 import unicodedata  # Pour supprimer les accents
 from newsapi import NewsApiClient
 from forex_python.converter import CurrencyRates, CurrencyCodes
-import math
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -286,8 +285,7 @@ if question:
                 message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie",
-            "palpitations", "otite", "sinusite", "crampes", "infections urinaires"]):
+        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires"]):
             reponses_medic = {
                 "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
                 "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
@@ -522,11 +520,10 @@ if question:
         # --- Bloc Convertisseur intelligent ---
         if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
             try:
-
                 c = CurrencyRates()
                 code = CurrencyCodes()
                 phrase = question_clean.replace(",", ".")
-
+                
                 # Conversion monétaire
                 match = re.search(r"(\d+(\.\d+)?)\s*(\w{3})\s*(en|to)\s*(\w{3})", phrase)
                 if match:
@@ -564,7 +561,7 @@ if question:
                         c_temp = (f_temp - 32) * 5/9
                         message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
             except Exception as e:
-                message_bot = "⚠️ Désolé, je n’ai pas pu faire la conversion. Essayez avec une phrase simple com"
+                message_bot = f"⚠️ Désolé, je n’ai pas pu faire la conversion: {e}. Essayez avec une phrase simple."
 
         # === Bloc Reconnaissance des tickers (exemple) ===
         if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
@@ -611,7 +608,7 @@ if question:
                 nom_ticker = "uni-usd"
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
-                
+        
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             reponses_ava = [
@@ -635,8 +632,126 @@ if question:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
         
+        # --- Bloc de détection de conversion (Convertisseur intelligent) ---
+        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
+            try:
+                c = CurrencyRates()
+                code = CurrencyCodes()
+                phrase = question_clean.replace(",", ".")
+                
+                # Conversion monétaire
+                match = re.search(r"(\d+(\.\d+)?)\s*(\w{3})\s*(en|to)\s*(\w{3})", phrase)
+                if match:
+                    montant = float(match.group(1))
+                    from_cur = match.group(3).upper()
+                    to_cur = match.group(5).upper()
+                    taux = c.get_rate(from_cur, to_cur)
+                    result = montant * taux
+                    symbol = code.get_symbol(to_cur) or to_cur
+                    message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {symbol}"
+                
+                # Conversion d'unités simples
+                elif "km en miles" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*km", phrase)
+                    if match:
+                        km = float(match.group(1))
+                        miles = km * 0.621371
+                        message_bot = f"📏 {km} km = {round(miles, 2)} miles"
+                elif "miles en km" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*miles?", phrase)
+                    if match:
+                        mi = float(match.group(1))
+                        km = mi / 0.621371
+                        message_bot = f"📏 {mi} miles = {round(km, 2)} km"
+                elif "celsius en fahrenheit" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*c", phrase)
+                    if match:
+                        celsius = float(match.group(1))
+                        fahrenheit = (celsius * 9/5) + 32
+                        message_bot = f"🌡️ {celsius}°C = {round(fahrenheit, 2)}°F"
+                elif "fahrenheit en celsius" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*f", phrase)
+                    if match:
+                        f_temp = float(match.group(1))
+                        c_temp = (f_temp - 32) * 5/9
+                        message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
+            except Exception as e:
+                message_bot = f"⚠️ Désolé, je n’ai pas pu faire la conversion: {e}. Essayez avec une phrase simple."
+        
+        # --- Bloc Reconnaissance des tickers (exemple) ---
+        if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
+            nom_ticker = question_clean.replace(" ", "").replace("-", "")
+            if "btc" in nom_ticker or "bitcoin" in nom_ticker:
+                nom_ticker = "btc-usd"
+            elif "eth" in nom_ticker:
+                nom_ticker = "eth-usd"
+            elif "aapl" in nom_ticker:
+                nom_ticker = "aapl"
+            elif "tsla" in nom_ticker:
+                nom_ticker = "tsla"
+            elif "googl" in nom_ticker:
+                nom_ticker = "googl"
+            elif "fchi" in nom_ticker or "cac" in nom_ticker:
+                nom_ticker = "^fchi"
+            elif "msft" in nom_ticker:
+                nom_ticker = "msft"
+            elif "amzn" in nom_ticker:
+                nom_ticker = "amzn"
+            elif "nvda" in nom_ticker:
+                nom_ticker = "nvda"
+            elif "sp500" in nom_ticker or "s&p" in nom_ticker:
+                nom_ticker = "^gspc"
+            elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
+                nom_ticker = "doge-usd"
+            elif "ada" in nom_ticker or "cardano" in nom_ticker:
+                nom_ticker = "ada-usd"
+            elif "sol" in nom_ticker or "solana" in nom_ticker:
+                nom_ticker = "sol-usd"
+            elif "gold" in nom_ticker or "or" in nom_ticker:
+                nom_ticker = "gc=F"
+            elif "xrp" in nom_ticker or "ripple" in nom_ticker:
+                nom_ticker = "xrp-usd"
+            elif "bnb" in nom_ticker:
+                nom_ticker = "bnb-usd"
+            elif "cl" in nom_ticker or "petrole" in nom_ticker or "pétrole" in nom_ticker:
+                nom_ticker = "cl=F"
+            elif "si" in nom_ticker or "argent" in nom_ticker:
+                nom_ticker = "si=F"
+            elif "matic" in nom_ticker or "polygon" in nom_ticker:
+                nom_ticker = "matic-usd"
+            elif "uni" in nom_ticker or "uniswap" in nom_ticker:
+                nom_ticker = "uni-usd"
+            elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
+                nom_ticker = "^ndx"
+        
+        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+        if not message_bot:
+            reponses_ava = [
+                "Je suis là pour vous aider, mais j'aurais besoin d’un peu plus de précision 🤖",
+                "Je n’ai pas bien compris, mais je suis prête à apprendre ! Reformulez votre question 😊",
+                "Ce sujet est encore flou pour moi... mais je peux vous parler d’analyse technique, météo, actualités et bien plus !",
+                "Hmm... Ce n'est pas dans ma base pour l’instant. Essayez une autre formulation ou tapez 'analyse complète' pour un bilan des marchés 📊"
+            ]
+            message_bot = random.choice(reponses_ava)
+        
+        if not message_bot.strip():
+            message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
+        
+        # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
+        if question_clean not in ["merci", "merci beaucoup"]:
+            try:
+                langue = detect(question)
+                if langue in ["en", "es", "de"]:
+                    message_bot = traduire_texte(message_bot, langue)
+            except:
+                if message_bot.strip():
+                    message_bot += "\n\n⚠️ Traduction indisponible."
+        
+        # --- Bloc de détection de conversion (Convertisseur intelligent) est déjà traité plus haut ---
+        
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
