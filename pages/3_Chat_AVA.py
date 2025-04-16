@@ -841,7 +841,28 @@ if question:
                 "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
                 "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
                 "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
-                "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !"
+                "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !",
+                "🧊 Les manchots proposent parfois des galets comme cadeau de séduction.",
+                "🚀 Les astronautes peuvent grandir de quelques centimètres dans l’espace à cause de la microgravité.",
+                "🥶 L’eau chaude peut geler plus vite que l’eau froide. C’est l’effet Mpemba.",
+                "🐥 Les canetons s’attachent à la première chose qu’ils voient — c’est l’empreinte.",
+                "🍕 En Italie, il existe une pizza avec 111 sortes de fromages dessus !",
+                "🎵 Les abeilles peuvent reconnaître des visages humains… et elles adorent les sons aigus.",
+                "🌍 Il y a plus d’arbres sur Terre que d’étoiles dans la Voie lactée.",
+                "👅 La langue est aussi unique qu’une empreinte digitale.",
+                "🚿 En moyenne, une personne passe **6 mois de sa vie sous la douche**.",
+                "🎈 Une banane est techniquement une baie. Mais pas la fraise !",
+                "🦙 Les alpagas peuvent cracher… mais seulement s’ils sont vraiment énervés.",
+                "⏳ Les crocodiles peuvent vivre plus de 100 ans… et certains ne meurent que de vieillesse.",
+                "🐓 Les poules peuvent se souvenir de plus de 100 visages humains ou animaux.",
+                "🦇 Les chauves-souris tournent toujours à gauche en sortant d’une grotte.",
+                "🛸 Il existe un endroit sur Terre où la gravité semble inversée : la Mystery Spot en Californie.",
+                "🎮 Un gamer japonais détient le record mondial du plus long temps passé à jouer sans pause : 35 heures !",
+                "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
+                "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
+                "🐠 Certains poissons changent de sexe au cours de leur vie.",
+                "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie."
+
             ]
             message_bot = random.choice(faits_insolites)
         # --- Bloc Recettes rapides ---
