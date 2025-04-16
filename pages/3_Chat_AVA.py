@@ -762,27 +762,24 @@ if question:
             response = requests.post(url, data=params)
             if response.status_code == 200:
                 json_data = response.json()
-                # Si la réponse contient des traductions, retourne la première, sinon retourne le texte original
                 if "translations" in json_data and len(json_data["translations"]) > 0:
                     return json_data["translations"][0]["text"]
                 else:
                     return texte
             else:
-                # En cas d'erreur, retourne le texte original pour éviter d'afficher un message d'erreur non souhaité
                 return texte
-
+        
         try:
             lang_question = detect(question)
             # Si la langue de la question n'est pas le français et que le message_bot n'est pas vide, on traduit.
             if lang_question != "fr" and message_bot.strip():
                 traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
-                # Si la traduction ne renvoie pas un message d'erreur, on met à jour message_bot
                 if not traduction.startswith("❌"):
                     message_bot = traduction
         except Exception as e:
             if message_bot.strip():
                 message_bot += "\n\n⚠️ Traduction indisponible."
-
+        
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
         st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
