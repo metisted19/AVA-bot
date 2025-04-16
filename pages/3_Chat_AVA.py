@@ -752,7 +752,7 @@ if question:
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
         # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
-        def traduire_deepl(texte, langue_cible="EN", api_key="VOTRE_CLE_API"):
+        def traduire_deepl(texte, langue_cible="EN", api_key="19A8LSUiX2TDU1UHy"):
             url = "https://api-free.deepl.com/v2/translate"
             params = {
                  "auth_key": api_key,
