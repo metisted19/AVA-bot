@@ -742,6 +742,20 @@ if question:
 
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
+        
+        # Détecter la langue de la question et loguer le résultat
+        try:
+            lang_question = detect(question)
+        except Exception as e:
+            lang_question = "fr"  # Valeur par défaut
+        st.write("Langue détectée:", lang_question)
+        st.write("Réponse avant traduction:", message_bot)
+
+        # Si la langue détectée n'est pas le français et que le message n'est pas vide, tenter la traduction.
+        if lang_question.lower() != "fr" and message_bot.strip():
+            traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
+            st.write("Réponse après traduction:", traduction)
+            message_bot = traduction
 
         # --- Bloc Traduction corrigé ---
         def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
