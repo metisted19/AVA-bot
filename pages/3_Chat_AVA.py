@@ -19,7 +19,7 @@ import unicodedata  # Pour supprimer les accents
 from newsapi import NewsApiClient
 from forex_python.converter import CurrencyRates, CurrencyCodes  # Ces imports peuvent rester si vous en avez besoin pour d'autres parties
 from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarit
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
