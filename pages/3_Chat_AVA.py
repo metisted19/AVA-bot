@@ -55,8 +55,6 @@ def get_general_news():
     except Exception as e:
         return f"❌ Error fetching news via NewsApiClient: {e}"
 
-
-
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
     try:
@@ -286,8 +284,7 @@ if question:
                 message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère","anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie",
-            "palpitations", "otite", "sinusite", "crampes", "infections urinaires"]):
+        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires"]):
             reponses_medic = {
                 "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
                 "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
@@ -316,9 +313,9 @@ if question:
                 "allergie": "🤧 Éternuements, démangeaisons, yeux rouges ? Pollen, acariens ou poils ? Antihistaminiques peuvent aider.",
                 "palpitations": "💓 Sensation de cœur qui s’emballe ? Cela peut être bénin, mais consultez si cela se répète.",
                 "otite": "👂 Douleur vive à l’oreille, fièvre ? Surtout chez les enfants. Consultez sans tarder.",
-                "sinusite": "👃 Pression au visage, nez bouché, fièvre ? Hydratation, lavage nasal, et parfois traitement.",
+                "sinusite": "👃 Pression au visage, nez bouché, fièvre ? Hydratez-vous, faites un lavage nasal, et consultez si nécessaire.",
                 "crampes": "💥 Hydratez-vous, étirez les muscles concernés. Magnésium ou potassium peuvent aider.",
-                "infections urinaires": "🚽 Brûlures en urinant, besoin fréquent. Buvez beaucoup d’eau et consultez rapidement."
+                "infections urinaires": "🚽 Brûlures en urinant, besoin fréquent ? Buvez beaucoup d’eau et consultez rapidement."
             }
             for cle, rep in reponses_medic.items():
                 if cle in question_clean:
@@ -400,7 +397,6 @@ if question:
                         message_bot = random.choice(reponses)
                         perso_repondu = True
                         break
- 
 
         # --- Bloc Punchlines motivationnelles ---
         if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
@@ -431,7 +427,6 @@ if question:
                 if question_cle in question_clean:
                     message_bot = reponse
                     break
-        
 
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
@@ -452,8 +447,7 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "cl=F", "pétrole": "cl=F", 
-                "petrole": "cl=F", "cl=f": "cl=F",
+                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F", "cl=f": "cl=F",
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
                 "bnb": "bnb-usd",
@@ -498,7 +492,6 @@ if question:
                     message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
             else:
                 message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
-            
 
         # --- Bloc Calcul (simple expression mathématique ou phrase) ---
         if not message_bot:
@@ -523,8 +516,9 @@ if question:
             except:
                 pass
 
-        # ✅ ICI tu insères ton bloc de reconnaissance des tickers :
-        if any(symb in question_clean for symb in [...]):
+        # === Bloc Reconnaissance des tickers (exemple) ===
+        # Remplacez [...] par la liste de mots-clés pertinents pour détecter les tickers
+        if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             if "btc" in nom_ticker or "bitcoin" in nom_ticker:
                 nom_ticker = "btc-usd"
@@ -566,9 +560,10 @@ if question:
                 nom_ticker = "matic-usd"
             elif "uni" in nom_ticker or "uniswap" in nom_ticker:
                 nom_ticker = "uni-usd"
-            elif "nasdaq" in nom_ticker or "ndx" in nom_ticker or "nasdaq100" in nom_ticker:
+            elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
-                
+            # Vous pouvez ajouter d'autres conditions si nécessaire.
+
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             reponses_ava = [
