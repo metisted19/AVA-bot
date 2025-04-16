@@ -73,6 +73,7 @@ if os.path.exists(fichier_data):
 
         signaux_list = analyse.split("\n") if analyse else []
         resume = generer_resume_signal(signaux_list)
+        
         # --- Affichage des suggestions de position ---
         st.subheader("📌 Suggestion de position")
         st.markdown(suggerer_position_et_niveaux(df))
