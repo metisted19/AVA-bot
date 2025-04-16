@@ -17,7 +17,7 @@ import difflib
 import re  # Pour le bloc sécurité, le traitement géographique et l'analyse
 import unicodedata  # Pour supprimer les accents
 from newsapi import NewsApiClient
-from forex_python.converter import CurrencyRates, CurrencyCodes
+from forex_python.converter import CurrencyRates, CurrencyCodes  # Ces imports peuvent rester si vous en avez besoin pour d'autres parties
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -521,18 +521,26 @@ if question:
         # --- Bloc Convertisseur intelligent ---
         if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
             try:
-                c = CurrencyRates()
-                code = CurrencyCodes()
+                # Utilisation de l'API ExchangeRate-API
                 phrase = question_clean.replace(",", ".")
                 match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
                 if match:
                     montant = float(match.group(1))
                     from_cur = match.group(3).upper()
                     to_cur = match.group(5).upper()
-                    taux = c.get_rate(from_cur, to_cur)
-                    result = montant * taux
-                    symbol = code.get_symbol(to_cur) or to_cur
-                    message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {symbol}"
+                    # Requête vers l'API ExchangeRate-API
+                    url = f"https://v6.exchangerate-api.com/v6/dab2bba4f43a99445158d9ae/latest/{from_cur}"
+                    response = requests.get(url, timeout=10)
+                    data = response.json()
+                    if data.get("result") == "success":
+                        taux = data["conversion_rates"].get(to_cur)
+                        if taux:
+                            result = montant * taux
+                            message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {to_cur}"
+                        else:
+                            message_bot = "❌ Taux de conversion non disponible pour la devise demandée."
+                    else:
+                        message_bot = "⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème avec l’API. Veuillez réessayer plus tard."
                 elif "km en miles" in phrase:
                     match = re.search(r"(\d+(\.\d+)?)\s*km", phrase)
                     if match:
@@ -558,7 +566,7 @@ if question:
                         c_temp = (f_temp - 32) * 5/9
                         message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
             except Exception as e:
-                message_bot = f"⚠️ Désolé, la conversion n'a pas pu être effectuée en raison d'un problème de connexion. Veuillez réessayer plus tard."
+                message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
 
         # === Bloc Reconnaissance des tickers (exemple) ===
         if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
@@ -633,6 +641,7 @@ if question:
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
