@@ -755,9 +755,9 @@ if question:
         def traduire_deepl(texte, langue_cible="EN", api_key="19A8LSUiX2TDU1UHy"):
             url = "https://api-free.deepl.com/v2/translate"
             params = {
-                 "auth_key": api_key,
-                 "text": texte,
-                 "target_lang": langue_cible
+                "auth_key": api_key,
+                "text": texte,
+                "target_lang": langue_cible
             }
             response = requests.post(url, data=params)
             if response.status_code == 200:
@@ -765,22 +765,18 @@ if question:
             else:
                 return "❌ Erreur lors de la traduction."
 
-        # Bloc de traduction intégré dans le traitement final :
         try:
-            # Si la question contient des caractères spécifiques aux langues (ex. accents), on suppose que c'est du français.
             lang_question = detect(question)
             if lang_question != "fr" and message_bot.strip():
-                 message_bot = traduire_deepl(message_bot, langue_cible=lang_question.upper())
-                langue = detect(question)
+                message_bot = traduire_deepl(message_bot, langue_cible=lang_question.upper())
         except Exception as e:
             if message_bot.strip():
                 message_bot += "\n\n⚠️ Traduction indisponible."
- 
 
-        st.markdown(message_bot)
-        st.session_state.messages.append({"role": "assistant", "content": message_bot})
-
+st.markdown(message_bot)
+st.session_state.messages.append({"role": "assistant", "content": message_bot})
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
