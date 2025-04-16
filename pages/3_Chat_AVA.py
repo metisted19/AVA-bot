@@ -430,6 +430,7 @@ if question:
                 if question_cle in question_clean:
                     message_bot = reponse
                     break
+        
 
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
@@ -450,10 +451,14 @@ if question:
                 "gold": "gc=F", "or": "gc=F",
                 "sp500": "^gspc", "s&p": "^gspc",
                 "cac": "^fchi", "cac40": "^fchi",
-                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F", "cl=f": "cl=F",
+                "cl": "cl=F", "pétrole": "cl=F", 
+                "petrole": "cl=F", "cl=f": "cl=F",
                 "si": "si=F", "argent": "si=F",
                 "xrp": "xrp-usd", "ripple": "xrp-usd",
-                "bnb": "bnb-usd"
+                "bnb": "bnb-usd",
+                "matic": "matic-usd", "polygon": "matic-usd",
+                "uni": "uni-usd", "uniswap": "uni-usd",
+                "ndx": "^ndx", "nasdaq": "^ndx", "nasdaq100": "^ndx"
             }
             nom_ticker = correspondances.get(nom_simple_norm)
             if nom_ticker:
@@ -492,7 +497,53 @@ if question:
                     message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
             else:
                 message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
-
+            
+            if any(symb in question_clean for symb in ["aapl", "tsla", "googl", "btc", "bitcoin", "eth", "fchi", "cac", "msft", "amzn", "nvda", "sp500", "s&p", "doge", "ada", "sol", "gold", "or", "xrp", "bnb", "matic", "polygon", "uni", "uniswap", "nasdaq", "nasdaq100", "ndx"]):
+            nom_ticker = question_clean.replace(" ", "").replace("-", "")
+    
+            if "btc" in nom_ticker or "bitcoin" in nom_ticker:
+                nom_ticker = "btc-usd"
+            elif "eth" in nom_ticker:
+                nom_ticker = "eth-usd"
+            elif "aapl" in nom_ticker:
+                nom_ticker = "aapl"
+            elif "tsla" in nom_ticker:
+                nom_ticker = "tsla"
+            elif "googl" in nom_ticker:
+                nom_ticker = "googl"
+            elif "fchi" in nom_ticker or "cac" in nom_ticker:
+                nom_ticker = "^fchi"
+            elif "msft" in nom_ticker:
+               nom_ticker = "msft"
+            elif "amzn" in nom_ticker:
+               nom_ticker = "amzn"
+            elif "nvda" in nom_ticker:
+               nom_ticker = "nvda"
+            elif "sp500" in nom_ticker or "s&p" in nom_ticker:
+               nom_ticker = "^gspc"
+            elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
+               nom_ticker = "doge-usd"
+            elif "ada" in nom_ticker or "cardano" in nom_ticker:
+               nom_ticker = "ada-usd"
+            elif "sol" in nom_ticker or "solana" in nom_ticker:
+               nom_ticker = "sol-usd"
+            elif "gold" in nom_ticker or "or" in nom_ticker:
+               nom_ticker = "gc=F"
+            elif "xrp" in nom_ticker or "ripple" in nom_ticker:
+               nom_ticker = "xrp-usd"
+            elif "bnb" in nom_ticker:
+               nom_ticker = "bnb-usd"
+            elif "cl" in nom_ticker or "petrole" in nom_ticker or "pétrole" in nom_ticker:
+               nom_ticker = "cl=F"
+            elif "si" in nom_ticker or "argent" in nom_ticker:
+               nom_ticker = "si=F"
+            elif "matic" in nom_ticker or "polygon" in nom_ticker:
+               nom_ticker = "matic-usd"
+            elif "uni" in nom_ticker or "uniswap" in nom_ticker:
+               nom_ticker = "uni-usd"
+            elif "nasdaq" in nom_ticker or "ndx" in nom_ticker or "nasdaq100" in nom_ticker:
+               nom_ticker = "^ndx"
+               
         # --- Bloc Calcul (simple expression mathématique ou phrase) ---
         if not message_bot:
             question_calc = question_clean.replace(",", ".")
