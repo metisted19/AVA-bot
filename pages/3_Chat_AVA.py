@@ -786,9 +786,3 @@ if question:
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
         st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
-
-
-
-
-
-
