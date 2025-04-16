@@ -10,8 +10,8 @@ st.title("📍 Signaux Techniques d'AVA")
 tickers = [
     "aapl", "tsla", "googl", "btc-usd", "eth-usd",
     "msft", "amzn", "nvda", "^gspc", "doge-usd", "ada-usd",
-    "sol-usd", "gc=F", "^fchi","xrp-usd", "bnb-usd", "cl=F", "si=F",
-    "matic-usd", "uni-usd", "^ndx"  # <= le CAC 40 est ici
+    "sol-usd", "gc=F", "^fchi", "xrp-usd", "bnb-usd", "cl=F", "si=F",
+    "matic-usd", "uni-usd", "^ndx"
 ]
 
 nom_affichages = {
@@ -38,6 +38,28 @@ nom_affichages = {
     "^ndx": "Nasdaq 100"
 }
 
+# --- Fonction de suggestion d'ouverture de position avec SL/TP ---
+def suggerer_position_et_niveaux(df):
+    close = df["Close"].iloc[-1]
+    macd = df["Macd"].iloc[-1]
+    rsi = df["Rsi"].iloc[-1]
+    adx = df["Adx"].iloc[-1]
+
+    if macd > 0 and rsi < 70 and adx > 20:
+        position = "📈 Ouverture d’une **position acheteuse** (long)"
+        sl = close * 0.97
+        tp = close * 1.05
+    elif macd < 0 and rsi > 30 and adx > 20:
+        position = "📉 Ouverture d’une **position vendeuse** (short)"
+        sl = close * 1.03
+        tp = close * 0.95
+    else:
+        return "⚠️ Les conditions ne sont pas assez claires pour une prise de position."
+
+    sl = round(sl, 2)
+    tp = round(tp, 2)
+    return f"{position}\n\n🛑 Stop-Loss : **{sl}**\n🎯 Take-Profit : **{tp}**"
+
 # --- Sélection du ticker ---
 ticker = st.selectbox("Choisissez un actif :", options=tickers, format_func=lambda x: nom_affichages.get(x, x))
 
@@ -51,7 +73,6 @@ if os.path.exists(fichier_data):
     df = ajouter_indicateurs_techniques(df)
 
     try:
-        # --- Analyse technique ---
         analyse, suggestion = analyser_signaux_techniques(df)
 
         def generer_resume_signal(signaux):
@@ -73,17 +94,16 @@ if os.path.exists(fichier_data):
 
         signaux_list = analyse.split("\n") if analyse else []
         resume = generer_resume_signal(signaux_list)
-        
-        # --- Affichage des suggestions de position ---
-        st.subheader("📌 Suggestion de position")
-        st.markdown(suggerer_position_et_niveaux(df))
 
-
-        # --- Affichage complet ---
+        # --- Affichage ---
         st.subheader(f"🔎 Analyse pour {nom_affichages.get(ticker, ticker.upper())}")
         st.markdown(analyse)
         st.markdown(f"💬 **Résumé d'AVA :**\n{resume}")
         st.success(f"🤖 *Intuition d'AVA :* {suggestion}")
+
+        # --- Suggestion de position ---
+        st.subheader("📌 Suggestion de position")
+        st.markdown(suggerer_position_et_niveaux(df))
 
         # --- Prédiction IA ---
         if os.path.exists(fichier_pred):
@@ -102,33 +122,13 @@ if os.path.exists(fichier_data):
         # --- Données brutes ---
         st.subheader("📄 Données récentes")
         st.dataframe(df.tail(10), use_container_width=True)
-        # --- Fonction de suggestion d'ouverture de position avec SL/TP ---
-        def suggerer_position_et_niveaux(df):
-            close = df["Close"].iloc[-1]
-            macd = df["Macd"].iloc[-1]
-            rsi = df["Rsi"].iloc[-1]
-            adx = df["Adx"].iloc[-1]
-
-        if macd > 0 and rsi < 70 and adx > 20:
-            position = "📈 Ouverture d’une **position acheteuse** (long)"
-            sl = close * 0.97  # SL à -3%
-            tp = close * 1.05  # TP à +5%
-        elif macd < 0 and rsi > 30 and adx > 20:
-            position = "📉 Ouverture d’une **position vendeuse** (short)"
-            sl = close * 1.03  # SL à +3%
-            tp = close * 0.95  # TP à -5%
-        else:
-            return "⚠️ Les conditions ne sont pas assez claires pour une prise de position."
-
-        sl = round(sl, 2)
-        tp = round(tp, 2)
-        return f"{position}\n\n🛑 Stop-Loss : **{sl}**\n🎯 Take-Profit : **{tp}**"
 
     except Exception as e:
         st.error(f"Une erreur est survenue pendant l'analyse : {e}")
 
 else:
     st.warning(f"❌ Aucune donnée trouvée pour {ticker}. Veuillez lancer l'entraînement AVA.")
+
 
 
 
