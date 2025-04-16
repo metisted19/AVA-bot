@@ -766,6 +766,17 @@ if question:
                 traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
                 st.write("Réponse après traduction:", traduction)
                 message_bot = traduction
+            if not message_bot:
+                if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
+                    message_bot = "Hello! I'm here and ready to help. How can I assist you today?"
+                else:
+                    reponses_ava = [
+                        "I'm here to help, but I need a bit more detail 🤖",
+                        "I didn't quite understand that; could you please rephrase?",
+                        "This subject is still a bit unclear to me... I can talk about technical analysis, weather, news, and much more!",
+                        "Hmm... That's not in my database yet. Try another phrasing or type 'complete analysis' for a market overview 📊"
+                    ]
+                    message_bot = random.choice(reponses_ava)
 
 
         st.markdown(message_bot)
