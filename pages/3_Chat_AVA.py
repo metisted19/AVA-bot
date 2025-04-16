@@ -797,7 +797,20 @@ if question:
                 "👾 Hey ! Moi c’est AVA, votre copilote futuriste.",
                 "🎯 Toujours connectée ! Que puis-je faire pour vous ?",
                 "🧠 Présente et prête à analyser les signaux !",
-                "😎 Yo ! Prêt pour une session d’analyse ou un peu de culture ?"
+                "😎 Yo ! Prêt pour une session d’analyse ou un peu de culture ?",
+                "quoi de neuf": "Pas mal de choses en réalité ! Le monde bouge vite... et moi aussi 😄",
+                "ça va": "Toujours au top, prêt(e) à vous aider ! Et vous ?",
+                "salut": "Salut à vous ! Que puis-je faire aujourd’hui ?",
+                "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+                "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+                "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+                "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+                "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+                "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+                "tu m'entends": "Je vous entends fort et clair 🎧",
+                "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+                "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
             ]
             message_bot = random.choice(reponses_salut)
         
