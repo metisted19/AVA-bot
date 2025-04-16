@@ -285,7 +285,8 @@ if question:
                 message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires"]):
+        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie",
+            "palpitations", "otite", "sinusite", "crampes", "infections urinaires"]):
             reponses_medic = {
                 "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
                 "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
@@ -523,7 +524,6 @@ if question:
                 c = CurrencyRates()
                 code = CurrencyCodes()
                 phrase = question_clean.replace(",", ".")
-                # Utilisation d'une regex insensible à la casse
                 match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
                 if match:
                     montant = float(match.group(1))
@@ -533,7 +533,6 @@ if question:
                     result = montant * taux
                     symbol = code.get_symbol(to_cur) or to_cur
                     message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {symbol}"
-                # Conversion d'unités simples
                 elif "km en miles" in phrase:
                     match = re.search(r"(\d+(\.\d+)?)\s*km", phrase)
                     if match:
@@ -559,7 +558,7 @@ if question:
                         c_temp = (f_temp - 32) * 5/9
                         message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
             except Exception as e:
-                message_bot = f"⚠️ Désolé, je n’ai pas pu faire la conversion: {e}. Essayez avec une phrase simple."
+                message_bot = f"⚠️ Désolé, la conversion n'a pas pu être effectuée en raison d'un problème de connexion. Veuillez réessayer plus tard."
 
         # === Bloc Reconnaissance des tickers (exemple) ===
         if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
@@ -606,7 +605,7 @@ if question:
                 nom_ticker = "uni-usd"
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
-        
+
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             reponses_ava = [
@@ -616,10 +615,10 @@ if question:
                 "Hmm... Ce n'est pas dans ma base pour l’instant. Essayez une autre formulation ou tapez 'analyse complète' pour un bilan des marchés 📊"
             ]
             message_bot = random.choice(reponses_ava)
-        
+
         if not message_bot.strip():
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
-        
+
         # --- Bloc Traduction (seulement si la question n'est pas un court mot-clé français) ---
         if question_clean not in ["merci", "merci beaucoup"]:
             try:
@@ -629,11 +628,12 @@ if question:
             except:
                 if message_bot.strip():
                     message_bot += "\n\n⚠️ Traduction indisponible."
-        
+
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
 
 
