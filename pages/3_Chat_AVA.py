@@ -768,6 +768,22 @@ if question:
             else:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
+        # --- Bloc Faits Insolites ---
+        # À insérer juste avant le bloc catch-all final
+        if not message_bot and any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
+            faits_insolites = [
+                "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
+                "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
+                "🐌 Un escargot peut dormir pendant trois ans d’affilée.",
+                "🌋 Il y a plus de volcans sous l’eau que sur la terre ferme.",
+                "📦 Amazon a été fondée dans un garage... et maintenant, ils livrent même des frigos !",
+                "🧠 Le cerveau humain génère assez d’électricité pour allumer une petite ampoule.",
+                "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
+                "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
+                "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
+                "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !"
+            ]
+            message_bot = random.choice(faits_insolites)
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
