@@ -765,6 +765,21 @@ if question:
             else:
                 return "❌ Erreur lors de la traduction."
 
+        # Bloc de traduction intégré dans le traitement final :
+        if question_clean not in ["merci", "merci beaucoup"]:
+            try:
+                # Si la question contient des caractères spécifiques aux langues (ex. accents), on suppose que c'est du français.
+                if any(char in question for char in "éèàùç"):
+                    langue = "fr"
+                else:
+                    langue = detect(question)
+                # Si la langue détectée n'est pas le français, traduire le message_bot via DeepL.
+                if langue != "fr" and message_bot:
+                    message_bot = traduire_deepl(message_bot, langue_cible=langue.upper())
+            except Exception as e:
+                if message_bot.strip():
+                    message_bot += "\n\n⚠️ Traduction indisponible." 
+
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
