@@ -752,39 +752,9 @@ if question:
                     "Hmm... That's not in my database yet. Try another phrasing or type 'complete analysis' for a market overview 📊"
                 ]
                 message_bot = random.choice(reponses_ava)
-        # --- Bloc Quiz de culture générale ---
-        if not message_bot and any(mot in question_clean for mot in [
-            "quiz", "quizz", "question", "culture générale", "pose-moi une question", "teste mes connaissances"
-        ]):
-            quizz_culture = [
-                {"question": "🌍 Quelle est la capitale de l'Australie ?", "réponse": "Canberra"},
-                {"question": "🧪 Quel est l'élément chimique dont le symbole est O ?", "réponse": "oxygène"},
-                {"question": "🖼️ Qui a peint la Joconde ?", "réponse": "léonard de vinci"},
-                {"question": "📚 Combien y a-t-il de continents sur Terre ?", "réponse": "7"},
-                {"question": "🚀 Quelle planète est la plus proche du Soleil ?", "réponse": "mercure"},
-                {"question": "🇫🇷 Qui a écrit 'Les Misérables' ?", "réponse": "victor hugo"},
-                {"question": "🎬 Quel film a remporté l'Oscar du meilleur film en 1998 avec 'Titanic' ?", "réponse": "titanic"},
-                {"question": "🐘 Quel est le plus grand animal terrestre ?", "réponse": "éléphant"},
-                {"question": "🎼 Quel musicien est surnommé 'le Roi de la Pop' ?", "réponse": "michael jackson"},
-                {"question": "⚽ Quelle nation a remporté la Coupe du Monde 2018 ?", "réponse": "france"}
-            ]
-    
-            question_choisie = random.choice(quizz_culture)
-            st.session_state["quiz_attendu"] = question_choisie["réponse"].lower()
-            message_bot = f"🧠 **Quiz Culture G** :\n{question_choisie['question']}\n\nRépondez directement !"
-
-            # --- Vérification de la réponse au quiz ---
-            elif "quiz_attendu" in st.session_state and st.session_state["quiz_attendu"]:
-                reponse_attendue = st.session_state["quiz_attendu"]
-                if question_clean.lower() == reponse_attendue:
-                    message_bot = "✅ Bonne réponse ! Vous avez l’esprit affûté 🧠💪"
-                else:
-                    message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
-                st.session_state["quiz_attendu"] = ""
 
 
-
-        # --- Bloc Traduction corrigé ---
+    # --- Bloc Traduction corrigé ---
         def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
             url = "https://api-free.deepl.com/v2/translate"
             params = {
