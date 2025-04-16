@@ -792,12 +792,17 @@ if question:
                 nom_ticker = "^ndx"
         
         # --- Bloc Salutations Simples ---
-        if not message_bot and any(mot in question_clean for mot in ["salut", "bonjour", "bonsoir", "yo", "coucou", "hey"]):
-            reponses_salut = [
+        if not message_bot and any(mot in question_clean for mot in ["salut", "bonjour", "bonsoir", "yo", "coucou", "hey", "ça va", "quoi de neuf", "tu fais quoi", "tu es là", "tu m'entends", "tu vas bien", "qui es-tu", "t'es qui", "bonne nuit", "bonne journée"]):
+    
+            reponses_salut_simples = [
                 "👾 Hey ! Moi c’est AVA, votre copilote futuriste.",
                 "🎯 Toujours connectée ! Que puis-je faire pour vous ?",
                 "🧠 Présente et prête à analyser les signaux !",
                 "😎 Yo ! Prêt pour une session d’analyse ou un peu de culture ?",
+                "✨ Hello ! Vous voulez une blague, une info bourse ou un fait insolite ?"
+            ]
+
+            reponses_salut_precises = {
                 "quoi de neuf": "Pas mal de choses en réalité ! Le monde bouge vite... et moi aussi 😄",
                 "ça va": "Toujours au top, prêt(e) à vous aider ! Et vous ?",
                 "salut": "Salut à vous ! Que puis-je faire aujourd’hui ?",
@@ -810,9 +815,15 @@ if question:
                 "tu m'entends": "Je vous entends fort et clair 🎧",
                 "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
                 "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-            ]
-            message_bot = random.choice(reponses_salut)
+                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous."
+            }
+
+            # Réponse ciblée si la phrase est dans le dictionnaire
+            if question_clean in reponses_salut_precises:
+                message_bot = reponses_salut_precises[question_clean]
+            else:
+                message_bot = random.choice(reponses_salut_simples)
+
         
         # --- Bloc Quiz de culture générale ---
         if not message_bot and any(mot in question_clean for mot in [
