@@ -796,6 +796,7 @@ if question:
                 "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes."
             ]
             message_bot = f"🍽️ Une petite faim ? Voici une idée :\n\n{random.choice(recettes)}"
+
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
             base_generale = {
@@ -809,9 +810,9 @@ if question:
             }
 
             for question_base, reponse_base in base_generale.items():
-            if question_base in question_clean:
-                message_bot = reponse_base
-                break
+                if question_base in question_clean:
+                    message_bot = reponse_base
+                    break
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
