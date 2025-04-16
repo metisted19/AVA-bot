@@ -10,7 +10,8 @@ st.title("📍 Signaux Techniques d'AVA")
 tickers = [
     "aapl", "tsla", "googl", "btc-usd", "eth-usd",
     "msft", "amzn", "nvda", "^gspc", "doge-usd", "ada-usd",
-    "sol-usd", "gc=F", "^fchi","xrp-usd", "bnb-usd", "cl=F", "si=F"  # <= le CAC 40 est ici
+    "sol-usd", "gc=F", "^fchi","xrp-usd", "bnb-usd", "cl=F", "si=F",
+    "matic-usd", "uni-usd", "^ndx"  # <= le CAC 40 est ici
 ]
 
 nom_affichages = {
@@ -31,7 +32,10 @@ nom_affichages = {
     "xrp-usd": "XRP",
     "bnb-usd": "BNB",
     "cl=F": "Pétrole brut",
-    "si=F": "Argent (Silver)"
+    "si=F": "Argent (Silver)",
+    "matic-usd": "Polygon (MATIC)",
+    "uni-usd": "Uniswap",
+    "^ndx": "Nasdaq 100"
 }
 
 # --- Sélection du ticker ---
