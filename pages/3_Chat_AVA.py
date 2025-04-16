@@ -751,25 +751,22 @@ if question:
                 "text": texte,
                 "target_lang": langue_cible
             }
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
             try:
-                response = requests.post(url, data=params)
-                response.raise_for_status()  # Lève une exception en cas d'erreur HTTP
+                response = requests.post(url, data=params, headers=headers)
+                response.raise_for_status()  # Lève une exception si le code HTTP n'est pas 200
                 json_data = response.json()
                 if "translations" in json_data and len(json_data["translations"]) > 0:
                     return json_data["translations"][0]["text"]
+            except requests.exceptions.HTTPError as http_err:
+                if response.status_code == 403:
+                    st.write("Erreur 403 : Accès refusé. Vérifiez que votre clé API DeepL est valide et que vous respectez bien le quota.")
+                else:
+                    st.write("Erreur lors de la traduction DeepL :", http_err)
             except Exception as e:
-                st.write("Erreur lors de la traduction DeepL :", e)
+                st.write("Erreur inattendue lors de la traduction :", e)
             return texte
 
-        try:
-            lang_question = detect(question)  # Détecte la langue de la question de l'utilisateur
-        except Exception as e:
-            lang_question = "fr"  # Par défaut, le français
-
-        # Si la langue détectée n'est pas le français et le message n'est pas vide, on traduit
-        if lang_question.lower() != "fr" and message_bot.strip():
-            traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
-            message_bot = traduction
 
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
