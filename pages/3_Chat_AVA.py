@@ -744,7 +744,7 @@ if question:
             message_bot = "Désolé, je n'ai pas trouvé de réponse à votre question."
 
         # --- Bloc Traduction corrigé ---
-        def traduire_deepl(texte, langue_cible="EN", api_key="19A8LSUiX2TDU1UHy"):
+        def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
             url = "https://api-free.deepl.com/v2/translate"
             params = {
                 "auth_key": api_key,
