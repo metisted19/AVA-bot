@@ -285,10 +285,12 @@ if question:
                 message_bot = "🌱 Il existe de nombreux remèdes naturels. Précisez votre souci (ex : toux, stress, rhume...) et je vous proposerai une solution douce."
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in ["grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
+        elif not message_bot and any(mot in question_clean for mot in [    "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
             "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
             "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
-            "mal de dos", "brûlure d'estomac", "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne"
+            "ballonnements", "brûlures d’estomac", "brûlure d'estomac", "saignement de nez", "mal de dos", "entorse", "tendinite",
+            "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
+            "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne"
             ]):
 
             reponses_medic = {
