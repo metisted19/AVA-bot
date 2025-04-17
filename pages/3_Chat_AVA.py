@@ -1191,8 +1191,8 @@ if question:
                     question_clean = nettoyer_texte(question_clean)
                 else:
                     question_clean = ""  # Valeur par défaut si la question est vide
-                else:
-                    question_clean = ""  # Valeur par défaut si la variable n'est pas définie
+            else:
+                question_clean = ""  # Valeur par défaut si la variable n'est pas définie
 
             # Encodage des questions et calcul des similarités
             questions_connues = list(base_savoir.keys())
