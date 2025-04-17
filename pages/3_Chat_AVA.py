@@ -1137,9 +1137,8 @@ if question:
         question_raw = st.text_input("Posez votre question :")
         message_bot  = None
 
-        # --- Bloc d'intelligence sémantique locale ---
-        if question_raw:
-            # 1️⃣ Nettoyage
+        # 3) Bloc sémantique
+        if question_raw and not message_bot:
             question_clean = nettoyer_texte(question_raw)
 
             # 2️⃣ Réponses « hard‑codées »
@@ -1216,14 +1215,10 @@ if question:
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
 
-        # 4️⃣ Fallback vers la fonction principale si toujours aucune réponse
         if question_raw and not message_bot:
             message_bot = obtenir_reponse_ava(question_raw)
-
-        # 5️⃣ Affichage du résultat
         if message_bot:
             st.write(message_bot)
-
         
 
         # --- Bloc Mini base générale (culture quotidienne) ---
