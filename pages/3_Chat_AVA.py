@@ -1419,8 +1419,21 @@ if question:
                 if question_base in qc:
                     message_bot = reponse_base
                     break
-                
-            # --- Modules personnalisés (à enrichir) ---
+           
+        # --- Interface utilisateur ---
+        st.title("💬 Chat AVA")
+
+        question_raw = st.chat_input("Posez votre question ici :")
+
+        if question_raw:
+            message_bot = trouver_reponse(question_raw)
+
+            with st.chat_message("user"):
+                st.markdown(question_raw)
+
+            with st.chat_message("assistant"):
+                st.markdown(message_bot)
+        # --- Modules personnalisés (à enrichir) ---
             def gerer_modules_speciaux(qc):
             if "analyse" in qc and "btc" in qc:
                 return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
@@ -1436,21 +1449,6 @@ if question:
                 ]
                 return random.choice(blagues)
             return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
-            
-        # --- Interface utilisateur ---
-        st.title("💬 Chat AVA")
-
-        question_raw = st.chat_input("Posez votre question ici :")
-
-        if question_raw:
-            message_bot = trouver_reponse(question_raw)
-
-            with st.chat_message("user"):
-                st.markdown(question_raw)
-
-            with st.chat_message("assistant"):
-                st.markdown(message_bot)
-
             
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
