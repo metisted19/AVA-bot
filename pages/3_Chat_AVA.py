@@ -1233,8 +1233,8 @@ if question:
             with st.chat_message("assistant"):
                 st.markdown(message_bot)
 
-            # --- Bloc Mini base générale (culture quotidienne) ---
-            if not message_bot:
+        # --- Bloc Mini base générale (culture quotidienne) ---
+        if not message_bot:
 
             base_generale = {
                 # 🌍 Météo & nature
