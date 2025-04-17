@@ -1191,32 +1191,33 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
-        # --- Moteur de réponse simplifié
         def trouver_reponse(question):
             qc = nettoyer_texte(question)
+            st.write("🧼 Texte nettoyé :", qc)
+
             base = reponses_courantes
 
-            # Direct
             if qc in base:
+                st.write("✅ Match direct trouvé")
                 return base[qc]
 
-            # Fuzzy
             proche = difflib.get_close_matches(qc, base.keys(), n=1, cutoff=0.85)
             if proche:
+                st.write(f"🔎 Match fuzzy trouvé : {proche[0]}")
                 return base[proche[0]]
 
-            # Sémantique
             keys = list(base.keys())
             vb = model_semantic.encode(keys)
             vq = model_semantic.encode([qc])[0]
             sims = cosine_similarity([vq], vb)[0]
             best, score = max(zip(keys, sims), key=lambda x: x[1])
+            st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
 
             if score > 0.7:
                 return base[best]
 
-            # Fallback
-            return "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖"
+            return "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !"
+
 
         # --- Interface test
         st.title("🧪 Test AVA Light")
