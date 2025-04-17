@@ -1405,6 +1405,13 @@ if question:
 
         # --- Bloc d'intelligence sémantique locale ---
         if not message_bot:
+            # Dictionnaire des réponses courantes
+            reponses_courantes = {
+                "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+                "ça va": "Je vais bien, merci de demander ! Et vous ?",
+                "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+                "hello": "Hello! How can I assist you today?"
+            }
             base_savoir = {
                 # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
                 "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
