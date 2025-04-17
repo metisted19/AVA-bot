@@ -1047,6 +1047,11 @@ if question:
 
         # --- Bloc Faits Insolites ---
         # Liste des faits insolites (définie une seule fois)
+        # Gestion de la demande "fait insolite"
+        if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
+            if 'derniere_fait' not in st.session_state:
+                st.session_state['derniere_fait'] = random.choice(faits_insolites)
+            message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
         faits_insolites = [
             "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
             "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
@@ -1095,12 +1100,7 @@ if question:
             "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
         ]
 
-        # Gestion de la demande "fait insolite"
-        if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
-            if 'derniere_fait' not in st.session_state:
-                st.session_state['derniere_fait'] = random.choice(faits_insolites)
-            message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
-
+        
         # Gestion de la demande "encore un" ou "plus" pour les faits insolites
         if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
             if 'derniere_fait' in st.session_state:
@@ -1112,6 +1112,12 @@ if question:
 
         # --- Bloc Recettes rapides ---
         # Liste des recettes rapides (définie une seule fois)
+        # Gestion de la demande de recette
+        if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+            if 'derniere_recette' not in st.session_state:
+                st.session_state['derniere_recette'] = random.choice(recettes)
+
+        message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
         recettes = [
             "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
             "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
@@ -1152,12 +1158,7 @@ if question:
             "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
         ]
 
-        # Gestion de la demande de recette
-        if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
-            if 'derniere_recette' not in st.session_state:
-                st.session_state['derniere_recette'] = random.choice(recettes)
-
-        message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
+        
 
         # Gestion de la demande "encore un" ou "plus" pour les recettes
         if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
