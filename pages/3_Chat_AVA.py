@@ -1178,8 +1178,8 @@ if question:
                                                   cutoff=0.8)
             if close:
                 message_bot = reponses_courantes[close[0]]
-            st.write("DEBUG – question_clean :", repr(question_clean))
-            st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])    
+        st.write("DEBUG – question_clean :", repr(question_clean))
+        st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])    
 
             # C) Matching sémantique si toujours rien
             
