@@ -1139,8 +1139,8 @@ if question:
         if question_raw:
             # A) Nettoyage
             question_clean = question_raw.lower().strip
-        st.write("DEBUG – question_clean :", repr(question_clean))
-        st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])    
+            st.write("DEBUG – question_clean :", repr(question_clean))
+            st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])    
 
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
