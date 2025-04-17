@@ -1094,20 +1094,15 @@ if question:
             "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
             "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
         ]
-        # Initialisation de dernier_type
-        if 'dernier_type' not in st.session_state:
-            st.session_state['dernier_type'] = None
-
         # Gestion de la demande "fait insolite"
         if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
             if 'derniere_fait' not in st.session_state:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
-            st.session_state['dernier_type'] = 'fait_insolite'
             message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
         # Gestion de la demande "encore un" ou "plus" pour les faits insolites
-        elif any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
-            if st.session_state['dernier_type'] == 'fait_insolite' and 'derniere_fait' in st.session_state:
+        if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
+            if 'derniere_fait' in st.session_state:
                 message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
@@ -1158,12 +1153,12 @@ if question:
         if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
             if 'derniere_recette' not in st.session_state:
                 st.session_state['derniere_recette'] = random.choice(recettes)
-            st.session_state['dernier_type'] = 'recette'
+
             message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
 
         # Gestion de la demande "encore un" ou "plus" pour les recettes
-        elif any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
-            if st.session_state['dernier_type'] == 'recette' and 'derniere_recette' in st.session_state:
+        if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
+            if 'derniere_recette' in st.session_state:
                 message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
