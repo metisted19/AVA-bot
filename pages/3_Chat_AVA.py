@@ -1170,17 +1170,15 @@ if question:
             # Essai d'accès direct
             message_bot = reponses_courantes.get(question_clean)
 
-            # B.2) Si rien, tentative fuzzy (tolérance 80%)
             if not message_bot:
-                close = difflib.get_close_matches(question_clean,
-                                                  reponses_courantes.keys(),
-                                                  n=1,
-                                                  cutoff=0.8)
-                if close:
-                    message_bot = reponses_courantes[close[0]]
-            
-
-            # C) Matching sémantique si toujours rien
+                close = difflib.get_close_matches(
+                    question_clean,
+                    reponses_courantes.keys(),
+                    n=1,
+                    cutoff=0.8
+               ) 
+            if close:
+                message_bot = reponses_courantes[close[0]]
             
                 base_savoir = {
                     # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
