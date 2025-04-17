@@ -1211,7 +1211,7 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
-             st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
+            st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
 
             # C) Lookup strict
             message_bot = reponses_courantes.get(question_clean)
