@@ -1163,7 +1163,7 @@ if question:
             }
         # 2.a. Si c’est exact, on renvoie tout de suite
         if question_clean in reponses_courantes:
-            message_bot = reponses_courantes[question_clean
+            message_bot = reponses_courantes[question_clean]
 
         # 3. Si pas de réponse « hard‑codée », on utilise le matching sémantique
         else:
