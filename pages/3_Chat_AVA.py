@@ -16,7 +16,8 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
 import unicodedata, re
 import difflib
-from fonctions_chat import obtenir_reponse_ava 
+import urllib.parse
+
 
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -554,8 +555,8 @@ if question:
             # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
             return gerer_modules_speciaux(qc)
 
-        # --- Modules personnalisés (à enrichir) ---
-                def gerer_modules_speciaux(qc):
+            # --- Modules personnalisés (à enrichir) ---
+            def gerer_modules_speciaux(qc):
             if "analyse" in qc and "btc" in qc:
                 return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
             if "horoscope" in qc:
@@ -674,7 +675,8 @@ if question:
                 if cle in qc:
                     message_bot = rep
                     break
-        # Fonction humeur dynamique selon l'heure
+
+        def humeur_du_jour():
             heure = datetime.now().hour
             if heure < 8:
                 return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
@@ -776,7 +778,7 @@ if question:
             if match:
                 pays_detecte = match.group(1).strip().lower()
             else:
-                tokens = QC.split()
+                tokens = qc.split()
                 if len(tokens) >= 2:
                     pays_detecte = tokens[-1].strip(" ?!.,;").lower()
             capitales = {
