@@ -24,9 +24,16 @@ from fonctions_meteo import obtenir_meteo, get_meteo_ville  # À redéfinir just
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# 1️⃣ Assure-toi que cette ligne existe et **en premier** :
+question_raw = st.text_input("Posez votre question :")
+
+# 2️⃣ Initialise aussi message_bot pour éviter d’autres NameError
+message_bot = None
+
+# 3️⃣ Ton modèle et le reste de la config
 @st.cache_resource
 def load_semantic_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    return SentenceTransformer("all‑MiniLM‑L6‑v2")
 
 model_semantic = load_semantic_model()
 
