@@ -563,7 +563,6 @@ if question:
                 return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
             if "météo" in qc and "paris" in qc:
                 return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-            # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
             if "blague" in qc:
                 blagues = [
                     "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
@@ -571,7 +570,8 @@ if question:
                     "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
                 ]
                 return random.choice(blagues)
-
+            return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
+            
         # --- Bloc Réponses médicales explicites ---
         elif not message_bot and any(mot in qc for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
             "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
