@@ -1125,6 +1125,77 @@ if question:
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
+        # --- Bloc d'intelligence sémantique locale ---
+        if not message_bot:
+            # Dictionnaire des réponses courantes
+            reponses_courantes = {
+                "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+                "ça va": "Je vais bien, merci de demander ! Et vous ?",
+                "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+                "hello": "Hello! How can I assist you today?",
+                "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+                "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+                "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+                "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+                "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+                "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+                "tu m'entends": "Je vous entends fort et clair 🎧",
+                "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+                "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+                "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+                "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+                "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+                "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+                "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+                "re": "Re bienvenue à bord ! On continue notre mission ?",
+                "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+                "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+                "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+                "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+                "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
+            }
+            base_savoir = {
+                # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
+                "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
+                "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
+                "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
+                "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
+                "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
+                "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+                "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
+                "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
+                "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
+                "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
+                "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
+                "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+                "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
+                "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
+                "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
+                "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
+                "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+                "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
+                "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
+                "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
+                "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
+                "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
+                "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
+                "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
+                "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
+                "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
+                "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
+            }
+
+            questions_connues = list(base_savoir.keys())
+            vecteurs_base = model_semantic.encode(questions_connues)
+            vecteur_question = model_semantic.encode([question_clean])
+            similarites = cosine_similarity([vecteur_question[0]], vecteurs_base)[0]
+
+            meilleure_correspondance = max(zip(questions_connues, similarites), key=lambda x: x[1])
+
+            if meilleure_correspondance[1] > 0.7:
+                message_bot = base_savoir[meilleure_correspondance[0]]        
+
         
 
         # --- Bloc Mini base générale (culture quotidienne) ---
@@ -1360,76 +1431,7 @@ if question:
                     message_bot = reponse_base
                     break
 
-        # --- Bloc d'intelligence sémantique locale ---
-        if not message_bot:
-            # Dictionnaire des réponses courantes
-            reponses_courantes = {
-                "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
-                "ça va": "Je vais bien, merci de demander ! Et vous ?",
-                "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-                "hello": "Hello! How can I assist you today?",
-                "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-                "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-                "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-                "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-                "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-                "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-                "tu m'entends": "Je vous entends fort et clair 🎧",
-                "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-                "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-                "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
-                "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-                "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
-                "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-                "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
-                "re": "Re bienvenue à bord ! On continue notre mission ?",
-                "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-                "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-                "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-                "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
-                "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
-            }
-            base_savoir = {
-                # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
-                "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
-                "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
-                "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
-                "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
-                "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
-                "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-                "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
-                "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
-                "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
-                "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
-                "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
-                "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
-                "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
-                "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
-                "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
-                "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
-                "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-                "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
-                "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
-                "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
-                "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
-                "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
-                "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
-                "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
-                "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
-                "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
-                "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
-            }
 
-            questions_connues = list(base_savoir.keys())
-            vecteurs_base = model_semantic.encode(questions_connues)
-            vecteur_question = model_semantic.encode([question_clean])
-            similarites = cosine_similarity([vecteur_question[0]], vecteurs_base)[0]
-
-            meilleure_correspondance = max(zip(questions_connues, similarites), key=lambda x: x[1])
-
-            if meilleure_correspondance[1] > 0.7:
-                message_bot = base_savoir[meilleure_correspondance[0]]
 
         
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
