@@ -1448,9 +1448,6 @@ if question:
             with st.chat_message("assistant"):
                 st.markdown(message_bot)
 
-
-
-                message_bot = traduction
             
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
