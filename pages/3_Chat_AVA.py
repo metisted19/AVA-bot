@@ -1176,8 +1176,8 @@ if question:
                                                   reponses_courantes.keys(),
                                                   n=1,
                                                   cutoff=0.8)
-            if close:
-                message_bot = reponses_courantes[close[0]]
+                if close:
+                    message_bot = reponses_courantes[close[0]]
             
 
             # C) Matching sémantique si toujours rien
@@ -1220,23 +1220,25 @@ if question:
                     return SentenceTransformer("all-MiniLM-L6-v2")
                 model_semantic = load_semantic_model()
 
-                # Encodage + similarité
-                vecteurs_base    = model_semantic.encode(questions_connues)
-                vecteur_question = model_semantic.encode([question_clean])[0]
-                sims             = cosine_similarity([vecteur_question], vecteurs_base)[0]
+                # 2.5) Matching sémantique si toujours rien
+                if not message_bot:
+                    # ta base_savoir doit être définie en amont (hors du if)
+                    questions_connues = list(base_savoir.keys())
+                    vecteurs_base     = model_semantic.encode(questions_connues)
+                    vecteur_question  = model_semantic.encode([question_clean])[0]
+                    sims              = cosine_similarity([vecteur_question], vecteurs_base)[0]
 
-                meilleure_q, score = max(zip(questions_connues, sims),
-                                        key=lambda x: x[1])
-                if score > 0.7:
-                    message_bot = base_savoir[meilleure_q]
+                    meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
+                    if score > 0.7:
+                        message_bot = base_savoir[meilleure_q]
 
-            # D) Dernier recours : appel à ta fonction principale
-            if not message_bot:
+                # 2.6) Dernier recours : appel à ta fonction principale
+                if not message_bot:
                 message_bot = obtenir_reponse_ava(question_raw)
 
-        # 3️⃣ Affichage
-        if message_bot:
-            st.write(message_bot)
+            # 3) Affichage final
+            if message_bot:
+               st.write(message_bot)
         
 
         # --- Bloc Mini base générale (culture quotidienne) ---
