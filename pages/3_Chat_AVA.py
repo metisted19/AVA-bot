@@ -105,19 +105,7 @@ def traduire_texte(texte, langue_dest):
     except:
         return texte  # fallback
 
-# Fonction humeur dynamique selon l'heure
-def humeur_du_jour():
-    heure = datetime.now().hour
-    if heure < 8:
-        return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
-    elif heure < 12:
-        return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
-    elif heure < 17:
-        return "💼 Focus total sur les marchés, on décortique tout ensemble !"
-    elif heure < 21:
-        return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
-    else:
-        return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
+
 
 
 heure_actuelle = datetime.now().hour
@@ -287,508 +275,7 @@ if question:
             else:
                 message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
             actus_repondu = True
-
-            
-
-        # --- Blagues ---
-        elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
-            blagues = [
-                "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
-                "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
-                "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
-            ]
-            message_bot = random.choice(blagues)
-            blague_repondu = True
-
-        # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
-        if not message_bot and any(phrase in question_clean for phrase in [
-            "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
-            "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
-        ]):
-            if "tête" in question_clean:
-                message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
-            elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
-                message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
-            elif "gorge" in question_clean:
-                message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
-            elif "ventre" in question_clean:
-                message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
-            elif "toux" in question_clean or "je tousse" in question_clean:
-                message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
-            elif "nez" in question_clean:
-                message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
-            elif "transpire" in question_clean or "j'ai froid" in question_clean:
-                message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
-
-            
-        # --- Bloc Remèdes naturels ---
-        if not message_bot and any(phrase in question_clean for phrase in [
-                "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
-                "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
-        ]):
-            if "stress" in question_clean:
-                message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
-            elif "mal de gorge" in question_clean or "gorge" in question_clean:
-                message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
-            elif "rhume" in question_clean or "nez bouché" in question_clean:
-                message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
-            elif "fièvre" in question_clean:
-                message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
-            elif "digestion" in question_clean or "ventre" in question_clean:
-                message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
-            elif "toux" in question_clean:
-                message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
-            elif "insomnie" in question_clean or "sommeil" in question_clean:
-                message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
-            elif "brûlure d'estomac" in question_clean or "reflux" in question_clean:
-                message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
-            elif "peau" in question_clean or "acné" in question_clean:
-                message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
-            elif "fatigue" in question_clean:
-                message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
-            elif "maux de tête" in question_clean or "migraine" in question_clean:
-                message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
-            elif "nausée" in question_clean:
-                message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
-            elif "crampes" in question_clean:
-                message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
-            elif "dépression" in question_clean:
-                message_bot = "🖤 Millepertuis (à surveiller si tu prends déjà un traitement), lumière naturelle quotidienne, et activités créatives relaxantes."
-            elif "allergie" in question_clean:
-                message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
-            elif "eczéma" in question_clean or "démangeaisons" in question_clean:
-                message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
-            elif "arthrose" in question_clean or "articulations" in question_clean:
-                message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
-            elif "ballonnements" in question_clean:
-                message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
-            elif "anxiété" in question_clean:
-                message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
-            elif "brûlure légère" in question_clean or "brûlure" in question_clean:
-                message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
-            elif "circulation" in question_clean or "jambes lourdes" in question_clean:
-                message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
-            elif "foie" in question_clean or "digestion difficile" in question_clean:
-                message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
-            elif "yeux fatigués" in question_clean:
-                message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
-            elif "système immunitaire" in question_clean or "immunité" in question_clean:
-                message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
-            elif "tensions musculaires" in question_clean:
-                message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
-            elif "transpiration excessive" in question_clean:
-                message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
-            elif "inflammation" in question_clean:
-                message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
-            else:
-                message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
-
-        # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
-            "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
-            "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
-            "ballonnements", "brûlures d’estomac", "brûlure d'estomac", "saignement de nez", "mal de dos", "entorse", "tendinite",
-            "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
-            "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne","bradycardie", "tachycardie", "psoriasis", "fibromyalgie", "thyroïde", "cystite", "glaucome", "bruxisme",
-            "arthrose", "hernie discale", "spasmophilie", "urticaire", "coup de chaleur", "luxation", "anxiété",
-            "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique","eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite", "pneumonie",
-            "zona", "épilepsie", "coupure profonde", "hépatite C", "phlébite",
-            "gastro-entérite", "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
-
-
-            ]):
-            reponses_medic = {
-                "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
-                "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
-                "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
-                "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et d'une sensibilité à la lumière.",
-                "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
-                "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée nécessitant un suivi médical et une hygiène de vie adaptée.",
-                "stress": "🧘 Le stress peut se soulager par des techniques de relaxation ou une activité physique modérée.",
-                "toux": "😷 Une toux sèche peut être le signe d'une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
-                "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
-                "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
-                "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
-                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous.",
-                "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
-                "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
-                "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
-                "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
-                "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques.",
-                "anémie": "🩸 Fatigue, pâleur, essoufflement. Manque de fer ? Misez sur viande rouge, lentilles, épinards !",
-                "insomnie": "🌙 Difficultés à dormir ? Évitez les écrans avant le coucher, créez une routine apaisante.",
-                "vertige": "🌀 Perte d’équilibre, nausée ? Cela peut venir des oreilles internes. Reposez-vous et évitez les mouvements brusques.",
-                "brûlures": "🔥 Refroidissez rapidement la zone (eau tiède, jamais glacée), puis appliquez une crème apaisante.",
-                "reflux": "🥴 Brûlures d’estomac ? Évitez les repas copieux, le café et dormez la tête surélevée.",
-                "nausée": "🤢 Boissons fraîches, gingembre ou citron peuvent apaiser. Attention si vomissements répétés.",
-                "dépression": "🖤 Fatigue, repli, tristesse persistante ? Parlez-en. Vous n’êtes pas seul(e), des aides existent.",
-                "allergie": "🤧 Éternuements, démangeaisons, yeux rouges ? Pollen, acariens ou poils ? Antihistaminiques peuvent aider.",
-                "palpitations": "💓 Sensation de cœur qui s’emballe ? Cela peut être bénin, mais consultez si cela se répète.",
-                "otite": "👂 Douleur vive à l’oreille, fièvre ? Surtout chez les enfants. Consultez sans tarder.",
-                "sinusite": "👃 Pression au visage, nez bouché, fièvre ? Hydratez-vous, faites un lavage nasal, et consultez si nécessaire.",
-                "crampes": "💥 Hydratez-vous, étirez les muscles concernés. Magnésium ou potassium peuvent aider.",
-                "infections urinaires": "🚽 Brûlures en urinant, besoin fréquent ? Buvez beaucoup d’eau et consultez rapidement.",
-                "fatigue": "😴 Fatigue persistante ? Sommeil insuffisant, stress ou carences. Écoutez votre corps, reposez-vous.",
-                "constipation": "🚽 Alimentation riche en fibres, hydratation et activité physique peuvent soulager naturellement.",
-                "diarrhée": "💧 Boire beaucoup d’eau, manger du riz ou des bananes. Attention si cela persiste plus de 2 jours.",
-                "ballonnements": "🌬️ Évitez les boissons gazeuses, mangez lentement, privilégiez les aliments faciles à digérer.",
-                "brûlures d’estomac": "🔥 Surélevez votre tête la nuit, évitez les plats gras ou épicés. Un antiacide peut aider.",
-                "saignement de nez": "🩸 Penchez la tête en avant, pincez le nez 10 minutes. Si répétitif, consultez.",
-                "mal de dos": "💺 Mauvaise posture ? Étirements doux, repos et parfois un coussin lombaire peuvent soulager.",
-                "entorse": "🦶 Glace, repos, compression, élévation (méthode GREC). Consultez si douleur intense.",
-                "tendinite": "💪 Repos de la zone, glace et mouvements doux. Évitez les efforts répétitifs.",
-                "ampoule": "🦶 Ne percez pas. Nettoyez doucement, couvrez avec un pansement stérile.",
-                "piqûre d’insecte": "🦟 Rougeur, démangeaison ? Lavez à l’eau et au savon, appliquez un gel apaisant.",
-                "bruit dans l'oreille": "🎧 Acouphène ? Bruit persistant dans l’oreille. Repos auditif, réduction du stress, consultez si persistant.",
-                "angoisse": "🧘‍♂️ Respiration profonde, exercices de pleine conscience, écoutez votre corps. Parlez-en si nécessaire.",
-                "boutons de fièvre": "👄 Herpès labial ? Évitez le contact, appliquez une crème spécifique dès les premiers signes.",
-                "lombalgie": "🧍‍♂️ Douleur en bas du dos ? Évitez les charges lourdes, dormez sur une surface ferme.",
-                "périarthrite": "🦴 Inflammation autour d’une articulation. Froid local, repos, et anti-inflammatoires si besoin.",
-                "hallux valgus": "👣 Déformation du gros orteil ? Port de chaussures larges, semelles spéciales ou chirurgie selon le cas.",
-                "bradycardie": "💓 Fréquence cardiaque anormalement basse. Peut être normale chez les sportifs, mais à surveiller si accompagnée de fatigue ou vertiges.",
-                "tachycardie": "💓 Accélération du rythme cardiaque. Peut être liée à l’anxiété, la fièvre ou un problème cardiaque. Consultez si cela se répète.",
-                "psoriasis": "🩹 Maladie de peau chronique provoquant des plaques rouges et squameuses. Hydratation et traitements locaux peuvent apaiser.",
-                "fibromyalgie": "😖 Douleurs diffuses, fatigue, troubles du sommeil. La relaxation, la marche douce et la gestion du stress peuvent aider.",
-                "thyroïde": "🦋 Une thyroïde déréglée peut causer fatigue, nervosité, prise ou perte de poids. Un bilan sanguin peut éclairer la situation.",
-                "cystite": "🚽 Inflammation de la vessie, fréquente chez les femmes. Boire beaucoup d’eau et consulter si symptômes persistants.",
-                "glaucome": "👁️ Maladie oculaire causée par une pression intraoculaire élevée. Risque de perte de vision. Bilan ophtalmo conseillé.",
-                "bruxisme": "😬 Grincement des dents, souvent nocturne. Stress ou tension en cause. Une gouttière peut protéger les dents.",
-                "arthrose": "🦴 Usure des articulations avec l'âge. Douleurs, raideurs. Le mouvement doux est bénéfique.",
-                "hernie discale": "🧍‍♂️ Douleur dans le dos irradiant vers les jambes. Une IRM peut confirmer. Repos, kiné, parfois chirurgie.",
-                "spasmophilie": "🫁 Crises de tremblements, oppression, liées à l’hyperventilation ou au stress. Respiration calme et magnésium peuvent aider.",
-                "urticaire": "🤯 Démangeaisons soudaines, plaques rouges. Souvent allergique. Antihistaminiques efficaces dans la plupart des cas.",
-                "coup de chaleur": "🔥 Survient par forte chaleur. Fatigue, nausée, température élevée. Refroidissement rapide nécessaire.",
-                "luxation": "🦴 Déplacement d’un os hors de son articulation. Douleur intense, immobilisation, urgence médicale.",
-                "anxiété": "🧠 Tension intérieure, nervosité. La relaxation, la respiration guidée ou un suivi thérapeutique peuvent aider.",
-                "torticolis": "💢 Douleur vive dans le cou, souvent due à une mauvaise position ou un faux mouvement. Chaleur et repos sont recommandés.",
-                "eczéma de contact": "🌿 Réaction cutanée suite à un contact avec une substance. Évitez le produit irritant et appliquez une crème apaisante.",
-                "hypoglycémie": "🩸 Baisse de sucre dans le sang : fatigue, sueurs, vertiges. Une boisson sucrée ou un fruit aident à rétablir rapidement.",
-                "apnée du sommeil": "😴 Arrêts respiratoires nocturnes. Somnolence, fatigue. Une consultation spécialisée est recommandée.",
-                "brûlure chimique": "🧪 Rincer abondamment à l’eau tiède (15-20 minutes) et consulter rapidement. Ne pas appliquer de produit sans avis médical.",
-                "eczéma atopique": "🧴 Forme chronique d’eczéma liée à des allergies. Utilisez des crèmes hydratantes et évitez les allergènes connus.",
-                "syndrome des jambes sans repos": "🦵 Sensations désagréables dans les jambes le soir, besoin de bouger. Une bonne hygiène de sommeil peut aider.",
-                "colique néphrétique": "🧊 Douleur intense dans le dos ou le côté, souvent due à un calcul rénal. Hydratation et consultation urgente recommandées.",
-                "hépatite": "🩸 Inflammation du foie, souvent virale. Fatigue, jaunisse, nausées. Nécessite un suivi médical.",
-                "pneumonie": "🫁 Infection pulmonaire sérieuse, accompagnée de fièvre, toux, et douleur thoracique. Consultez rapidement.",
-                "zona": "🔥 Éruption douloureuse sur une partie du corps. Cause : réactivation du virus de la varicelle. Consultez dès les premiers signes.",
-                "épilepsie": "⚡ Trouble neurologique provoquant des crises. Suivi médical strict indispensable.",
-                "coupure profonde": "🩹 Nettoyez, appliquez une pression pour arrêter le saignement et consultez si elle est profonde ou large.",
-                "hépatite C": "🧬 Infection virale du foie souvent silencieuse. Un dépistage est important pour un traitement efficace.",
-                "phlébite": "🦵 Caillot dans une veine, souvent au mollet. Douleur, rougeur, chaleur. Consultez en urgence.",
-                "gastro-entérite": "🤢 Diarrhée, vomissements, crampes. Repos, hydratation et alimentation légère sont essentiels.",
-                "blessure musculaire": "💪 Repos, glace et compression. Évitez de forcer. Étirement progressif après quelques jours.",
-                "tendinopathie": "🎾 Inflammation des tendons suite à un effort. Repos, glace et parfois kinésithérapie sont recommandés.",
-                "œil rouge": "👁️ Allergie, infection ou fatigue ? Si douleur ou vision floue, consultez rapidement.",
-                "perte d'odorat": "👃 Souvent liée à un virus comme la COVID-19. Hydratez-vous et surveillez les autres symptômes."
-
-            }
-            for cle, rep in reponses_medic.items():
-                if cle in question_clean:
-                    message_bot = rep
-                    break
-
-        # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
-        elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
-            pays_detecte = None
-            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
-            if match:
-                pays_detecte = match.group(1).strip().lower()
-            else:
-                tokens = question_clean.split()
-                if len(tokens) >= 2:
-                    pays_detecte = tokens[-1].strip(" ?!.,;").lower()
-            capitales = {
-                    "france"           : "Paris", 
-                    "espagne"          : "Madrid",
-                    "italie"           : "Rome",
-                    "allemagne"        : "Berlin",
-                    "japon"            : "Tokyo",
-                    "japonaise"        : "Tokyo",
-                    "chine"            : "Pékin",
-                    "brésil"           : "Brasilia",
-                    "mexique"          : "Mexico",
-                    "canada"           : "Ottawa",
-                    "états-unis"       : "Washington",
-                    "usa"              : "Washington",
-                    "united states"    : "Washington",
-                    "inde"             : "New Delhi",
-                    "portugal"         : "Lisbonne",
-                    "royaume-uni"      : "Londres",
-                    "angleterre"       : "Londres",
-                    "argentine"        : "Buenos Aires",
-                    "maroc"            : "Rabat",
-                    "algérie"          : "Alger",
-                    "tunisie"          : "Tunis",
-                    "turquie"          : "Ankara",
-                    "russie"           : "Moscou",
-                    "russe"            : "Moscou",
-                    "australie"        : "Canberra",
-                    "corée du sud"     : "Séoul",
-                    "corée"            : "Séoul",
-                    "corée du nord"    : "Pyongyang",
-                    "vietnam"          : "Hanoï",
-                    "thailande"        : "Bangkok",
-                    "indonésie"        : "Jakarta",
-                    "malaisie"         : "Kuala Lumpur",
-                    "singapour"        : "Singapour",
-                    "philippines"      : "Manille",
-                    "pakistan"         : "Islamabad",
-                    "bangladesh"       : "Dacca",
-                    "sri lanka"        : "Colombo",
-                    "népal"            : "Katmandou",
-                    "iran"             : "Téhéran",
-                    "irak"             : "Bagdad",
-                    "syrie"            : "Damas",
-                    "liban"            : "Beyrouth",
-                    "jordanie"         : "Amman",
-                    "israël"           : "Jérusalem",
-                    "palestine"        : "Ramallah",
-                    "qatar"            : "Doha",
-                    "oman"             : "Mascate",
-                    "yémen"            : "Sanaa",
-                    "afghanistan"      : "Kaboul",
-                    "émirats arabes unis" : "Abou Dabi",
-                    "sénégal"          : "Dakar",
-                    "côte d'ivoire"    : "Yamoussoukro",
-                    "mali"             : "Bamako",
-                    "niger"            : "Niamey",
-                    "tchad"            : "N'Djaména",
-                    "burkina faso"     : "Ouagadougou",
-                    "congo"            : "Brazzaville",
-                    "rd congo"         : "Kinshasa",
-                    "kenya"            : "Nairobi",
-                    "éthiopie"         : "Addis-Abeba",
-                    "ghana"            : "Accra",
-                    "zambie"           : "Lusaka",
-                    "zimbabwe"         : "Harare",
-                    "soudan"           : "Khartoum",
-                    "botswana"         : "Gaborone",
-                    "namibie"          : "Windhoek",
-                    "madagascar"       : "Antananarivo",
-                    "mozambique"       : "Maputo",
-                    "angola"           : "Luanda",
-                    "libye"            : "Tripoli",
-                    "egypte"           : "Le Caire",
-                    "grèce"            : "Athènes",
-                    "pologne"          : "Varsovie",
-                    "ukraine"          : "Kyiv",
-                    "roumanie"         : "Bucarest",
-                    "bulgarie"         : "Sofia",
-                    "serbie"           : "Belgrade",
-                    "croatie"          : "Zagreb",
-                    "slovénie"         : "Ljubljana",
-                    "hongrie"          : "Budapest",
-                    "tchéquie"         : "Prague",
-                    "slovaquie"        : "Bratislava",
-                    "suède"            : "Stockholm",
-                    "norvège"          : "Oslo",
-                    "finlande"         : "Helsinki",
-                    "islande"          : "Reykjavik",
-                    "belgique"         : "Bruxelles",
-                    "pays-bas"         : "Amsterdam",
-                    "irlande"          : "Dublin",
-                    "suisse"           : "Berne",
-                    "colombie"         : "Bogota",
-                    "pérou"            : "Lima",
-                    "chili"            : "Santiago",
-                    "équateur"         : "Quito",
-                    "uruguay"          : "Montevideo",
-                    "paraguay"         : "Asuncion",
-                    "bolivie"          : "Sucre",
-                    "venezuela"        : "Caracas",
-                    "cuba"             : "La Havane",
-                    "haïti"            : "Port-au-Prince",
-                    "république dominicaine" : "Saint-Domingue",
-                    "nicaragua"        : "Managua",
-                    "honduras"         : "Tegucigalpa",
-                    "guatemala"        : "Guatemala",
-                    "salvador"         : "San Salvador",
-                    "panama"           : "Panama",
-                    "costarica"        : "San José",
-                    "jamaïque"         : "Kingston",
-                    "bahamas"          : "Nassau",
-                    "barbade"          : "Bridgetown",
-                    "trinité-et-tobago": "Port of Spain",
-                    "kazakhstan"       : "Noursoultan",
-                    "ouzbekistan"      : "Tachkent",
-                    "turkménistan"     : "Achgabat",
-                    "kirghizistan"     : "Bichkek",
-                    "mongolie"         : "Oulan-Bator",
-                    "géorgie"          : "Tbilissi",
-                    "arménie"          : "Erevan",
-                    "azerbaïdjan"      : "Bakou",
-                    "nouvelles-zélande": "Wellington",
-                    "fidji"            : "Suva",
-                    "palaos"           : "Ngerulmud",
-                    "papouasie-nouvelle-guinée" : "Port Moresby",
-                    "samoa"            : "Apia",
-                    "tonga"            : "Nukuʻalofa",
-                    "vanuatu"          : "Port-Vila",
-                    "micronésie"       : "Palikir",
-                    "marshall"         : "Majuro",
-                    "tuvalu"           : "Funafuti",
-                    "bhoutan"          : "Thimphou",
-                    "maldives"         : "Malé",
-                    "laos"             : "Vientiane",
-                    "cambodge"         : "Phnom Penh",
-                    "brunei"           : "Bandar Seri Begawan",
-                    "timor oriental"   : "Dili",
-                    "somalie"           : "Mogadiscio",
-                    "tanzanie"          : "Dodoma",
-                    "ouganda"           : "Kampala",
-                    "rwanda"            : "Kigali",
-                    "burundi"           : "Bujumbura",
-                    "malawi"            : "Lilongwe",
-                    "sierra leone"      : "Freetown",
-                    "libéria"           : "Monrovia",
-                    "guinée"            : "Conakry",
-                    "guinée-bissau"     : "Bissau",
-                    "guinée équatoriale": "Malabo",
-                    "gambie"            : "Banjul",
-                    "cap-vert"          : "Praia",
-                    "swaziland"         : "Mbabane",
-                    "lesotho"           : "Maseru",
-                    "bénin"             : "Porto-Novo",
-                    "togo"              : "Lomé",
-                    "gabon"             : "Libreville",
-                    "république centrafricaine": "Bangui",
-                    "eswatini"          : "Mbabane",  # anciennement Swaziland
-                    "suriname"          : "Paramaribo",
-                    "guyana"            : "Georgetown",
-                    "dominique"         : "Roseau",
-                    "sainte-lucie"      : "Castries",
-                    "saint-vincent-et-les-grenadines": "Kingstown",
-                    "saint-christophe-et-niévès"    : "Basseterre",
-                    "saint-marin"       : "Saint-Marin",
-                    "liechtenstein"     : "Vaduz",
-                    "andorre"           : "Andorre-la-Vieille",
-                    "vatican"           : "Vatican",
-                    "luxembourg"        : "Luxembourg",
-                    "monténégro"        : "Podgorica",
-                    "macédoine du nord" : "Skopje",
-                    "bosnie-herzégovine": "Sarajevo"
-
-            }
-            if pays_detecte and pays_detecte in capitales:
-                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
-            else:
-                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
-
-        # --- Bloc Réponses personnalisées enrichies ---
-        if not message_bot:
-            if any(phrase in question_clean for phrase in ["ça va", "tu vas bien", "comment tu vas"]):
-                message_bot = "✨ Toujours opérationnelle et prête à analyser les marchés ! Et vous, tout roule ?"
-            elif "tu fais quoi" in question_clean:
-                message_bot = "🤖 J’analyse en silence, je prévois des tendances, je veille sur les marchés... et j’attends vos questions avec impatience !"
-            elif "tu es qui" in question_clean:
-                message_bot = "Je suis AVA, votre assistante IA futuriste, connectée aux marchés et aux infos pour vous guider chaque jour 🌐📊"
-            elif "tu dors" in question_clean or "tu es réveillée" in question_clean:
-                message_bot = "🌙 Dormir ? Jamais ! Je suis toujours en veille, prête à analyser, même à 3h du matin !"
-            elif "dis bonjour" in question_clean:
-                message_bot = "👋 Bonjour ! Ravie de vous voir connecté(e). Une analyse ? Une blague ? Je suis dispo pour tout ça !"
-            elif "tu m'entends" in question_clean or "tu es là" in question_clean:
-                message_bot = "🔊 Oui, je suis ici ! Connectée, attentive, et prête à répondre."
-            elif "tu veux jouer" in question_clean or "on joue" in question_clean:
-                message_bot = "🎮 Pourquoi pas ? Je peux lancer un quiz, raconter une devinette ou simplement discuter !"
-            elif "tu mens" in question_clean:
-                message_bot = "😇 Je fonctionne avec des données vérifiées, mais je peux me tromper... comme les humains !"
-            elif "tu m'oublies" in question_clean:
-                message_bot = "🧠 Impossible ! Vous êtes dans ma mémoire maintenant. Et j’ai une excellente mémoire."
-            elif "raconte une blague" in question_clean:
-                message_bot = "😂 Quelle est la cryptomonnaie préférée des vampires ? Le Bit-sang !"
-            elif "t'es marrante" in question_clean:
-                message_bot = "😄 Merci ! J’essaie de mêler finance et fun, c’est pas toujours évident !"
-            elif "t'as une passion" in question_clean:
-                message_bot = "📊 L’analyse des marchés, les faits insolites et aider les humains… c’est un bon programme non ?"
-            elif "je suis triste" in question_clean or "je vais mal" in question_clean:
-                message_bot = "💛 Je suis désolée de l'entendre. Vous n’êtes pas seul(e), je suis là si vous voulez discuter un peu."
-            else:
-                reponses_perso = {
-                    "merci": ["Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
-                    "je t'aime": ["💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions"],
-                    "un secret": ["🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…"],
-                    "tu es belle": ["😍 Merci ! C’est le code qui fait tout… et un peu la lumière LED !", "💅 Flattée, même en version binaire.", "🪞 Vous me voyez vraiment ? Je rougis (virtuellement) !"],
-                    "je suis fatigué": ["😴 Reposez-vous bien, le cerveau a aussi besoin de sa pause comme les marchés le week-end !", "🛌 Une tisane et au dodo. Demain sera plus lumineux."],
-                    "t'es intelligente": ["🧠 Merci ! J’ai été entraînée pour ça, mais vos compliments me boostent encore plus.", "💡 On me dit souvent ça. Merci !"],
-                    "je m'ennuie": ["🎲 Je peux vous faire un quiz ou vous raconter un fait insolite si vous voulez ?", "📚 Et si je vous surprenais avec une anecdote ? Dites 'fait insolite' !"]
-                }
-                for cle, reponses in reponses_perso.items():
-                    if cle in question_clean:
-                        message_bot = random.choice(reponses)
-                        perso_repondu = True
-                        break
-
-        # --- Bloc Punchlines motivationnelles ---
-        if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
-            punchlines = [
-                "🚀 *N’attends pas les opportunités. Crée-les.*",
-                "🔥 *Chaque bougie japonaise est une chance de rebondir.*",
-                "⚡ *La discipline bat la chance sur le long terme.*",
-                "🌟 *Tu ne trades pas juste des actifs, tu construis ton avenir.*",
-                "💪 *Même dans un marché baissier, ta volonté peut monter en flèche.*",
-                "🏁 *Les gagnants n’abandonnent jamais, les perdants n’essaient même pas.*",
-                "🎯 *Rêve grand, agis fort, ajuste vite.*",
-                "⏳ *Le temps est ton meilleur allié… ou ton pire ennemi.*",
-                "🧠 *Ce n’est pas le marché qui te limite. C’est ta vision.*",
-                "🦾 *Chaque difficulté est une opportunité camouflée.*",
-                "📈 *Ta plus belle courbe, c’est celle de ta progression.*",
-                "💼 *Travaille en silence, laisse tes gains faire le bruit.*",
-                "🔮 *Prédis l’avenir ? Non. Prépare-toi à l’écrire.*",
-                "🌌 *Le doute tue plus de rêves que l’échec.*",
-                "🛠️ *Construis-toi un mindset solide avant de construire ton portefeuille.*",
-                "🧭 *Quand tu sais où tu vas, même les tempêtes deviennent utiles.*"
-            ]
-            message_bot = random.choice(punchlines)
-
-        # --- Bloc Culture Générale (questions simples) ---
-        if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
-            base_connaissances = {
-                    "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
-                    "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de **Tesla**.",
-                    "combien y a-t-il de pays dans le monde": "🌍 Il y a actuellement **195 pays reconnus** dans le monde.",
-                    "quelle est la capitale de la france": "📍 La capitale de la France est **Paris**.",
-                    "quel est le plus grand océan": "🌊 L'océan Pacifique est le plus grand au monde.",
-                    "quelle est la distance entre la terre et la lune": "🌕 En moyenne, la distance est de **384 400 km** entre la Terre et la Lune.",
-                    "quel est l’élément chimique o": "🧪 L'élément chimique 'O' est **l'oxygène**.",
-                    "qui a écrit roméo et juliette": "🎭 C'est **William Shakespeare** qui a écrit *Roméo et Juliette*.",
-                    "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
-                    "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-                    "qui a marché sur la lune en premier": "👨‍🚀 **Neil Armstrong** a été le premier homme à marcher sur la Lune en 1969.",
-                    "quelle est la plus haute montagne du monde": "🏔️ L’**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
-                    "combien y a-t-il d’os dans le corps humain": "🦴 Le corps humain adulte compte **206 os**.",
-                    "qui a peint la joconde": "🖼️ C’est **Léonard de Vinci** qui a peint *La Joconde*.",
-                    "quelle est la capitale du japon": "🏙️ La capitale du Japon est **Tokyo**.",
-                    "quelle planète est la plus proche du soleil": "☀️ **Mercure** est la planète la plus proche du Soleil.",
-                    "qui a inventé l’électricité": "⚡ L'électricité n’a pas été inventée, mais **Benjamin Franklin** et **Thomas Edison** ont été des figures clés dans sa compréhension et son exploitation.",
-                    "qu’est-ce que l’adn": "🧬 L’**ADN** est le support de l’information génétique chez tous les êtres vivants.",
-                    "quelle est la plus grande forêt du monde": "🌳 L’**Amazonie** est la plus grande forêt tropicale du monde.",
-                    "quel est l’animal terrestre le plus rapide": "🐆 Le **guépard** peut atteindre jusqu’à 110 km/h en vitesse de pointe.",
-                    "qui a écrit harry potter": "📚 C’est **J.K. Rowling** qui a écrit la saga *Harry Potter*.",
-                    "quelle est la température de l’eau qui bout": "💧 L’eau bout à **100°C** à pression atmosphérique normale.",
-                    "quel est le pays le plus peuplé": "👥 **La Chine** est actuellement le pays le plus peuplé du monde.",
-                    "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-                    "qui a découvert l’amérique": "🗺️ C’est **Christophe Colomb** qui a découvert l’Amérique en 1492, du moins pour l’Europe.",
-                    "quelle est la planète la plus grosse": "🪐 **Jupiter** est la plus grosse planète du système solaire.",
-                    "quelle est la vitesse de la lumière": "⚡ La lumière voyage à environ **299 792 km/s** dans le vide.",
-                    "combien de jours dans une année bissextile": "📅 Une année bissextile dure **366 jours**.",
-                    "quelle est la capitale de l’italie": "🇮🇹 La capitale de l’Italie est **Rome**.",
-                    "qui a écrit les misérables": "📖 C’est **Victor Hugo** qui a écrit *Les Misérables*.",
-                    "quelle est la capitale de l’allemagne": "🇩🇪 La capitale de l’Allemagne est **Berlin**.",
-                    "qui est le président de la france": "🇫🇷 Le président actuel de la France est **Emmanuel Macron** (en 2025).",
-                    "quelle est la profondeur de la fosse des mariannes": "🌊 La fosse des Mariannes atteint environ **11 000 mètres** de profondeur.",
-                    "qui a inventé le téléphone": "📞 **Alexander Graham Bell** est l’inventeur du téléphone.",
-                    "quelle est la langue officielle du brésil": "🇧🇷 La langue officielle du Brésil est **le portugais**.",
-                    "combien de muscles dans le corps humain": "💪 Le corps humain compte environ **650 muscles**.",
-                    "quelle est la capitale de la russie": "🇷🇺 La capitale de la Russie est **Moscou**.",
-                    "quand a eu lieu la révolution française": "⚔️ La Révolution française a commencé en **1789**.",
-                    "qui est le créateur de facebook": "🌐 **Mark Zuckerberg** a cofondé Facebook en 2004.",
-                    "quelle est la capitale de la chine": "🇨🇳 La capitale de la Chine est **Pékin**."
-            }
-            for question_cle, reponse in base_connaissances.items():
-                if question_cle in question_clean:
-                    message_bot = reponse
-                    break
-
+ 
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
             nom_simple = question_clean.replace("analyse", "").strip()
@@ -968,10 +455,580 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
         
+        # ─── 4) Bases de réponses ───────────────────────────────────────────────────
+        # 4.a) Hard‑codées
+        reponses_courantes = {
+            "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+            "ça va": "Je vais bien, merci de demander ! Et vous ?",
+            "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+            "hello": "Hello! How can I assist you today?",
+            "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+            "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+            "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+            "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+            "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+            "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+            "tu m'entends": "Je vous entends fort et clair 🎧",
+            "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+            "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+            "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+            "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+            "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+            "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+            "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+            "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+            "re": "Re bienvenue à bord ! On continue notre mission ?",
+            "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+            "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+            "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+            "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+            "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
+            "merci": "Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
+            "je t'aime": "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions",
+            "un secret": "🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…",
+            "tu es belle": "😍 Merci ! C’est le code qui fait tout… et un peu la lumière LED !", "💅 Flattée, même en version binaire.", "🪞 Vous me voyez vraiment ? Je rougis (virtuellement) !",
+            "je suis fatigué": "😴 Reposez-vous bien, le cerveau a aussi besoin de sa pause comme les marchés le week-end !", "🛌 Une tisane et au dodo. Demain sera plus lumineux.",
+            "t'es intelligente": "🧠 Merci ! J’ai été entraînée pour ça, mais vos compliments me boostent encore plus.", "💡 On me dit souvent ça. Merci !",
+            "je m'ennuie": "🎲 Je peux vous faire un quiz ou vous raconter un fait insolite si vous voulez ?", "📚 Et si je vous surprenais avec une anecdote ? Dites 'fait insolite' !"
+        }
+        base_savoir = {
+            # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
+            "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
+            "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
+            "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
+            "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
+            "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
+            "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+            "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
+            "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
+            "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
+            "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
+            "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
+            "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+            "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
+            "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
+            "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
+            "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
+            "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+            "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
+            "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
+            "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
+            "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
+            "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
+            "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
+            "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
+            "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
+            "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
+            "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
+        }
+        # Fusionner les deux dans une base complète
+        base_complet = {**base_savoir, **reponses_courantes}
 
-        
+        # --- Moteur central de réponse AVA ---
+        def trouver_reponse(question):
+            qc = nettoyer_texte(question)
+            st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
+
+            # 1. Direct
+            if qc in base_complet:
+                st.write("✅ Match direct trouvé")
+                return base_complet[qc]
+
+            # 2. Fuzzy
+            proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
+            if proche:
+                st.write(f"🔎 Match fuzzy : {proche[0]}")
+                return base_complet[proche[0]]
+
+            # 3. Sémantique
+            keys = list(base_complet.keys())
+            vb = model_semantic.encode(keys)
+            vq = model_semantic.encode([qc])[0]
+            sims = cosine_similarity([vq], vb)[0]
+            best, score = max(zip(keys, sims), key=lambda x: x[1])
+            st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
+
+            if score > 0.7:
+                return base_complet[best]
+
+            # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
+            return gerer_modules_speciaux(qc)
+
+        # --- Modules personnalisés (à enrichir) ---
+                def gerer_modules_speciaux(qc):
+            if "analyse" in qc and "btc" in qc:
+                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
+            if "horoscope" in qc:
+                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+            if "météo" in qc and "paris" in qc:
+                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+            # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
+            if "blague" in qc:
+                blagues = [
+                    "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
+                    "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
+                    "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
+                ]
+                return random.choice(blagues)
+
+        # --- Bloc Réponses médicales explicites ---
+        elif not message_bot and any(mot in qc for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
+            "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
+            "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
+            "ballonnements", "brûlures d’estomac", "brûlure d'estomac", "saignement de nez", "mal de dos", "entorse", "tendinite",
+            "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
+            "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne","bradycardie", "tachycardie", "psoriasis", "fibromyalgie", "thyroïde", "cystite", "glaucome", "bruxisme",
+            "arthrose", "hernie discale", "spasmophilie", "urticaire", "coup de chaleur", "luxation", "anxiété",
+            "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique","eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite", "pneumonie",
+            "zona", "épilepsie", "coupure profonde", "hépatite C", "phlébite",
+            "gastro-entérite", "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
+
+
+            ]):
+            reponses_medic = {
+                "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
+                "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
+                "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
+                "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et d'une sensibilité à la lumière.",
+                "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
+                "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée nécessitant un suivi médical et une hygiène de vie adaptée.",
+                "stress": "🧘 Le stress peut se soulager par des techniques de relaxation ou une activité physique modérée.",
+                "toux": "😷 Une toux sèche peut être le signe d'une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
+                "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
+                "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
+                "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
+                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous.",
+                "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
+                "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
+                "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
+                "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
+                "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques.",
+                "anémie": "🩸 Fatigue, pâleur, essoufflement. Manque de fer ? Misez sur viande rouge, lentilles, épinards !",
+                "insomnie": "🌙 Difficultés à dormir ? Évitez les écrans avant le coucher, créez une routine apaisante.",
+                "vertige": "🌀 Perte d’équilibre, nausée ? Cela peut venir des oreilles internes. Reposez-vous et évitez les mouvements brusques.",
+                "brûlures": "🔥 Refroidissez rapidement la zone (eau tiède, jamais glacée), puis appliquez une crème apaisante.",
+                "reflux": "🥴 Brûlures d’estomac ? Évitez les repas copieux, le café et dormez la tête surélevée.",
+                "nausée": "🤢 Boissons fraîches, gingembre ou citron peuvent apaiser. Attention si vomissements répétés.",
+                "dépression": "🖤 Fatigue, repli, tristesse persistante ? Parlez-en. Vous n’êtes pas seul(e), des aides existent.",
+                "allergie": "🤧 Éternuements, démangeaisons, yeux rouges ? Pollen, acariens ou poils ? Antihistaminiques peuvent aider.",
+                "palpitations": "💓 Sensation de cœur qui s’emballe ? Cela peut être bénin, mais consultez si cela se répète.",
+                "otite": "👂 Douleur vive à l’oreille, fièvre ? Surtout chez les enfants. Consultez sans tarder.",
+                "sinusite": "👃 Pression au visage, nez bouché, fièvre ? Hydratez-vous, faites un lavage nasal, et consultez si nécessaire.",
+                "crampes": "💥 Hydratez-vous, étirez les muscles concernés. Magnésium ou potassium peuvent aider.",
+                "infections urinaires": "🚽 Brûlures en urinant, besoin fréquent ? Buvez beaucoup d’eau et consultez rapidement.",
+                "fatigue": "😴 Fatigue persistante ? Sommeil insuffisant, stress ou carences. Écoutez votre corps, reposez-vous.",
+                "constipation": "🚽 Alimentation riche en fibres, hydratation et activité physique peuvent soulager naturellement.",
+                "diarrhée": "💧 Boire beaucoup d’eau, manger du riz ou des bananes. Attention si cela persiste plus de 2 jours.",
+                "ballonnements": "🌬️ Évitez les boissons gazeuses, mangez lentement, privilégiez les aliments faciles à digérer.",
+                "brûlures d’estomac": "🔥 Surélevez votre tête la nuit, évitez les plats gras ou épicés. Un antiacide peut aider.",
+                "saignement de nez": "🩸 Penchez la tête en avant, pincez le nez 10 minutes. Si répétitif, consultez.",
+                "mal de dos": "💺 Mauvaise posture ? Étirements doux, repos et parfois un coussin lombaire peuvent soulager.",
+                "entorse": "🦶 Glace, repos, compression, élévation (méthode GREC). Consultez si douleur intense.",
+                "tendinite": "💪 Repos de la zone, glace et mouvements doux. Évitez les efforts répétitifs.",
+                "ampoule": "🦶 Ne percez pas. Nettoyez doucement, couvrez avec un pansement stérile.",
+                "piqûre d’insecte": "🦟 Rougeur, démangeaison ? Lavez à l’eau et au savon, appliquez un gel apaisant.",
+                "bruit dans l'oreille": "🎧 Acouphène ? Bruit persistant dans l’oreille. Repos auditif, réduction du stress, consultez si persistant.",
+                "angoisse": "🧘‍♂️ Respiration profonde, exercices de pleine conscience, écoutez votre corps. Parlez-en si nécessaire.",
+                "boutons de fièvre": "👄 Herpès labial ? Évitez le contact, appliquez une crème spécifique dès les premiers signes.",
+                "lombalgie": "🧍‍♂️ Douleur en bas du dos ? Évitez les charges lourdes, dormez sur une surface ferme.",
+                "périarthrite": "🦴 Inflammation autour d’une articulation. Froid local, repos, et anti-inflammatoires si besoin.",
+                "hallux valgus": "👣 Déformation du gros orteil ? Port de chaussures larges, semelles spéciales ou chirurgie selon le cas.",
+                "bradycardie": "💓 Fréquence cardiaque anormalement basse. Peut être normale chez les sportifs, mais à surveiller si accompagnée de fatigue ou vertiges.",
+                "tachycardie": "💓 Accélération du rythme cardiaque. Peut être liée à l’anxiété, la fièvre ou un problème cardiaque. Consultez si cela se répète.",
+                "psoriasis": "🩹 Maladie de peau chronique provoquant des plaques rouges et squameuses. Hydratation et traitements locaux peuvent apaiser.",
+                "fibromyalgie": "😖 Douleurs diffuses, fatigue, troubles du sommeil. La relaxation, la marche douce et la gestion du stress peuvent aider.",
+                "thyroïde": "🦋 Une thyroïde déréglée peut causer fatigue, nervosité, prise ou perte de poids. Un bilan sanguin peut éclairer la situation.",
+                "cystite": "🚽 Inflammation de la vessie, fréquente chez les femmes. Boire beaucoup d’eau et consulter si symptômes persistants.",
+                "glaucome": "👁️ Maladie oculaire causée par une pression intraoculaire élevée. Risque de perte de vision. Bilan ophtalmo conseillé.",
+                "bruxisme": "😬 Grincement des dents, souvent nocturne. Stress ou tension en cause. Une gouttière peut protéger les dents.",
+                "arthrose": "🦴 Usure des articulations avec l'âge. Douleurs, raideurs. Le mouvement doux est bénéfique.",
+                "hernie discale": "🧍‍♂️ Douleur dans le dos irradiant vers les jambes. Une IRM peut confirmer. Repos, kiné, parfois chirurgie.",
+                "spasmophilie": "🫁 Crises de tremblements, oppression, liées à l’hyperventilation ou au stress. Respiration calme et magnésium peuvent aider.",
+                "urticaire": "🤯 Démangeaisons soudaines, plaques rouges. Souvent allergique. Antihistaminiques efficaces dans la plupart des cas.",
+                "coup de chaleur": "🔥 Survient par forte chaleur. Fatigue, nausée, température élevée. Refroidissement rapide nécessaire.",
+                "luxation": "🦴 Déplacement d’un os hors de son articulation. Douleur intense, immobilisation, urgence médicale.",
+                "anxiété": "🧠 Tension intérieure, nervosité. La relaxation, la respiration guidée ou un suivi thérapeutique peuvent aider.",
+                "torticolis": "💢 Douleur vive dans le cou, souvent due à une mauvaise position ou un faux mouvement. Chaleur et repos sont recommandés.",
+                "eczéma de contact": "🌿 Réaction cutanée suite à un contact avec une substance. Évitez le produit irritant et appliquez une crème apaisante.",
+                "hypoglycémie": "🩸 Baisse de sucre dans le sang : fatigue, sueurs, vertiges. Une boisson sucrée ou un fruit aident à rétablir rapidement.",
+                "apnée du sommeil": "😴 Arrêts respiratoires nocturnes. Somnolence, fatigue. Une consultation spécialisée est recommandée.",
+                "brûlure chimique": "🧪 Rincer abondamment à l’eau tiède (15-20 minutes) et consulter rapidement. Ne pas appliquer de produit sans avis médical.",
+                "eczéma atopique": "🧴 Forme chronique d’eczéma liée à des allergies. Utilisez des crèmes hydratantes et évitez les allergènes connus.",
+                "syndrome des jambes sans repos": "🦵 Sensations désagréables dans les jambes le soir, besoin de bouger. Une bonne hygiène de sommeil peut aider.",
+                "colique néphrétique": "🧊 Douleur intense dans le dos ou le côté, souvent due à un calcul rénal. Hydratation et consultation urgente recommandées.",
+                "hépatite": "🩸 Inflammation du foie, souvent virale. Fatigue, jaunisse, nausées. Nécessite un suivi médical.",
+                "pneumonie": "🫁 Infection pulmonaire sérieuse, accompagnée de fièvre, toux, et douleur thoracique. Consultez rapidement.",
+                "zona": "🔥 Éruption douloureuse sur une partie du corps. Cause : réactivation du virus de la varicelle. Consultez dès les premiers signes.",
+                "épilepsie": "⚡ Trouble neurologique provoquant des crises. Suivi médical strict indispensable.",
+                "coupure profonde": "🩹 Nettoyez, appliquez une pression pour arrêter le saignement et consultez si elle est profonde ou large.",
+                "hépatite C": "🧬 Infection virale du foie souvent silencieuse. Un dépistage est important pour un traitement efficace.",
+                "phlébite": "🦵 Caillot dans une veine, souvent au mollet. Douleur, rougeur, chaleur. Consultez en urgence.",
+                "gastro-entérite": "🤢 Diarrhée, vomissements, crampes. Repos, hydratation et alimentation légère sont essentiels.",
+                "blessure musculaire": "💪 Repos, glace et compression. Évitez de forcer. Étirement progressif après quelques jours.",
+                "tendinopathie": "🎾 Inflammation des tendons suite à un effort. Repos, glace et parfois kinésithérapie sont recommandés.",
+                "œil rouge": "👁️ Allergie, infection ou fatigue ? Si douleur ou vision floue, consultez rapidement.",
+                "perte d'odorat": "👃 Souvent liée à un virus comme la COVID-19. Hydratez-vous et surveillez les autres symptômes."
+
+            }
+            for cle, rep in reponses_medic.items():
+                if cle in qc:
+                    message_bot = rep
+                    break
+        # Fonction humeur dynamique selon l'heure
+            heure = datetime.now().hour
+            if heure < 8:
+                return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
+            elif heure < 12:
+                return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
+            elif heure < 17:
+                return "💼 Focus total sur les marchés, on décortique tout ensemble !"
+            elif heure < 21:
+                return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
+            else:
+                return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
+
+        # --- Bloc Remèdes naturels ---
+        if not message_bot and any(phrase in qc for phrase in [
+                "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
+                "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
+        ]):
+            if "stress" in qc:
+                message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
+            elif "mal de gorge" in qc or "gorge" in qc:
+                message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
+            elif "rhume" in qc or "nez bouché" in qc:
+                message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
+            elif "fièvre" in qc:
+                message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
+            elif "digestion" in qc or "ventre" in qc:
+                message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
+            elif "toux" in qc:
+                message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
+            elif "insomnie" in qc or "sommeil" in qc:
+                message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
+            elif "brûlure d'estomac" in qc or "reflux" in qc:
+                message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
+            elif "peau" in qc or "acné" in qc:
+                message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
+            elif "fatigue" in qc:
+                message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
+            elif "maux de tête" in qc or "migraine" in qc:
+                message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
+            elif "nausée" in qc:
+                message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
+            elif "crampes" in qc:
+                message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
+            elif "dépression" in qc:
+                message_bot = "🖤 Millepertuis (à surveiller si tu prends déjà un traitement), lumière naturelle quotidienne, et activités créatives relaxantes."
+            elif "allergie" in qc:
+                message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
+            elif "eczéma" in qc or "démangeaisons" in qc:
+                message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
+            elif "arthrose" in qc or "articulations" in qc:
+                message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
+            elif "ballonnements" in qc:
+                message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
+            elif "anxiété" in qc:
+                message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
+            elif "brûlure légère" in qc or "brûlure" in qc:
+                message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
+            elif "circulation" in qc or "jambes lourdes" in qc:
+                message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
+            elif "foie" in qc or "digestion difficile" in qc:
+                message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
+            elif "yeux fatigués" in qc:
+                message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
+            elif "système immunitaire" in qc or "immunité" in qc:
+                message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
+            elif "tensions musculaires" in qc:
+                message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
+            elif "transpiration excessive" in qc:
+                message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
+            elif "inflammation" in qc:
+                message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
+            else:
+                message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
+
+        # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
+        if not message_bot and any(phrase in qc for phrase in [
+            "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
+            "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
+        ]):
+            if "tête" in qc:
+                message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
+            elif "fièvre" in qc or "j'ai chaud" in qc:
+                message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
+            elif "gorge" in qc:
+                message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
+            elif "ventre" in qc:
+                message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
+            elif "toux" in qc or "je tousse" in qc:
+                message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
+            elif "nez" in qc:
+                message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
+            elif "transpire" in qc or "j'ai froid" in qc:
+                message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
+
+        # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
+        elif any(kw in qc for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
+            pays_detecte = None
+            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", qc)
+            if match:
+                pays_detecte = match.group(1).strip().lower()
+            else:
+                tokens = QC.split()
+                if len(tokens) >= 2:
+                    pays_detecte = tokens[-1].strip(" ?!.,;").lower()
+            capitales = {
+                    "france"           : "Paris", 
+                    "espagne"          : "Madrid",
+                    "italie"           : "Rome",
+                    "allemagne"        : "Berlin",
+                    "japon"            : "Tokyo",
+                    "japonaise"        : "Tokyo",
+                    "chine"            : "Pékin",
+                    "brésil"           : "Brasilia",
+                    "mexique"          : "Mexico",
+                    "canada"           : "Ottawa",
+                    "états-unis"       : "Washington",
+                    "usa"              : "Washington",
+                    "united states"    : "Washington",
+                    "inde"             : "New Delhi",
+                    "portugal"         : "Lisbonne",
+                    "royaume-uni"      : "Londres",
+                    "angleterre"       : "Londres",
+                    "argentine"        : "Buenos Aires",
+                    "maroc"            : "Rabat",
+                    "algérie"          : "Alger",
+                    "tunisie"          : "Tunis",
+                    "turquie"          : "Ankara",
+                    "russie"           : "Moscou",
+                    "russe"            : "Moscou",
+                    "australie"        : "Canberra",
+                    "corée du sud"     : "Séoul",
+                    "corée"            : "Séoul",
+                    "corée du nord"    : "Pyongyang",
+                    "vietnam"          : "Hanoï",
+                    "thailande"        : "Bangkok",
+                    "indonésie"        : "Jakarta",
+                    "malaisie"         : "Kuala Lumpur",
+                    "singapour"        : "Singapour",
+                    "philippines"      : "Manille",
+                    "pakistan"         : "Islamabad",
+                    "bangladesh"       : "Dacca",
+                    "sri lanka"        : "Colombo",
+                    "népal"            : "Katmandou",
+                    "iran"             : "Téhéran",
+                    "irak"             : "Bagdad",
+                    "syrie"            : "Damas",
+                    "liban"            : "Beyrouth",
+                    "jordanie"         : "Amman",
+                    "israël"           : "Jérusalem",
+                    "palestine"        : "Ramallah",
+                    "qatar"            : "Doha",
+                    "oman"             : "Mascate",
+                    "yémen"            : "Sanaa",
+                    "afghanistan"      : "Kaboul",
+                    "émirats arabes unis" : "Abou Dabi",
+                    "sénégal"          : "Dakar",
+                    "côte d'ivoire"    : "Yamoussoukro",
+                    "mali"             : "Bamako",
+                    "niger"            : "Niamey",
+                    "tchad"            : "N'Djaména",
+                    "burkina faso"     : "Ouagadougou",
+                    "congo"            : "Brazzaville",
+                    "rd congo"         : "Kinshasa",
+                    "kenya"            : "Nairobi",
+                    "éthiopie"         : "Addis-Abeba",
+                    "ghana"            : "Accra",
+                    "zambie"           : "Lusaka",
+                    "zimbabwe"         : "Harare",
+                    "soudan"           : "Khartoum",
+                    "botswana"         : "Gaborone",
+                    "namibie"          : "Windhoek",
+                    "madagascar"       : "Antananarivo",
+                    "mozambique"       : "Maputo",
+                    "angola"           : "Luanda",
+                    "libye"            : "Tripoli",
+                    "egypte"           : "Le Caire",
+                    "grèce"            : "Athènes",
+                    "pologne"          : "Varsovie",
+                    "ukraine"          : "Kyiv",
+                    "roumanie"         : "Bucarest",
+                    "bulgarie"         : "Sofia",
+                    "serbie"           : "Belgrade",
+                    "croatie"          : "Zagreb",
+                    "slovénie"         : "Ljubljana",
+                    "hongrie"          : "Budapest",
+                    "tchéquie"         : "Prague",
+                    "slovaquie"        : "Bratislava",
+                    "suède"            : "Stockholm",
+                    "norvège"          : "Oslo",
+                    "finlande"         : "Helsinki",
+                    "islande"          : "Reykjavik",
+                    "belgique"         : "Bruxelles",
+                    "pays-bas"         : "Amsterdam",
+                    "irlande"          : "Dublin",
+                    "suisse"           : "Berne",
+                    "colombie"         : "Bogota",
+                    "pérou"            : "Lima",
+                    "chili"            : "Santiago",
+                    "équateur"         : "Quito",
+                    "uruguay"          : "Montevideo",
+                    "paraguay"         : "Asuncion",
+                    "bolivie"          : "Sucre",
+                    "venezuela"        : "Caracas",
+                    "cuba"             : "La Havane",
+                    "haïti"            : "Port-au-Prince",
+                    "république dominicaine" : "Saint-Domingue",
+                    "nicaragua"        : "Managua",
+                    "honduras"         : "Tegucigalpa",
+                    "guatemala"        : "Guatemala",
+                    "salvador"         : "San Salvador",
+                    "panama"           : "Panama",
+                    "costarica"        : "San José",
+                    "jamaïque"         : "Kingston",
+                    "bahamas"          : "Nassau",
+                    "barbade"          : "Bridgetown",
+                    "trinité-et-tobago": "Port of Spain",
+                    "kazakhstan"       : "Noursoultan",
+                    "ouzbekistan"      : "Tachkent",
+                    "turkménistan"     : "Achgabat",
+                    "kirghizistan"     : "Bichkek",
+                    "mongolie"         : "Oulan-Bator",
+                    "géorgie"          : "Tbilissi",
+                    "arménie"          : "Erevan",
+                    "azerbaïdjan"      : "Bakou",
+                    "nouvelles-zélande": "Wellington",
+                    "fidji"            : "Suva",
+                    "palaos"           : "Ngerulmud",
+                    "papouasie-nouvelle-guinée" : "Port Moresby",
+                    "samoa"            : "Apia",
+                    "tonga"            : "Nukuʻalofa",
+                    "vanuatu"          : "Port-Vila",
+                    "micronésie"       : "Palikir",
+                    "marshall"         : "Majuro",
+                    "tuvalu"           : "Funafuti",
+                    "bhoutan"          : "Thimphou",
+                    "maldives"         : "Malé",
+                    "laos"             : "Vientiane",
+                    "cambodge"         : "Phnom Penh",
+                    "brunei"           : "Bandar Seri Begawan",
+                    "timor oriental"   : "Dili",
+                    "somalie"           : "Mogadiscio",
+                    "tanzanie"          : "Dodoma",
+                    "ouganda"           : "Kampala",
+                    "rwanda"            : "Kigali",
+                    "burundi"           : "Bujumbura",
+                    "malawi"            : "Lilongwe",
+                    "sierra leone"      : "Freetown",
+                    "libéria"           : "Monrovia",
+                    "guinée"            : "Conakry",
+                    "guinée-bissau"     : "Bissau",
+                    "guinée équatoriale": "Malabo",
+                    "gambie"            : "Banjul",
+                    "cap-vert"          : "Praia",
+                    "swaziland"         : "Mbabane",
+                    "lesotho"           : "Maseru",
+                    "bénin"             : "Porto-Novo",
+                    "togo"              : "Lomé",
+                    "gabon"             : "Libreville",
+                    "république centrafricaine": "Bangui",
+                    "eswatini"          : "Mbabane",  # anciennement Swaziland
+                    "suriname"          : "Paramaribo",
+                    "guyana"            : "Georgetown",
+                    "dominique"         : "Roseau",
+                    "sainte-lucie"      : "Castries",
+                    "saint-vincent-et-les-grenadines": "Kingstown",
+                    "saint-christophe-et-niévès"    : "Basseterre",
+                    "saint-marin"       : "Saint-Marin",
+                    "liechtenstein"     : "Vaduz",
+                    "andorre"           : "Andorre-la-Vieille",
+                    "vatican"           : "Vatican",
+                    "luxembourg"        : "Luxembourg",
+                    "monténégro"        : "Podgorica",
+                    "macédoine du nord" : "Skopje",
+                    "bosnie-herzégovine": "Sarajevo"
+
+            }
+            if pays_detecte and pays_detecte in capitales:
+                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
+            else:
+                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+
+        # --- Bloc Punchlines motivationnelles ---
+        if not message_bot and any(kw in qc for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
+            punchlines = [
+                "🚀 *N’attends pas les opportunités. Crée-les.*",
+                "🔥 *Chaque bougie japonaise est une chance de rebondir.*",
+                "⚡ *La discipline bat la chance sur le long terme.*",
+                "🌟 *Tu ne trades pas juste des actifs, tu construis ton avenir.*",
+                "💪 *Même dans un marché baissier, ta volonté peut monter en flèche.*",
+                "🏁 *Les gagnants n’abandonnent jamais, les perdants n’essaient même pas.*",
+                "🎯 *Rêve grand, agis fort, ajuste vite.*",
+                "⏳ *Le temps est ton meilleur allié… ou ton pire ennemi.*",
+                "🧠 *Ce n’est pas le marché qui te limite. C’est ta vision.*",
+                "🦾 *Chaque difficulté est une opportunité camouflée.*",
+                "📈 *Ta plus belle courbe, c’est celle de ta progression.*",
+                "💼 *Travaille en silence, laisse tes gains faire le bruit.*",
+                "🔮 *Prédis l’avenir ? Non. Prépare-toi à l’écrire.*",
+                "🌌 *Le doute tue plus de rêves que l’échec.*",
+                "🛠️ *Construis-toi un mindset solide avant de construire ton portefeuille.*",
+                "🧭 *Quand tu sais où tu vas, même les tempêtes deviennent utiles.*"
+            ]
+            message_bot = random.choice(punchlines)
+
+        # --- Bloc Culture Générale (questions simples) --
+        if not message_bot and any(mot in qc for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
+            base_connaissances = {
+                    "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
+                    "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de **Tesla**.",
+                    "combien y a-t-il de pays dans le monde": "🌍 Il y a actuellement **195 pays reconnus** dans le monde.",
+                    "quelle est la capitale de la france": "📍 La capitale de la France est **Paris**.",
+                    "quel est le plus grand océan": "🌊 L'océan Pacifique est le plus grand au monde.",
+                    "quelle est la distance entre la terre et la lune": "🌕 En moyenne, la distance est de **384 400 km** entre la Terre et la Lune.",
+                    "quel est l’élément chimique o": "🧪 L'élément chimique 'O' est **l'oxygène**.",
+                    "qui a écrit roméo et juliette": "🎭 C'est **William Shakespeare** qui a écrit *Roméo et Juliette*.",
+                    "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
+                    "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+                    "qui a marché sur la lune en premier": "👨‍🚀 **Neil Armstrong** a été le premier homme à marcher sur la Lune en 1969.",
+                    "quelle est la plus haute montagne du monde": "🏔️ L’**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+                    "combien y a-t-il d’os dans le corps humain": "🦴 Le corps humain adulte compte **206 os**.",
+                    "qui a peint la joconde": "🖼️ C’est **Léonard de Vinci** qui a peint *La Joconde*.",
+                    "quelle est la capitale du japon": "🏙️ La capitale du Japon est **Tokyo**.",
+                    "quelle planète est la plus proche du soleil": "☀️ **Mercure** est la planète la plus proche du Soleil.",
+                    "qui a inventé l’électricité": "⚡ L'électricité n’a pas été inventée, mais **Benjamin Franklin** et **Thomas Edison** ont été des figures clés dans sa compréhension et son exploitation.",
+                    "qu’est-ce que l’adn": "🧬 L’**ADN** est le support de l’information génétique chez tous les êtres vivants.",
+                    "quelle est la plus grande forêt du monde": "🌳 L’**Amazonie** est la plus grande forêt tropicale du monde.",
+                    "quel est l’animal terrestre le plus rapide": "🐆 Le **guépard** peut atteindre jusqu’à 110 km/h en vitesse de pointe.",
+                    "qui a écrit harry potter": "📚 C’est **J.K. Rowling** qui a écrit la saga *Harry Potter*.",
+                    "quelle est la température de l’eau qui bout": "💧 L’eau bout à **100°C** à pression atmosphérique normale.",
+                    "quel est le pays le plus peuplé": "👥 **La Chine** est actuellement le pays le plus peuplé du monde.",
+                    "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+                    "qui a découvert l’amérique": "🗺️ C’est **Christophe Colomb** qui a découvert l’Amérique en 1492, du moins pour l’Europe.",
+                    "quelle est la planète la plus grosse": "🪐 **Jupiter** est la plus grosse planète du système solaire.",
+                    "quelle est la vitesse de la lumière": "⚡ La lumière voyage à environ **299 792 km/s** dans le vide.",
+                    "combien de jours dans une année bissextile": "📅 Une année bissextile dure **366 jours**.",
+                    "quelle est la capitale de l’italie": "🇮🇹 La capitale de l’Italie est **Rome**.",
+                    "qui a écrit les misérables": "📖 C’est **Victor Hugo** qui a écrit *Les Misérables*.",
+                    "quelle est la capitale de l’allemagne": "🇩🇪 La capitale de l’Allemagne est **Berlin**.",
+                    "qui est le président de la france": "🇫🇷 Le président actuel de la France est **Emmanuel Macron** (en 2025).",
+                    "quelle est la profondeur de la fosse des mariannes": "🌊 La fosse des Mariannes atteint environ **11 000 mètres** de profondeur.",
+                    "qui a inventé le téléphone": "📞 **Alexander Graham Bell** est l’inventeur du téléphone.",
+                    "quelle est la langue officielle du brésil": "🇧🇷 La langue officielle du Brésil est **le portugais**.",
+                    "combien de muscles dans le corps humain": "💪 Le corps humain compte environ **650 muscles**.",
+                    "quelle est la capitale de la russie": "🇷🇺 La capitale de la Russie est **Moscou**.",
+                    "quand a eu lieu la révolution française": "⚔️ La Révolution française a commencé en **1789**.",
+                    "qui est le créateur de facebook": "🌐 **Mark Zuckerberg** a cofondé Facebook en 2004.",
+                    "quelle est la capitale de la chine": "🇨🇳 La capitale de la Chine est **Pékin**."
+            }
+            for question_cle, reponse in base_connaissances.items():
+                if question_cle in qc:
+                    message_bot = reponse
+                    break
+
         # --- Bloc Quiz de culture générale ---
-        if not message_bot and any(mot in question_clean for mot in [
+        if not message_bot and any(mot in qc for mot in [
             "quiz", "quizz", "question", "culture générale", "pose-moi une question", "teste mes connaissances"
         ]):
             quizz_culture = [
@@ -1008,8 +1065,7 @@ if question:
             else:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
-
-        # --- Bloc Faits Insolites ---
+            
         # Liste des faits insolites (définie une seule fois)
         faits_insolites = [
             "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
@@ -1059,27 +1115,26 @@ if question:
             "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
         ]
         # Gestion de la demande "fait insolite"
-        if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
+        if any(mot in qc for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
             if 'derniere_fait' not in st.session_state:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
             message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
         # Gestion de la demande "encore un" ou "plus" pour les faits insolites
-        if any(mot in question_clean for mot in ["encore un", "un autre","encore"]):
+        if any(mot in qc for mot in ["encore un", "un autre","encore"]):
             if 'derniere_fait' in st.session_state:
                 message_bot = f"✨ Voici une autre anecdote :\n\n{random.choice(faits_insolites)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
-        if any(mot in question_clean for mot in ["encore une", "une autre"]):
+        if any(mot in qc for mot in ["encore une", "une autre"]):
             if 'derniere_fait' in st.session_state:
                 message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
 
-
-        # --- Bloc Recettes rapides 
+        # --- Bloc Recettes rapides
         recettes = [
             "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
             "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
@@ -1120,136 +1175,30 @@ if question:
             "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
         ]
         # Gestion de la demande "recette"
-        if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+        if any(mot in qc for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
             if 'derniere_recette' not in st.session_state:
                 st.session_state['derniere_recette'] = random.choice(recettes)
             message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
     
         # Gestion de la demande "encore un" ou "plus" pour les recettes
-        if any(mot in question_clean for mot in ["encore une", "une autre"]):
+        if any(mot in qc for mot in ["encore une", "une autre"]):
             if 'derniere_recette' in st.session_state:
                 message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
-        # ─── 4) Bases de réponses ───────────────────────────────────────────────────
-        # 4.a) Hard‑codées
-        reponses_courantes = {
-            "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
-            "ça va": "Je vais bien, merci de demander ! Et vous ?",
-            "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-            "hello": "Hello! How can I assist you today?",
-            "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-            "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-            "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-            "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-            "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-            "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-            "tu m'entends": "Je vous entends fort et clair 🎧",
-            "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-            "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-            "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-            "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
-            "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-            "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
-            "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-            "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
-            "re": "Re bienvenue à bord ! On continue notre mission ?",
-            "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-            "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-            "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-            "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
-            "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
-        }
-        base_savoir = {
-            # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
-            "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
-            "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
-            "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
-            "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
-            "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
-            "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-            "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
-            "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
-            "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
-            "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
-            "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
-            "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
-            "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
-            "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
-            "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
-            "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
-            "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-            "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
-            "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
-            "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
-            "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
-            "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
-            "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
-            "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
-            "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
-            "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
-             "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
-        }
-        # Fusionner les deux dans une base complète
-        base_complet = {**base_savoir, **reponses_courantes}
-
-        # --- Moteur central de réponse AVA ---
-        def trouver_reponse(question):
-            qc = nettoyer_texte(question)
-            st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
-
-            # 1. Direct
-            if qc in base_complet:
-                st.write("✅ Match direct trouvé")
-                return base_complet[qc]
-
-            # 2. Fuzzy
-            proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
-            if proche:
-                st.write(f"🔎 Match fuzzy : {proche[0]}")
-                return base_complet[proche[0]]
-
-            # 3. Sémantique
-            keys = list(base_complet.keys())
-            vb = model_semantic.encode(keys)
-            vq = model_semantic.encode([qc])[0]
-            sims = cosine_similarity([vq], vb)[0]
-            best, score = max(zip(keys, sims), key=lambda x: x[1])
-            st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
-
-            if score > 0.7:
-                return base_complet[best]
-
-            # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
-            return gerer_modules_speciaux(qc)
-
-        # --- Modules personnalisés (à enrichir) ---
-        def gerer_modules_speciaux(qc):
-            if "analyse" in qc and "btc" in qc:
-                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-            if "horoscope" in qc:
-                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-            if "météo" in qc and "paris" in qc:
-                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-            # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
-    
-            return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"
-
-        # --- Interface utilisateur ---
-        st.title("💬 Chat AVA")
-
-        question_raw = st.chat_input("Posez votre question ici :")
-
-        if question_raw:
-            message_bot = trouver_reponse(question_raw)
-
-            with st.chat_message("user"):
-                st.markdown(question_raw)
-
-            with st.chat_message("assistant"):
-                st.markdown(message_bot)
-
+        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+        if not message_bot:
+            if any(phrase in qc for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
+                message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
+            else:
+                reponses_ava = [
+                    "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖",
+                    "Je n'ai pas bien compris. Pouvez-vous reformuler, s'il vous plaît ?",
+                    "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !",
+                    "Hmm... Ce n'est pas encore dans ma base de données. Essayez une autre formulation ou tapez 'analyse complète' pour un aperçu du marché 📊"
+                ]
+                message_bot = random.choice(reponses_ava)
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
@@ -1481,25 +1430,30 @@ if question:
             }
 
             for question_base, reponse_base in base_generale.items():
-                if question_base in question_clean:
+                if question_base in qc:
                     message_bot = reponse_base
                     break
 
+                                                           
+            # ... les autres modules (horoscope, météo, etc.)
 
-
+            return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
         
-        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
-        if not message_bot:
-            if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
-                message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
-            else:
-                reponses_ava = [
-                    "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖",
-                    "Je n'ai pas bien compris. Pouvez-vous reformuler, s'il vous plaît ?",
-                    "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !",
-                    "Hmm... Ce n'est pas encore dans ma base de données. Essayez une autre formulation ou tapez 'analyse complète' pour un aperçu du marché 📊"
-                ]
-                message_bot = random.choice(reponses_ava)
+
+        # --- Interface utilisateur ---
+        st.title("💬 Chat AVA")
+
+        question_raw = st.chat_input("Posez votre question ici :")
+
+        if question_raw:
+            message_bot = trouver_reponse(question_raw)
+
+            with st.chat_message("user"):
+                st.markdown(question_raw)
+
+            with st.chat_message("assistant"):
+                st.markdown(message_bot)
+
 
 
     # --- Bloc Traduction corrigé ---
