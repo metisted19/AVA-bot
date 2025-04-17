@@ -1389,7 +1389,23 @@ if question:
                 "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
                 "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
                 "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
-                "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1."
+                "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
+                "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+                "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
+                "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
+                "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
+                "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
+                "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+                "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
+                "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
+                "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
+                "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
+                "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
+                "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
+                "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
+                "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
+                "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
+                "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
             }
 
             questions_connues = list(base_savoir.keys())
@@ -1406,13 +1422,13 @@ if question:
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
             if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
-                message_bot = "Hello! I'm here and ready to help. How can I assist you today?"
+                message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
             else:
                 reponses_ava = [
-                    "I'm here to help, but I need a bit more detail 🤖",
-                    "I didn't quite understand that; could you please rephrase?",
-                    "This subject is still a bit unclear to me... I can talk about technical analysis, weather, news, and much more!",
-                    "Hmm... That's not in my database yet. Try another phrasing or type 'complete analysis' for a market overview 📊"
+                    "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖",
+                    "Je n'ai pas bien compris. Pouvez-vous reformuler, s'il vous plaît ?",
+                    "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !",
+                    "Hmm... Ce n'est pas encore dans ma base de données. Essayez une autre formulation ou tapez 'analyse complète' pour un aperçu du marché 📊"
                 ]
                 message_bot = random.choice(reponses_ava)
 
