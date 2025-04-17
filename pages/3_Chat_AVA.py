@@ -21,7 +21,12 @@ from forex_python.converter import CurrencyRates, CurrencyCodes  # Ces imports p
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-model_semantic = SentenceTransformer("all-MiniLM-L6-v2")
+@st.cache_resource
+def load_semantic_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+model_semantic = load_semantic_model()
+
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
