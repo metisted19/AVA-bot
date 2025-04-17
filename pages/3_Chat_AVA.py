@@ -18,16 +18,16 @@ import unicodedata, re
 import difflib
 from fonctions_chat import obtenir_reponse_ava 
 
-# 1) Config Streamlit
+# --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 2) Chargement du modèle sémantique (cache)
+# --- Modèle sémantique (cache) ---
 @st.cache_resource
-def load_semantic_model():
+def load_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
-model_semantic = load_semantic_model()
+model_semantic = load_model()
 
-# --- Fonction de nettoyage
+# --- Nettoyage du texte ---
 def nettoyer_texte(txt):
     txt = unicodedata.normalize("NFKC", txt)
     txt = txt.lower().strip()
@@ -1191,22 +1191,27 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
+        # Fusionner les deux dans une base complète
+        base_complet = {**base_savoir, **reponses_courantes}
+
+        # --- Moteur central de réponse AVA ---
         def trouver_reponse(question):
             qc = nettoyer_texte(question)
-            st.write("🧼 Texte nettoyé :", qc)
+            st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
 
-            base = reponses_courantes
-
-            if qc in base:
+            # 1. Direct
+            if qc in base_complet:
                 st.write("✅ Match direct trouvé")
-                return base[qc]
+                return base_complet[qc]
 
-            proche = difflib.get_close_matches(qc, base.keys(), n=1, cutoff=0.85)
+            # 2. Fuzzy
+            proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
             if proche:
-                st.write(f"🔎 Match fuzzy trouvé : {proche[0]}")
-                return base[proche[0]]
+                st.write(f"🔎 Match fuzzy : {proche[0]}")
+                return base_complet[proche[0]]
 
-            keys = list(base.keys())
+            # 3. Sémantique
+            keys = list(base_complet.keys())
             vb = model_semantic.encode(keys)
             vq = model_semantic.encode([qc])[0]
             sims = cosine_similarity([vq], vb)[0]
@@ -1214,10 +1219,36 @@ if question:
             st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
 
             if score > 0.7:
-                return base[best]
+                return base_complet[best]
 
-            return "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !"
+            # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
+            return gerer_modules_speciaux(qc)
 
+        # --- Modules personnalisés (à enrichir) ---
+        def gerer_modules_speciaux(qc):
+            if "analyse" in qc and "btc" in qc:
+                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
+            if "horoscope" in qc:
+                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+            if "météo" in qc and "paris" in qc:
+                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+            # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
+    
+            return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"
+
+        # --- Interface utilisateur ---
+        st.title("💬 Chat AVA")
+
+        question_raw = st.chat_input("Posez votre question ici :")
+
+        if question_raw:
+            message_bot = trouver_reponse(question_raw)
+
+            with st.chat_message("user"):
+                st.markdown(question_raw)
+
+            with st.chat_message("assistant"):
+                st.markdown(message_bot)
 
 
         # --- Bloc Mini base générale (culture quotidienne) ---
