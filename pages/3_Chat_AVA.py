@@ -1131,11 +1131,12 @@ if question:
                 message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
+
         # 1) Récupération de l’input
         question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot  = None
         if question_raw:
-           # 1) Nettoyage
+            # 1) Nettoyage
             question_clean = nettoyer_texte(question_raw)  
 
             reponses_courantes = {
@@ -1169,7 +1170,7 @@ if question:
             st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
             # Essai d'accès direct
             message_bot = reponses_courantes.get(question_clean)
-
+            # 2.4) Si pas de correspondance, tentative fuzzy
             if not message_bot:
                 close = difflib.get_close_matches(
                     question_clean,
@@ -1177,8 +1178,8 @@ if question:
                     n=1,
                     cutoff=0.8
                ) 
-            if close:
-                message_bot = reponses_courantes[close[0]]
+                if close:
+                    message_bot = reponses_courantes[close[0]]
             
                 base_savoir = {
                     # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
@@ -1218,25 +1219,25 @@ if question:
                     return SentenceTransformer("all-MiniLM-L6-v2")
                 model_semantic = load_semantic_model()
 
-                # 2.5) Matching sémantique si toujours rien
-                if not message_bot:
-                    # ta base_savoir doit être définie en amont (hors du if)
-                    questions_connues = list(base_savoir.keys())
-                    vecteurs_base     = model_semantic.encode(questions_connues)
-                    vecteur_question  = model_semantic.encode([question_clean])[0]
-                    sims              = cosine_similarity([vecteur_question], vecteurs_base)[0]
+            # 2.5) Matching sémantique si toujours rien
+            if not message_bot:
+                # ta base_savoir doit être définie en amont (hors du if)
+                questions_connues = list(base_savoir.keys())
+                vecteurs_base     = model_semantic.encode(questions_connues)
+                vecteur_question  = model_semantic.encode([question_clean])[0]
+                sims              = cosine_similarity([vecteur_question], vecteurs_base)[0]
 
-                    meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
-                    if score > 0.7:
-                        message_bot = base_savoir[meilleure_q]
+                meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
+                if score > 0.7:
+                    message_bot = base_savoir[meilleure_q]
 
-                # 2.6) Dernier recours : appel à ta fonction principale
-                if not message_bot:
-                message_bot = obtenir_reponse_ava(question_raw)
+            # 2.6) Dernier recours : appel à ta fonction principale
+            if not message_bot:
+            message_bot = obtenir_reponse_ava(question_raw)
 
-            # 3) Affichage final
-            if message_bot:
-               st.write(message_bot)
+        # 3) Affichage final
+        if message_bot:
+            st.write(message_bot)
         
 
         # --- Bloc Mini base générale (culture quotidienne) ---
