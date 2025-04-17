@@ -1102,7 +1102,7 @@ if question:
 
         # Gestion de la demande "encore un" ou "plus" pour les faits insolites
         elif any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
-           if 'derniere_fait' in st.session_state:
+            if 'derniere_fait' in st.session_state:
                message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
