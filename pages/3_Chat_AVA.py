@@ -1101,13 +1101,13 @@ if question:
             message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
         # Gestion de la demande "encore un" ou "plus" pour les faits insolites
-        if any(mot in question_clean for mot in ["encore une", "une autre"]):
+        if any(mot in question_clean for mot in ["encore un", "un autre","encore"]):
             if 'derniere_fait' in st.session_state:
                 message_bot = f"✨ Voici une autre anecdote :\n\n{random.choice(faits_insolites)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
-        if any(mot in question_clean for mot in ["encore un", "un autre"]):
+        if any(mot in question_clean for mot in ["encore une", "une autre"]):
             if 'derniere_fait' in st.session_state:
                 message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
             else:
