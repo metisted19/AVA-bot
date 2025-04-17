@@ -555,22 +555,6 @@ if question:
             # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
             return gerer_modules_speciaux(qc)
 
-            # --- Modules personnalisés (à enrichir) ---
-            def gerer_modules_speciaux(qc):
-            if "analyse" in qc and "btc" in qc:
-                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-            if "horoscope" in qc:
-                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-            if "météo" in qc and "paris" in qc:
-                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-            if "blague" in qc:
-                blagues = [
-                    "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
-                    "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
-                    "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
-                ]
-                return random.choice(blagues)
-            return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
             
         # --- Bloc Réponses médicales explicites ---
         elif not message_bot and any(mot in qc for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
@@ -1435,7 +1419,24 @@ if question:
                 if question_base in qc:
                     message_bot = reponse_base
                     break
-
+                
+            # --- Modules personnalisés (à enrichir) ---
+            def gerer_modules_speciaux(qc):
+            if "analyse" in qc and "btc" in qc:
+                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
+            if "horoscope" in qc:
+                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+            if "météo" in qc and "paris" in qc:
+                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+            if "blague" in qc:
+                blagues = [
+                    "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
+                    "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
+                    "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
+                ]
+                return random.choice(blagues)
+            return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
+            
         # --- Interface utilisateur ---
         st.title("💬 Chat AVA")
 
