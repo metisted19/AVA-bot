@@ -718,7 +718,18 @@ if question:
                 "🔥 *Chaque bougie japonaise est une chance de rebondir.*",
                 "⚡ *La discipline bat la chance sur le long terme.*",
                 "🌟 *Tu ne trades pas juste des actifs, tu construis ton avenir.*",
-                "💪 *Même dans un marché baissier, ta volonté peut monter en flèche.*"
+                "💪 *Même dans un marché baissier, ta volonté peut monter en flèche.*",
+                "🏁 *Les gagnants n’abandonnent jamais, les perdants n’essaient même pas.*",
+                "🎯 *Rêve grand, agis fort, ajuste vite.*",
+                "⏳ *Le temps est ton meilleur allié… ou ton pire ennemi.*",
+                "🧠 *Ce n’est pas le marché qui te limite. C’est ta vision.*",
+                "🦾 *Chaque difficulté est une opportunité camouflée.*",
+                "📈 *Ta plus belle courbe, c’est celle de ta progression.*",
+                "💼 *Travaille en silence, laisse tes gains faire le bruit.*",
+                "🔮 *Prédis l’avenir ? Non. Prépare-toi à l’écrire.*",
+                "🌌 *Le doute tue plus de rêves que l’échec.*",
+                "🛠️ *Construis-toi un mindset solide avant de construire ton portefeuille.*",
+                "🧭 *Quand tu sais où tu vas, même les tempêtes deviennent utiles.*"
             ]
             message_bot = random.choice(punchlines)
 
