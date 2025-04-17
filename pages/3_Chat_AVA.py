@@ -206,23 +206,8 @@ if question:
                     analyse_complete = True
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
-
-
-        # --- Actualités améliorées ---
-        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
-            actus = get_general_news()
-            if isinstance(actus, str):
-                message_bot += actus
-            elif actus and isinstance(actus, list):
-                message_bot += "📰 **Dernières actualités importantes :**\n\n"
-                for i, (titre, lien) in enumerate(actus[:5], 1):
-                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
-                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
-            else:
-                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
-            actus_repondu = True
-
-            # --- Bloc météo intelligent avec gestion des villages et noms composés ---
+                
+        # --- Bloc météo intelligent avec gestion des villages et noms composés ---
             if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
                 ville_detectee = "paris"  # par défaut
                 # On essaie d'extraire le lieu après "à", "au", "aux", "dans"
@@ -248,6 +233,22 @@ if question:
                 message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
 
                 meteo_repondu = True
+
+        # --- Actualités améliorées ---
+        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
+            actus = get_general_news()
+            if isinstance(actus, str):
+                message_bot += actus
+            elif actus and isinstance(actus, list):
+                message_bot += "📰 **Dernières actualités importantes :**\n\n"
+                for i, (titre, lien) in enumerate(actus[:5], 1):
+                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
+                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
+            else:
+                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
+            actus_repondu = True
+
+            
 
         # --- Blagues ---
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
