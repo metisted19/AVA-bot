@@ -19,21 +19,17 @@ from forex_python.converter import CurrencyRates, CurrencyCodes
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
 from fonctions_meteo import obtenir_meteo, get_meteo_ville  # À redéfinir juste après
-
-# Import du modèle sémantique
 from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity 
 
-# 1️⃣ Assure-toi que cette ligne existe et **en premier** :
-question_raw = st.text_input("Posez votre question :")
+# 1️⃣ Toujours tout de suite après les imports
+question_raw = st.text_input("Posez votre question :")
+message_bot  = None
 
-# 2️⃣ Initialise aussi message_bot pour éviter d’autres NameError
-message_bot = None
-
-# 3️⃣ Ton modèle et le reste de la config
+# 2️⃣ Chargement du modèle en cache
 @st.cache_resource
 def load_semantic_model():
-    return SentenceTransformer("all‑MiniLM‑L6‑v2")
+    return SentenceTransformer("all-MiniLM-L6-v2")
 
 model_semantic = load_semantic_model()
 
