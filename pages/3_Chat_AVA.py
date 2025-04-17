@@ -950,7 +950,7 @@ if question:
                     "luxembourg"        : "Luxembourg",
                     "monténégro"        : "Podgorica",
                     "macédoine du nord" : "Skopje",
-                    "bosnie-herzégovine": "Sarajevo"
+                    "bosnie-herzégovine": "Sarajevo",
 
             }
             if pays_detecte and pays_detecte in capitales:
