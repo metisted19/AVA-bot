@@ -1103,6 +1103,7 @@ if question:
             # Initialisation de la variable pour garder la dernière recette
             if 'derniere_recette' not in st.session_state:
                 st.session_state['derniere_recette'] = None
+                
                 # Liste des recettes rapides
                 recettes = [
                     "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
