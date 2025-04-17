@@ -1,30 +1,33 @@
 import streamlit as st
 st.set_page_config(page_title="Chat AVA", layout="centered")
+
+# Imports système
 import os
+import re
+import random
+from datetime import datetime
+
+# Imports tiers
 import pandas as pd
-from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
-from fonctions_chat import obtenir_reponse_ava
-# Remplacez cette importation par l'appel à la nouvelle version
-#from fonctions_actualites import obtenir_actualites, get_general_news
-from fonctions_meteo import obtenir_meteo, get_meteo_ville  # Nous redéfinirons get_meteo_ville ici.
 import requests
 from PIL import Image
-from datetime import datetime
 from langdetect import detect
-import urllib.parse
-import random
-import glob
-import difflib
-import re  # Pour le bloc sécurité, le traitement géographique et l'analyse
-import unicodedata  # Pour supprimer les accents
 from newsapi import NewsApiClient
-import urllib.parse
-from forex_python.converter import CurrencyRates, CurrencyCodes  # Ces imports peuvent rester si vous en avez besoin pour d'autres parties
+from forex_python.converter import CurrencyRates, CurrencyCodes
+
+# Importations de tes modules
+from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
+from fonctions_chat import obtenir_reponse_ava
+from fonctions_meteo import obtenir_meteo, get_meteo_ville  # À redéfinir juste après
+
+# Import du modèle sémantique
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+
 @st.cache_resource
 def load_semantic_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
+
 model_semantic = load_semantic_model()
 
 
@@ -1126,8 +1129,9 @@ if question:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
         # --- Bloc d'intelligence sémantique locale ---
-        if not message_bot:
-            # Dictionnaire des réponses courantes
+        if not message_bot and question_raw:
+            # 1. Nettoyage de la question brute
+            question_clean = nettoyer_texte(question_raw)
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
                 "ça va": "Je vais bien, merci de demander ! Et vous ?",
@@ -1155,6 +1159,12 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
+        # 2.a. Vérification d'une réponse exacte
+        if question_clean in reponses_courantes:
+            message_bot = reponses_courantes[question_clean]
+
+        # 3. Si pas de réponse « hard‑codée », on utilise le matching sémantique
+        else:
             base_savoir = {
                 # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
                 "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
@@ -1185,29 +1195,26 @@ if question:
                 "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
                 "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
             }
-            # Vérification que 'question_clean' existe et contient une valeur
-            if 'question_clean' in locals() or 'question_clean' in globals():
-                if question_clean:
-                    question_clean = nettoyer_texte(question_clean)
-                else:
-                    question_clean = ""  # Valeur par défaut si la question est vide
-            else:
-                question_clean = ""  # Valeur par défaut si la variable n'est pas définie
-
-            # Encodage des questions et calcul des similarités
             questions_connues = list(base_savoir.keys())
-            vecteurs_base = model_semantic.encode(questions_connues)
-            vecteur_question = model_semantic.encode([question_clean])
-            similarites = cosine_similarity([vecteur_question[0]], vecteurs_base)[0]
 
-            # Trouver la meilleure correspondance
-            meilleure_correspondance = max(zip(questions_connues, similarites), key=lambda x: x[1])
+            # Encodage
+            vecteurs_base   = model_semantic.encode(questions_connues)
+            vecteur_question = model_semantic.encode([question_clean])[0]
 
-            # Si une correspondance suffisante est trouvée
-            if meilleure_correspondance[1] > 0.7:
-                message_bot = base_savoir[meilleure_correspondance[0]]
+            # Calcul des similarités cosinus
+            similarites = cosine_similarity([vecteur_question], vecteurs_base)[0]
+
+            # Recherche de la meilleure correspondance
+            meilleure_question, score = max(zip(questions_connues, similarites),
+                                            key=lambda x: x[1])
+
+            # Seuil de confiance
+            if score > 0.7:
+                message_bot = base_savoir[meilleure_question]
             else:
-                message_bot = "Je ne suis pas sûre de comprendre votre question. Pouvez-vous reformuler ?"   
+                message_bot = "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
+
+            # Note : si question_raw est vide ou message_bot déjà défini, ce bloc est sauté.  
 
         
 
