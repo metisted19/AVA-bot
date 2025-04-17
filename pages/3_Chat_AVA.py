@@ -1,24 +1,17 @@
 import streamlit as st
-
-
-# Imports système
 import os
 import re
 import random
 from datetime import datetime
-
-# Imports tiers
 import pandas as pd
 import requests
 from PIL import Image
 from langdetect import detect
 from newsapi import NewsApiClient
 from forex_python.converter import CurrencyRates, CurrencyCodes
-
-# Importations de tes modules
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
 from fonctions_chat import obtenir_reponse_ava
-from fonctions_meteo import obtenir_meteo, get_meteo_ville  # À redéfinir juste après
+from fonctions_meteo import obtenir_meteo, get_meteo_ville  
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
 import unicodedata, re
@@ -1197,34 +1190,47 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
-        message_bot = None
+        # 3) Fonction de nettoyage
+        def nettoyer_texte(txt):
+            return txt.lower().strip()
 
-        if question_raw:  # <- NE PAS redemander question ici si elle est déjà définie ailleurs
-            qc = nettoyer_texte(question_raw.strip().lower())
-
+        # 4) Fonction de recherche
+        def trouver_reponse(question):
+            qc = nettoyer_texte(question)
             base_complet = {**base_savoir, **reponses_courantes}
 
-            if qc in reponses_courantes:
-                message_bot = reponses_courantes[qc]
+            # 4.a) Direct
+            if qc in base_complet:
+                return base_complet[qc]
 
-            else:
-                close = difflib.get_close_matches(qc, reponses_courantes.keys(), n=1, cutoff=0.8)
-                if close:
-                    message_bot = reponses_courantes[close[0]]
-                else:
-                    keys = list(base_complet.keys())
-                    vb = model_semantic.encode(keys)
-                    vq = model_semantic.encode([qc])[0]
-                    sims = cosine_similarity([vq], vb)[0]
-                    best, score = max(zip(keys, sims), key=lambda x: x[1])
-                    if score > 0.7:
-                        message_bot = base_complet[best]
-                    else:
-                        message_bot = obtenir_reponse_ava(question_raw)
+            # 4.b) Fuzzy
+            proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
+            if proche:
+                return base_complet[proche[0]]
 
-        if message_bot:
-            st.write(message_bot)
-            
+            # 4.c) Sémantique
+            keys = list(base_complet.keys())
+            vb = model_semantic.encode(keys)
+            vq = model_semantic.encode([qc])[0]
+            sims = cosine_similarity([vq], vb)[0]
+            best, score = max(zip(keys, sims), key=lambda x: x[1])
+            if score > 0.7:
+                return base_complet[best]
+
+            # 4.d) Fallback ultime
+            return "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !"
+
+        # 5) Interface utilisateur
+        st.title("💬 Chat AVA")
+
+        question_raw = st.chat_input("Posez votre question ici :")
+        if question_raw:
+            message_bot = trouver_reponse(question_raw)
+            with st.chat_message("user"):
+                st.markdown(question_raw)
+            with st.chat_message("assistant"):
+                st.markdown(message_bot)
+
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
             base_generale = {
