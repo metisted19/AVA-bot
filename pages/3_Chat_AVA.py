@@ -1134,8 +1134,8 @@ if question:
         question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot  = None
         if question_raw:
-        # 1) Nettoyage
-        question_clean = nettoyer_texte(question_raw)  
+           # 1) Nettoyage
+            question_clean = nettoyer_texte(question_raw)  
 
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
