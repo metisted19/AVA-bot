@@ -1199,40 +1199,39 @@ if question:
         }
         # 5) Saisie utilisateur
         question_raw = st.text_input("Posez votre question :", key="chat_input")
-        message_bot  = None
+        message_bot = None
 
         if question_raw:
             qc = nettoyer_texte(question_raw)
 
-            # 5.a) Override pour “quoi de neuf”
-            if qc == "quoi de neuf":
-                message_bot = "Rien de spécial, juste en train d'aider les utilisateurs comme vous !"
+            # Fusion des bases
+            base_complet = {**base_savoir, **reponses_courantes}
 
-             # 5.b) Lookup direct
-            elif qc in reponses_courantes:
+            # a) Vérification directe
+           if qc in reponses_courantes:
                 message_bot = reponses_courantes[qc]
 
+            # b) Fuzzy matching
             else:
-                # 5.c) Fuzzy matching
                 close = difflib.get_close_matches(qc, reponses_courantes.keys(), n=1, cutoff=0.8)
                 if close:
                     message_bot = reponses_courantes[close[0]]
                 else:
-                    # 5.d) Matching sémantique
-                    keys = list(base_savoir.keys())
-                    vb   = model_semantic.encode(keys)
-                    vq   = model_semantic.encode([qc])[0]
+                    # c) Matching sémantique (sur toutes les données connues)
+                    keys = list(base_complet.keys())
+                    vb = model_semantic.encode(keys)
+                    vq = model_semantic.encode([qc])[0]
                     sims = cosine_similarity([vq], vb)[0]
                     best, score = max(zip(keys, sims), key=lambda x: x[1])
                     if score > 0.7:
-                        message_bot = base_savoir[best]
+                        message_bot = base_complet[best]
                     else:
-                        # 5.e) Fallback ultime
+                        # d) Fallback final
                         message_bot = obtenir_reponse_ava(question_raw)
 
-        # 6) Affichage unique
+        # 6) Affichage
         if message_bot:
-            st.write(message_bot)
+            st.write(message_bot
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
