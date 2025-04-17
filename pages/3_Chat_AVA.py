@@ -1094,7 +1094,7 @@ if question:
             "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
             "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
         ]
-        # # Initialisation de dernier_type
+        # Initialisation de dernier_type
         if 'dernier_type' not in st.session_state:
             st.session_state['dernier_type'] = None
 
