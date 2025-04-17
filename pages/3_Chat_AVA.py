@@ -1434,10 +1434,7 @@ if question:
                     message_bot = reponse_base
                     break
 
-                                                           
-            # ... les autres modules (horoscope, météo, etc.)
-
-            return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
+                                                                 
         
 
         # --- Interface utilisateur ---
