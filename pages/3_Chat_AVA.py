@@ -1099,59 +1099,58 @@ if question:
             message_bot = random.choice(faits_insolites)
 
         # --- Bloc Recettes rapides ---
-        elif any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
-            # Initialisation de 'derniere_recette' si elle n'existe pas encore
-            if 'derniere_recette' not in st.session_state:
-                st.session_state['derniere_recette'] = random.choice(recettes)
+        recettes = [
+            "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
+            "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
+            "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
+            "🥗 **Salade express** : tomates cerises, mozzarella, roquette, huile d’olive, vinaigre balsamique.",
+            "🌯 **Wrap poulet-crudités** : galette + restes de poulet + salade + sauce yaourt.",
+            "🥔 **Pommes de terre sautées** : en cubes, à la poêle avec ail et persil. Parfait avec des œufs !",
+            "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes.",
+            "🍞 **Croque-monsieur rapide** : pain de mie, jambon, fromage, 5 min au grill ou à la poêle.",
+            "🥒 **Tartines fraîcheur** : pain grillé, fromage frais, concombre, citron et herbes.",
+            "🍚 **Riz sauté aux légumes** : reste de riz + légumes + œuf + sauce soja. Un wok express !",
+            "🍗 **Poulet minute au curry** : dés de poulet + crème + curry + oignon, à la poêle en 10 min.",
+            "🍳 **Œufs brouillés crémeux** : œufs + beurre + sel + poivre, cuisson douce pour onctuosité.",
+            "🧄 **Pâtes ail-persil** : ail doré à la poêle, persil frais, huile d’olive, et hop sur les pâtes !",
+            "🥑 **Toast avocat-œuf** : pain grillé + avocat écrasé + œuf au plat ou mollet.",
+            "🌮 **Tacos express** : galette + steak haché ou haricots + tomate + salade + sauce.",
+            "🥔 **Gratin express au micro-ondes** : pommes de terre en tranches fines + crème + fromage.",
+            "🍅 **Tomates mozzarella** : tranches de tomates + mozzarella + basilic + huile d’olive. Simple et frais.",
+            "🧀 **Quesadilla express** : deux tortillas + fromage + restes au choix + poêle 5 min chaque côté.",
+            "🍳 **Mini shakshuka rapide** : tomates en dés + œufs + cumin dans une petite poêle. Un délice !",
+            "🥣 **Bowl sucré express** : fromage blanc + fruits + flocons d’avoine + miel. Parfait au petit dej.",
+            "🥕 **Bâtonnets carottes-concombre** : trempés dans du houmous ou une sauce yaourt. Frais et sain.",
+            "🍞 **Pain perdu rapide** : tranches de pain + œuf + lait + sucre, à la poêle jusqu’à dorure.",
+            "🍠 **Patate douce micro-ondes** : piquée à la fourchette, 7 min puissance max, à garnir à volonté.",
+            "🥒 **Taboulé express** : semoule, tomate, menthe, citron, huile d’olive. Hydratation 5 min à l’eau chaude.",
+            "🍌 **Banana pancakes** : 1 banane + 2 œufs, mélangés et cuits en petites galettes. Sans farine !",
+            "🧈 **Wrap beurre de cacahuète-banane** : rapide, énergétique, parfait en collation !",
+            "🍽️ **Assiette anti-gaspi** : reste de pâtes, légumes et un œuf, mélangés et poêlés façon wok !",
+            "🍜 **Nouilles instant maison** : nouilles + bouillon + œuf + légumes râpés. Prêt en 7 minutes top chrono !",
+            "🥓 **Œuf cocotte express** : œuf + crème + fromage dans un ramequin, 1 min au micro-ondes.",
+            "🌽 **Galette de maïs rapide** : maïs + œuf + farine + épices, cuit à la poêle façon pancake salé.",
+            "🍕 **Mini pizzas pain de mie** : pain de mie, sauce tomate, fromage, garniture au choix, 10 min au four.",
+            "🍄 **Poêlée champignons ail-persil** : champignons frais, ail, persil, et huile d’olive. Simple & savoureux.",
+            "🌯 **Wrap sucré pomme-cannelle** : pomme râpée, cannelle, un filet de miel, le tout roulé dans une galette.",
+            "🍳 **Tortilla minute** : œufs battus + restes de légumes + fromage, à la poêle comme une omelette épaisse.",
+            "🧀 **Boulettes express** : steak haché + chapelure + épices, façonnées et dorées en 5 min à la poêle.",
+            "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
+            "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
 
-                # Liste des recettes rapides
-                recettes = [
-                    "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
-                    "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
-                    "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
-                    "🥗 **Salade express** : tomates cerises, mozzarella, roquette, huile d’olive, vinaigre balsamique.",
-                    "🌯 **Wrap poulet-crudités** : galette + restes de poulet + salade + sauce yaourt.",
-                    "🥔 **Pommes de terre sautées** : en cubes, à la poêle avec ail et persil. Parfait avec des œufs !",
-                    "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes.",
-                    "🍞 **Croque-monsieur rapide** : pain de mie, jambon, fromage, 5 min au grill ou à la poêle.",
-                    "🥒 **Tartines fraîcheur** : pain grillé, fromage frais, concombre, citron et herbes.",
-                    "🍚 **Riz sauté aux légumes** : reste de riz + légumes + œuf + sauce soja. Un wok express !",
-                    "🍗 **Poulet minute au curry** : dés de poulet + crème + curry + oignon, à la poêle en 10 min.",
-                    "🍳 **Œufs brouillés crémeux** : œufs + beurre + sel + poivre, cuisson douce pour onctuosité.",
-                    "🧄 **Pâtes ail-persil** : ail doré à la poêle, persil frais, huile d’olive, et hop sur les pâtes !",
-                    "🥑 **Toast avocat-œuf** : pain grillé + avocat écrasé + œuf au plat ou mollet.",
-                    "🌮 **Tacos express** : galette + steak haché ou haricots + tomate + salade + sauce.",
-                    "🥔 **Gratin express au micro-ondes** : pommes de terre en tranches fines + crème + fromage.",
-                    "🍅 **Tomates mozzarella** : tranches de tomates + mozzarella + basilic + huile d’olive. Simple et frais.",
-                    "🧀 **Quesadilla express** : deux tortillas + fromage + restes au choix + poêle 5 min chaque côté.",
-                    "🍳 **Mini shakshuka rapide** : tomates en dés + œufs + cumin dans une petite poêle. Un délice !",
-                    "🥣 **Bowl sucré express** : fromage blanc + fruits + flocons d’avoine + miel. Parfait au petit dej.",
-                    "🥕 **Bâtonnets carottes-concombre** : trempés dans du houmous ou une sauce yaourt. Frais et sain.",
-                    "🍞 **Pain perdu rapide** : tranches de pain + œuf + lait + sucre, à la poêle jusqu’à dorure.",
-                    "🍠 **Patate douce micro-ondes** : piquée à la fourchette, 7 min puissance max, à garnir à volonté.",
-                    "🥒 **Taboulé express** : semoule, tomate, menthe, citron, huile d’olive. Hydratation 5 min à l’eau chaude.",
-                    "🍌 **Banana pancakes** : 1 banane + 2 œufs, mélangés et cuits en petites galettes. Sans farine !",
-                    "🧈 **Wrap beurre de cacahuète-banane** : rapide, énergétique, parfait en collation !",
-                    "🍽️ **Assiette anti-gaspi** : reste de pâtes, légumes et un œuf, mélangés et poêlés façon wok !",
-                    "🍜 **Nouilles instant maison** : nouilles + bouillon + œuf + légumes râpés. Prêt en 7 minutes top chrono !",
-                    "🥓 **Œuf cocotte express** : œuf + crème + fromage dans un ramequin, 1 min au micro-ondes.",
-                    "🌽 **Galette de maïs rapide** : maïs + œuf + farine + épices, cuit à la poêle façon pancake salé.",
-                    "🍕 **Mini pizzas pain de mie** : pain de mie, sauce tomate, fromage, garniture au choix, 10 min au four.",
-                    "🍄 **Poêlée champignons ail-persil** : champignons frais, ail, persil, et huile d’olive. Simple & savoureux.",
-                    "🌯 **Wrap sucré pomme-cannelle** : pomme râpée, cannelle, un filet de miel, le tout roulé dans une galette.",
-                    "🍳 **Tortilla minute** : œufs battus + restes de légumes + fromage, à la poêle comme une omelette épaisse.",
-                    "🧀 **Boulettes express** : steak haché + chapelure + épices, façonnées et dorées en 5 min à la poêle.",
-                    "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
-                    "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
+            ]
+            # Gestion de la demande de recette
+            if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+                if 'derniere_recette' not in st.session_state:
+                    st.session_state['derniere_recette'] = random.choice(recettes)
 
-                ]
                 message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
 
-        # Gestion de la demande "encore un" ou "plus" pour les recettes
-        if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
-            if st.session_state['derniere_recette']:
-                message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
-            else:
+            # Gestion de la demande "encore un" ou "plus" pour les recettes
+            if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
+                if st.session_state['derniere_recette']:
+                    message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
+                else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
         # --- Bloc Mini base générale (culture quotidienne) ---
