@@ -223,25 +223,28 @@ if question:
                 ville_detectee = "paris"  # par défaut
                 # On essaie d'extraire le lieu après "à", "au", "aux", "dans"
                 match_ville = re.search(r"(?:à|au|aux|dans|sur|en)\s+([a-zA-ZÀ-ÿ\-'\s]+)", question_clean)
-                if match_ville:
-                    ville_extraite = match_ville.group(1).strip()
-                # On retire les mots trop génériques ou très courts
+                ville_extraite = match_ville.group(1).strip() if match_ville else None
+                # 3) Filtrer les mots trop génériques ou très courts
+            if ville_extraite:
                 mots_exclus = ["météo", "temps", "quel", "quelle", "ville", "jour", "fait", "il"]
-                mots_valides = [mot for mot in ville_extraite.split() if mot.lower() not in mots_exclus and len(mot) > 2]
-                if mots_valides:
-                    ville_detectee = " ".join(mots_valides)
-                # Formatage du nom de la ville
-                ville_detectee_cap = ville_detectee.title()  # première lettre en majuscule
-                 # Récupération météo
-                meteo = get_meteo_ville(ville_detectee_cap)
+                valides = [
+                   mot for mot in ville_extraite.split()
+                   if mot.lower() not in mots_exclus and len(mot) > 2
+                ]  
+                if valides:
+                    ville_detectee = " ".join(valides)
+            # Formatage du nom de la ville
+            ville_detectee_cap = ville_detectee.title()  # première lettre en majuscule
+            # Récupération météo
+            meteo = get_meteo_ville(ville_detectee_cap)
                 
-                if "erreur" in meteo.lower():
-                    message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville ou village."
-                else:
-                    message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
+            if "erreur" in meteo.lower():
+                message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville ou village."
+            else:
+                message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
 
                 meteo_repondu = True
-                
+
         # --- Blagues ---
         elif not horoscope_repondu and any(phrase in question_clean for phrase in ["blague", "blagues"]):
             blagues = [
