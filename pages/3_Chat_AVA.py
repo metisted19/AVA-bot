@@ -24,16 +24,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 1) Un seul st.text_input, avec key unique
+# 1️⃣ Unique text_input, avec key pour éviter tout doublon
 question_raw = st.text_input("Posez votre question :", key="chat_input")
 message_bot  = None
-
-# 2) Chargement du modèle (cache)
-@st.cache_resource
-def load_semantic_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
-
-model_semantic = load_semantic_model()
 
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
@@ -1138,10 +1131,11 @@ if question:
         message_bot  = None
 
         # 3) Bloc sémantique
-        if question_raw and not message_bot:
-            question_clean = nettoyer_texte(question_raw)
+        # 2️⃣ Si l’utilisateur a tapé quelque chose…
+        if question_raw:
+            # A. Nettoyage basique : minuscules + suppression des espaces superflus
+            question_clean = question_raw.lower().strip()
 
-            # 2️⃣ Réponses « hard‑codées »
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
                 "ça va": "Je vais bien, merci de demander ! Et vous ?",
@@ -1169,12 +1163,17 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
-            # 2.a. Réponse immédiate si correspondance exacte
-            if question_clean in reponses_courantes:
-                message_bot = reponses_courantes[question_clean]
-
-            # 3️⃣ Sinon, passage au matching sémantique
-            else:
+            # Essai d'accès direct
+            message_bot = reponses_courantes.get(question_clean)
+    
+            # C. Matching sémantique si pas de correspondance exacte
+            if not message_bot:
+                # Chargement (ou cache) du modèle
+                @st.cache_resource
+                def load_model():
+                    return SentenceTransformer("all-MiniLM-L6-v2")
+                model = load_model()
+            
                 base_savoir = {
                     # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
                     "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
@@ -1205,18 +1204,20 @@ if question:
                     "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
                     "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
                 }
-                questions_connues   = list(base_savoir.keys())
-                vecteurs_base       = model_semantic.encode(questions_connues)
-                vecteur_question    = model_semantic.encode([question_clean])[0]
-                similarites         = cosine_similarity([vecteur_question], vecteurs_base)[0]
-
-                meilleure_q, score  = max(zip(questions_connues, similarites),
-                                        key=lambda x: x[1])
+                questions_connues = list(base_savoir.keys())
+                vecteurs_base    = model.encode(questions_connues)
+                vecteur_q        = model.encode([question_clean])[0]
+                sims             = cosine_similarity([vecteur_q], vecteurs_base)[0]
+        
+                meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
+    
+            # D. Fallback ultime vers ta fonction générale
+            if not message_bot:
+                message_bot = obtenir_reponse_ava(question_raw)
 
-        if question_raw and not message_bot:
-            message_bot = obtenir_reponse_ava(question_raw)
+        # 3️⃣ Affichage
         if message_bot:
             st.write(message_bot)
         
