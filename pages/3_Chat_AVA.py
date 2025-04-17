@@ -484,7 +484,7 @@ if question:
             "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
             "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
             "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
-            "merci": "Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
+            "merci": "Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏",
             "je t'aime": "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions",
             "un secret": "🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…",
             "tu es belle": "😍 Merci ! C’est le code qui fait tout… et un peu la lumière LED !", "💅 Flattée, même en version binaire.", "🪞 Vous me voyez vraiment ? Je rougis (virtuellement) !",
