@@ -25,20 +25,22 @@ import unicodedata, re
 import difflib
 from fonctions_chat import obtenir_reponse_ava 
 
+# 1) Config page
+st.set_page_config(page_title="Chat AVA", layout="centered")
+
+# 2) Chargement du modèle sémantique
 @st.cache_resource
 def load_semantic_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
-
 model_semantic = load_semantic_model()
+
+# 3) Nettoyage texte
 def nettoyer_texte(texte: str) -> str:
-    # Normalisation Unicode (combine et décompose les caractères)
-    texte = unicodedata.normalize('NFKC', texte)
-    # minuscules + suppression espaces de début/fin
+    texte = unicodedata.normalize("NFKC", texte)
     texte = texte.lower().strip()
-    # fusion des multiples espaces en un seul
-    texte = re.sub(r'\s+', ' ', texte)
+    texte = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", texte)
+    texte = re.sub(r"\s+", " ", texte)
     return texte
-st.set_page_config(page_title="Chat AVA", layout="centered")
 
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
@@ -1169,13 +1171,17 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
-        # ─── 5. Saisie utilisateur & logique ────────────────────────────────────────
+        # 5) Saisie utilisateur
         question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot  = None
+
+        # 5.a) Debug question_raw
+        st.write("🔍 DEBUG – question_raw  :", repr(question_raw))
 
         if question_raw:
             # A) Nettoyage
             question_clean = nettoyer_texte(question_raw)
+            st.write("🔍 DEBUG – question_clean:", repr(question_clean))
 
             # B) Réponses directes « hard‑codées »
             reponses_courantes = {
@@ -1205,15 +1211,12 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
-            # ─── DEBUG ───────────────────────────────────────────────────────────────
-            st.write("🔍 DEBUG – question_clean :", repr(question_clean))
-            st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
-            # ──────────────────────────────────────────────────────────────────────────
+             st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
 
             # C) Lookup strict
             message_bot = reponses_courantes.get(question_clean)
 
-            # D) Lookup fuzzy si besoin
+            # D) Lookup fuzzy (si nécessaire)
             if not message_bot:
                 close = difflib.get_close_matches(
                     question_clean,
@@ -1224,13 +1227,15 @@ if question:
                 if close:
                     message_bot = reponses_courantes[close[0]]
 
-            # E) Matching sémantique si toujours rien
+            # E) Matching sémantique (si toujours rien)
             if not message_bot:
                 questions_connues = list(base_savoir.keys())
                 vecteurs_base     = model_semantic.encode(questions_connues)
                 vecteur_question  = model_semantic.encode([question_clean])[0]
                 sims              = cosine_similarity([vecteur_question], vecteurs_base)[0]
+
                 meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
+                st.write(f"🔍 DEBUG – best match: {meilleure_q!r} (score {score:.2f})")
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
 
@@ -1238,7 +1243,7 @@ if question:
             if not message_bot:
                 message_bot = obtenir_reponse_ava(question_raw)
 
-        # ─── 6. Affichage ───────────────────────────────────────────────────────────
+        # 6) Affichage
         if message_bot:
             st.write(message_bot)
 
