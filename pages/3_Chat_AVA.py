@@ -1197,27 +1197,21 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
-        # 5) Saisie utilisateur
-        question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot = None
 
-        if question_raw:
-            qc = nettoyer_texte(question_raw)
+        if question_raw:  # <- NE PAS redemander question ici si elle est déjà définie ailleurs
+            qc = nettoyer_texte(question_raw.strip().lower())
 
-            # Fusion des bases
             base_complet = {**base_savoir, **reponses_courantes}
 
-            # a) Vérification directe
             if qc in reponses_courantes:
                 message_bot = reponses_courantes[qc]
 
-            # b) Fuzzy matching
             else:
                 close = difflib.get_close_matches(qc, reponses_courantes.keys(), n=1, cutoff=0.8)
                 if close:
                     message_bot = reponses_courantes[close[0]]
                 else:
-                    # c) Matching sémantique (sur toutes les données connues)
                     keys = list(base_complet.keys())
                     vb = model_semantic.encode(keys)
                     vq = model_semantic.encode([qc])[0]
@@ -1226,13 +1220,11 @@ if question:
                     if score > 0.7:
                         message_bot = base_complet[best]
                     else:
-                        # d) Fallback final
                         message_bot = obtenir_reponse_ava(question_raw)
 
-        # 6) Affichage
         if message_bot:
             st.write(message_bot)
-
+            
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
             base_generale = {
