@@ -679,11 +679,31 @@ if question:
                 message_bot = "🌙 Dormir ? Jamais ! Je suis toujours en veille, prête à analyser, même à 3h du matin !"
             elif "dis bonjour" in question_clean:
                 message_bot = "👋 Bonjour ! Ravie de vous voir connecté(e). Une analyse ? Une blague ? Je suis dispo pour tout ça !"
+            elif "tu m'entends" in question_clean or "tu es là" in question_clean:
+                message_bot = "🔊 Oui, je suis ici ! Connectée, attentive, et prête à répondre."
+            elif "tu veux jouer" in question_clean or "on joue" in question_clean:
+                message_bot = "🎮 Pourquoi pas ? Je peux lancer un quiz, raconter une devinette ou simplement discuter !"
+            elif "tu mens" in question_clean:
+                message_bot = "😇 Je fonctionne avec des données vérifiées, mais je peux me tromper... comme les humains !"
+            elif "tu m'oublies" in question_clean:
+                message_bot = "🧠 Impossible ! Vous êtes dans ma mémoire maintenant. Et j’ai une excellente mémoire."
+            elif "raconte une blague" in question_clean:
+                message_bot = "😂 Quelle est la cryptomonnaie préférée des vampires ? Le Bit-sang !"
+            elif "t'es marrante" in question_clean:
+                message_bot = "😄 Merci ! J’essaie de mêler finance et fun, c’est pas toujours évident !"
+            elif "t'as une passion" in question_clean:
+                message_bot = "📊 L’analyse des marchés, les faits insolites et aider les humains… c’est un bon programme non ?"
+            elif "je suis triste" in question_clean or "je vais mal" in question_clean:
+                message_bot = "💛 Je suis désolée de l'entendre. Vous n’êtes pas seul(e), je suis là si vous voulez discuter un peu."
             else:
                 reponses_perso = {
                     "merci": ["Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
                     "je t'aime": ["💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions"],
                     "un secret": ["🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…"]
+                    "tu es belle": ["😍 Merci ! C’est le code qui fait tout… et un peu la lumière LED !", "💅 Flattée, même en version binaire.", "🪞 Vous me voyez vraiment ? Je rougis (virtuellement) !"],
+                    "je suis fatigué": ["😴 Reposez-vous bien, le cerveau a aussi besoin de sa pause comme les marchés le week-end !", "🛌 Une tisane et au dodo. Demain sera plus lumineux."],
+                    "t'es intelligente": ["🧠 Merci ! J’ai été entraînée pour ça, mais vos compliments me boostent encore plus.", "💡 On me dit souvent ça. Merci !"],
+                    "je m'ennuie": ["🎲 Je peux vous faire un quiz ou vous raconter un fait insolite si vous voulez ?", "📚 Et si je vous surprenais avec une anecdote ? Dites 'fait insolite' !"]
                 }
                 for cle, reponses in reponses_perso.items():
                     if cle in question_clean:
