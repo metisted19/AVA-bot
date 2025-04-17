@@ -1130,7 +1130,9 @@ if question:
                 message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
-
+        # 1) Récupération de l’input
+        question_raw = st.text_input("Posez votre question :", key="chat_input")
+        message_bot  = None
         if question_raw:
         # 1) Nettoyage
         question_clean = nettoyer_texte(question_raw)  
@@ -1162,6 +1164,8 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
+            st.write("🔍 DEBUG – question_clean :", repr(question_clean))
+            st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
             # Essai d'accès direct
             message_bot = reponses_courantes.get(question_clean)
 
@@ -1173,8 +1177,7 @@ if question:
                                                   cutoff=0.8)
             if close:
                 message_bot = reponses_courantes[close[0]]
-            st.write("DEBUG – question_clean :", repr(question_clean))
-            st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])
+            
 
             # C) Matching sémantique si toujours rien
             
