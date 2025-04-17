@@ -1152,11 +1152,12 @@ if question:
                     "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
 
                 ]
-                # Choisir une recette aléatoire
-                message_bot = f"🍽️ Une petite faim ? Voici une idée :\n\n{random.choice(recettes)}"
-
-                # Garder la dernière recette pour pouvoir la redonner
-                st.session_state['derniere_recette'] = message_bot
+                # Gestion de la demande "encore un" ou "plus" pour les recettes
+                if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
+                    if st.session_state['derniere_recette']:
+                        message_bot = f"🍽️ Voici une autre idée :\n\n{st.session_state['derniere_recette']}"
+                    else:
+                        message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
