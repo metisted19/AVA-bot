@@ -1156,12 +1156,6 @@ if question:
 
             message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
 
-        # Gestion de la demande "encore un" ou "plus" pour les recettes
-        if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
-            if 'derniere_recette' in st.session_state:
-                message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
-            else:
-                message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
    
 
 
