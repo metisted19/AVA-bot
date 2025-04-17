@@ -34,7 +34,7 @@ def load_semantic_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
 model_semantic = load_semantic_model()
 
-# 3) Nettoyage texte
+# 3) Nettoyage du texte
 def nettoyer_texte(texte: str) -> str:
     texte = unicodedata.normalize("NFKC", texte)
     texte = texte.lower().strip()
@@ -1173,15 +1173,14 @@ if question:
         }
         # 5) Saisie utilisateur
         question_raw = st.text_input("Posez votre question :", key="chat_input")
-        message_bot  = None
+        st.write("🔍 DEBUG – question_raw             :", repr(question_raw))
 
-        # 5.a) Debug question_raw
-        st.write("🔍 DEBUG – question_raw  :", repr(question_raw))
+        message_bot = None
 
         if question_raw:
             # A) Nettoyage
             question_clean = nettoyer_texte(question_raw)
-            st.write("🔍 DEBUG – question_clean:", repr(question_clean))
+            st.write("🔍 DEBUG – question_clean           :", repr(question_clean))
 
             # B) Réponses directes « hard‑codées »
             reponses_courantes = {
@@ -1211,12 +1210,16 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
-            st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
+            # B.1) Affiche la liste brute des clés
+            st.write("🔍 DEBUG – reponses_courantes.keys() :", list(reponses_courantes.keys()))
+            # B.2) Vérifie l’appartenance
+            st.write("🔍 DEBUG – question_clean in keys?    :", question_clean in reponses_courantes)
 
             # C) Lookup strict
             message_bot = reponses_courantes.get(question_clean)
+            st.write("🔍 DEBUG – message_bot après strict   :", repr(message_bot))
 
-            # D) Lookup fuzzy (si nécessaire)
+            # D) Lookup fuzzy (80% tolérance)
             if not message_bot:
                 close = difflib.get_close_matches(
                     question_clean,
@@ -1224,10 +1227,12 @@ if question:
                     n=1,
                     cutoff=0.8
                 )
+                st.write("🔍 DEBUG – fuzzy matches            :", close)
                 if close:
                     message_bot = reponses_courantes[close[0]]
+                st.write("🔍 DEBUG – message_bot après fuzzy    :", repr(message_bot))
 
-            # E) Matching sémantique (si toujours rien)
+            # E) Matching sémantique si toujours rien
             if not message_bot:
                 questions_connues = list(base_savoir.keys())
                 vecteurs_base     = model_semantic.encode(questions_connues)
@@ -1235,17 +1240,19 @@ if question:
                 sims              = cosine_similarity([vecteur_question], vecteurs_base)[0]
 
                 meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
-                st.write(f"🔍 DEBUG – best match: {meilleure_q!r} (score {score:.2f})")
+                st.write(f"🔍 DEBUG – sémantique best match: {meilleure_q!r} (score {score:.2f})")
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
+                st.write("🔍 DEBUG – message_bot après sémantique:", repr(message_bot))
 
             # F) Fallback ultime
             if not message_bot:
                 message_bot = obtenir_reponse_ava(question_raw)
+                st.write("🔍 DEBUG – message_bot après fallback :", repr(message_bot))
 
-        # 6) Affichage
-        if message_bot:
-            st.write(message_bot)
+# 6) Affichage final
+if message_bot:
+    st.write(message_bot)
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
