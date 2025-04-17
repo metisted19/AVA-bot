@@ -1186,15 +1186,23 @@ if question:
                 "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
             }
 
+            # Nettoyage de la question de l'utilisateur
+            question_clean = nettoyer_texte(question_clean)
+
+            # Encodage des questions et calcul des similarités
             questions_connues = list(base_savoir.keys())
             vecteurs_base = model_semantic.encode(questions_connues)
             vecteur_question = model_semantic.encode([question_clean])
             similarites = cosine_similarity([vecteur_question[0]], vecteurs_base)[0]
 
+            # Trouver la meilleure correspondance
             meilleure_correspondance = max(zip(questions_connues, similarites), key=lambda x: x[1])
 
+            # Si une correspondance suffisante est trouvée
             if meilleure_correspondance[1] > 0.7:
-                message_bot = base_savoir[meilleure_correspondance[0]]        
+                message_bot = base_savoir[meilleure_correspondance[0]]
+            else:
+                message_bot = "Je ne suis pas sûre de comprendre votre question. Pouvez-vous reformuler ?"      
 
         
 
