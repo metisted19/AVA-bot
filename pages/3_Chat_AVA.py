@@ -1099,17 +1099,17 @@ if question:
             message_bot = random.choice(faits_insolites)
         # --- Bloc Recettes rapides ---
         elif any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
-            # Variable pour garder la dernière recette
+            # Initialisation de la variable pour garder la dernière recette
             if 'derniere_recette' not in st.session_state:
                 st.session_state['derniere_recette'] = None
 
-        # Gestion de la demande "encore un" ou "plus" pour les recettes
-        if question_clean in ["encore un", "plus", "encore", "autre", "un autre"]:
-            if st.session_state['derniere_recette']:
-                message_bot = st.session_state['derniere_recette']
+            # Gestion de la demande "encore un" ou "plus" pour les recettes
+            if question_clean in ["encore un", "plus", "encore", "autre", "un autre"]:
+                if st.session_state['derniere_recette']:
+                    message_bot = f"🍽️ Voici une autre idée :\n\n{st.session_state['derniere_recette']}"
+                else:
+                    message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
             else:
-                message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
-        else:
             # Liste des recettes rapides
             recettes = [
                 "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
