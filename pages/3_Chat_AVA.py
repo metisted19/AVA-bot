@@ -202,25 +202,29 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-            # --- Bloc météo intelligent (villages inclus) ---
+            # --- Bloc météo intelligent avec gestion des villages et noms composés ---
             if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
-                ville_detectee = "paris"  # valeur par défaut
-                mots_question = question_clean.split()
+                ville_detectee = "paris"  # par défaut
+                # On essaie d'extraire le lieu après "à", "au", "aux", "dans"
+                match_ville = re.search(r"(?:à|au|aux|dans|sur|en)\s+([a-zA-ZÀ-ÿ\-'\s]+)", question_clean)
+                if match_ville:
+                    ville_detectee = match_ville.group(1).strip()
 
-            # On filtre les mots utiles (pas trop courts, alphabétiques, pas trop génériques)
-            mots_utiles = [mot for mot in mots_question if len(mot) > 3 and mot.isalpha()]
-            if mots_utiles:
-                ville_detectee = mots_utiles[-1]  # on prend le dernier mot utile comme nom de ville
+                # On retire les mots trop génériques ou très courts
+                mots_exclus = ["météo", "temps", "quel", "quelle", "ville", "jour", "fait", "il"]
+                if ville_detectee.lower() in mots_exclus or len(ville_detectee) < 3:
+                    ville_detectee = "paris"
 
-            ville_detectee_cap = ville_detectee.capitalize()
-            meteo = get_meteo_ville(ville_detectee_cap)
+                ville_detectee_cap = ville_detectee.title()  # première lettre en majuscule
+                meteo = get_meteo_ville(ville_detectee_cap)
 
-            if "erreur" in meteo.lower():
-                message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville."
-            else:
-                message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
+                if "erreur" in meteo.lower():
+                    message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville ou village."
+                else:
+                    message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
 
-            meteo_repondu = True
+                meteo_repondu = True
+
 
         # --- Actualités améliorées ---
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
