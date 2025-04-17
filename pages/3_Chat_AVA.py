@@ -1434,9 +1434,6 @@ if question:
                     message_bot = reponse_base
                     break
 
-                                                                 
-        
-
         # --- Interface utilisateur ---
         st.title("💬 Chat AVA")
 
@@ -1453,22 +1450,6 @@ if question:
 
 
 
-    # --- Bloc Traduction corrigé ---
-        def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
-            url = "https://api-free.deepl.com/v2/translate"
-            params = {
-                "auth_key": api_key,
-                "text": texte,
-                "target_lang": langue_cible
-            }
-            headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            # Détecter la langue de la question et loguer le résultat
-            try:
-                lang_question = detect(question)
-            except Exception as e:
-                lang_question = "fr"
-            if lang_question.lower() != "fr" and message_bot.strip():
-                traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
                 message_bot = traduction
             
         st.markdown(message_bot)
