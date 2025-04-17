@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(page_title="Chat AVA", layout="centered")
 import os
 import pandas as pd
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
@@ -87,7 +88,6 @@ def humeur_du_jour():
     else:
         return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
 
-st.set_page_config(page_title="Chat AVA", layout="centered")
 
 heure_actuelle = datetime.now().hour
 if heure_actuelle < 12:
