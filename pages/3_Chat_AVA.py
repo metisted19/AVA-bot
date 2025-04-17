@@ -207,20 +207,39 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-        # --- Bloc météo intelligent (hors analyse complète) ---
-        if not horoscope_repondu and not analyse_complete and any(kw in question_clean for kw in ["météo", "quel temps"]):
-            # extraction de la ville
+        # --- Bloc météo intelligent ---
+        if not horoscope_repondu and not analyse_complete \
+           and any(kw in question_clean for kw in ["météo", "quel temps"]):
+
+            # 1) on initialise un fallback
             ville_detectee = "Paris"
-            match_ville = re.search(r"(?:à|au|aux|dans|sur|en)\s+([A-Za-zÀ-ÿ' -]+)", question_clean)
-            if match_ville:
-                ville_detectee = match_ville.group(1).strip().title()
-            # requête météo
+
+            # 2) on essaye d’attraper “à Bayonne”, “dans Lyon” etc.
+            match_geo = re.search(
+                r"(?:à|au|aux|dans|sur|en)\s+([A-Za-zÀ-ÿ' -]+)",
+                question_clean
+             )
+
+            # 3) si pas trouvé, on attrape “météo Bayonne” ou “météo  lyon”  
+            if not match_geo:
+                match_geo = re.search(
+                    r"m[eé]t[eé]o\s+([A-Za-zÀ-ÿ' -]+)",
+                    question_clean
+            )
+
+            if match_geo:
+                ville_detectee = match_geo.group(1).strip().title()
+
+            # 4) on appelle l’API
             meteo = get_meteo_ville(ville_detectee)
+
             if "erreur" in meteo.lower():
                 message_bot += f"⚠️ Je n'ai pas trouvé la météo pour **{ville_detectee}**. Essayez une autre ville.\n\n"
             else:
                 message_bot += f"🌦️ **Météo à {ville_detectee}** :\n{meteo}\n\n"
+
             meteo_repondu = True
+
 
         # --- Actualités améliorées ---
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
