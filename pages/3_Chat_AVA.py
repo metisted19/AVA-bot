@@ -1185,9 +1185,11 @@ if question:
                 "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
                 "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
             }
-
-            # Nettoyage de la question de l'utilisateur
-            question_clean = nettoyer_texte(question_clean)
+            # Vérifier que question_clean existe avant de la nettoyer
+            if 'question_clean' in locals() or 'question_clean' in globals():
+                question_clean = nettoyer_texte(question_clean)
+            else:
+                question_clean = ""  # Valeur par défaut si la variable n'est pas définie
 
             # Encodage des questions et calcul des similarités
             questions_connues = list(base_savoir.keys())
@@ -1202,7 +1204,7 @@ if question:
             if meilleure_correspondance[1] > 0.7:
                 message_bot = base_savoir[meilleure_correspondance[0]]
             else:
-                message_bot = "Je ne suis pas sûre de comprendre votre question. Pouvez-vous reformuler ?"      
+                message_bot = "Je ne suis pas sûre de comprendre votre question. Pouvez-vous reformuler ?"    
 
         
 
