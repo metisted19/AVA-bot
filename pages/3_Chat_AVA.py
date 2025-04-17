@@ -1098,8 +1098,13 @@ if question:
             ]
             message_bot = random.choice(faits_insolites)
 
+
         # --- Bloc Recettes rapides ---
-        recettes = [
+        elif any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+            # Initialisation de 'derniere_recette' si elle n'existe pas encore
+            if 'derniere_recette' not in st.session_state:
+                st.session_state['derniere_recette'] = random.choice(recettes)
+            recettes = [
             "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
             "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
             "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
