@@ -1129,9 +1129,11 @@ if question:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
         # --- Bloc d'intelligence sémantique locale ---
-        if not message_bot and question_raw:
+        if question_raw and not message_bot:
             # 1. Nettoyage de la question brute
             question_clean = nettoyer_texte(question_raw)
+
+            # 2. Réponses « hard‑codées » pour cas simples
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
                 "ça va": "Je vais bien, merci de demander ! Et vous ?",
@@ -1159,9 +1161,9 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
-        # 2.a. Vérification d'une réponse exacte
+        # 2.a. Si c’est exact, on renvoie tout de suite
         if question_clean in reponses_courantes:
-            message_bot = reponses_courantes[question_clean]
+            message_bot = reponses_courantes[question_clean
 
         # 3. Si pas de réponse « hard‑codée », on utilise le matching sémantique
         else:
@@ -1195,26 +1197,16 @@ if question:
                 "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
                 "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
             }
-            questions_connues = list(base_savoir.keys())
+            questions_connues  = list(base_savoir.keys())
+            vecteurs_base      = model_semantic.encode(questions_connues)
+            vecteur_question   = model_semantic.encode([question_clean])[0]
+            similarites        = cosine_similarity([vecteur_question], vecteurs_base)[0]
+            meilleure_q, score = max(zip(questions_connues, similarites), key=lambda x: x[1])
 
-            # Encodage
-            vecteurs_base   = model_semantic.encode(questions_connues)
-            vecteur_question = model_semantic.encode([question_clean])[0]
-
-            # Calcul des similarités cosinus
-            similarites = cosine_similarity([vecteur_question], vecteurs_base)[0]
-
-            # Recherche de la meilleure correspondance
-            meilleure_question, score = max(zip(questions_connues, similarites),
-                                            key=lambda x: x[1])
-
-            # Seuil de confiance
             if score > 0.7:
-                message_bot = base_savoir[meilleure_question]
+                message_bot = base_savoir[meilleure_q]
             else:
-                message_bot = "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
-
-            # Note : si question_raw est vide ou message_bot déjà défini, ce bloc est sauté.  
+                message_bot = "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"  
 
         
 
