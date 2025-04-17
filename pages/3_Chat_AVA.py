@@ -1250,9 +1250,9 @@ if question:
                 message_bot = obtenir_reponse_ava(question_raw)
                 st.write("🔍 DEBUG – message_bot après fallback :", repr(message_bot))
 
-# 6) Affichage final
-if message_bot:
-    st.write(message_bot)
+        # 6) Affichage final
+        if message_bot:
+            st.write(message_bot)
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
