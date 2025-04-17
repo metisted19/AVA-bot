@@ -1020,7 +1020,17 @@ if question:
                 {"question": "🎬 Quel film a remporté l'Oscar du meilleur film en 1998 avec 'Titanic' ?", "réponse": "titanic"},
                 {"question": "🐘 Quel est le plus grand animal terrestre ?", "réponse": "éléphant"},
                 {"question": "🎼 Quel musicien est surnommé 'le Roi de la Pop' ?", "réponse": "michael jackson"},
-                {"question": "⚽ Quelle nation a remporté la Coupe du Monde 2018 ?", "réponse": "france"}
+                {"question": "⚽ Quelle nation a remporté la Coupe du Monde 2018 ?", "réponse": "france"},
+                {"question": "🗼 En quelle année a été inaugurée la Tour Eiffel ?", "réponse": "1889"},
+                {"question": "🧬 Que signifie l'acronyme ADN ?", "réponse": "acide désoxyribonucléique"},
+                {"question": "🎨 Quel peintre est célèbre pour avoir coupé une partie de son oreille ?", "réponse": "vincent van gogh"},
+                {"question": "🇮🇹 Dans quel pays se trouve la ville de Venise ?", "réponse": "italie"},
+                {"question": "🎭 Qui a écrit la pièce 'Hamlet' ?", "réponse": "william shakespeare"},
+                {"question": "📐 Quel est le nom du triangle qui a deux côtés de même longueur ?", "réponse": "triangle isocèle"},
+                {"question": "🔬 Quel scientifique a formulé la théorie de la relativité ?", "réponse": "albert einstein"},
+                {"question": "🌋 Quel volcan italien est célèbre pour avoir détruit Pompéi ?", "réponse": "vesuve"},
+                {"question": "🎤 Qui chante la chanson 'Someone Like You' ?", "réponse": "adele"},
+                {"question": "🗳️ Quel est le régime politique de la France ?", "réponse": "république"}
             ]
             question_choisie = random.choice(quizz_culture)
             st.session_state["quiz_attendu"] = question_choisie["réponse"].lower()
