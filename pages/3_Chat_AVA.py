@@ -1208,7 +1208,7 @@ if question:
             base_complet = {**base_savoir, **reponses_courantes}
 
             # a) Vérification directe
-           if qc in reponses_courantes:
+            if qc in reponses_courantes:
                 message_bot = reponses_courantes[qc]
 
             # b) Fuzzy matching
