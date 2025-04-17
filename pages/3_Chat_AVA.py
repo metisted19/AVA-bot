@@ -1139,6 +1139,8 @@ if question:
         if question_raw:
             # A) Nettoyage
             question_clean = question_raw.lower().strip
+        st.write("DEBUG – question_clean :", repr(question_clean))
+        st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])    
 
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
@@ -1178,8 +1180,7 @@ if question:
                                                   cutoff=0.8)
             if close:
                 message_bot = reponses_courantes[close[0]]
-        st.write("DEBUG – question_clean :", repr(question_clean))
-        st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])    
+  
 
             # C) Matching sémantique si toujours rien
             
