@@ -23,7 +23,13 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
 import unicodedata, re
 import difflib
+from fonctions_chat import obtenir_reponse_ava 
 
+@st.cache_resource
+def load_semantic_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+model_semantic = load_semantic_model()
 def nettoyer_texte(texte: str) -> str:
     # Normalisation Unicode (combine et décompose les caractères)
     texte = unicodedata.normalize('NFKC', texte)
@@ -1132,13 +1138,46 @@ if question:
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
-        # 1) Récupération de l’input
+        # ─── 4. Base sémantique statique  
+        base_savoir = {
+            # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
+            "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
+            "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
+            "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
+            "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
+            "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
+            "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+            "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
+            "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
+            "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
+            "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
+            "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
+            "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+            "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
+            "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
+            "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
+            "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
+            "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+            "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
+            "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
+            "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
+            "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
+            "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
+            "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
+            "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
+            "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
+            "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
+             "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
+        }
+        # ─── 5. Saisie utilisateur & logique ────────────────────────────────────────
         question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot  = None
-        if question_raw:
-            # 1) Nettoyage
-            question_clean = nettoyer_texte(question_raw)  
 
+        if question_raw:
+            # A) Nettoyage
+            question_clean = nettoyer_texte(question_raw)
+
+            # B) Réponses directes « hard‑codées »
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
                 "ça va": "Je vais bien, merci de demander ! Et vous ?",
@@ -1166,79 +1205,42 @@ if question:
                 "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
                 "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
+            # ─── DEBUG ───────────────────────────────────────────────────────────────
             st.write("🔍 DEBUG – question_clean :", repr(question_clean))
             st.write("🔍 DEBUG – clés dispo      :", [repr(k) for k in reponses_courantes.keys()])
-            # Essai d'accès direct
+            # ──────────────────────────────────────────────────────────────────────────
+
+            # C) Lookup strict
             message_bot = reponses_courantes.get(question_clean)
-            # 2.4) Si pas de correspondance, tentative fuzzy
+
+            # D) Lookup fuzzy si besoin
             if not message_bot:
                 close = difflib.get_close_matches(
                     question_clean,
                     reponses_courantes.keys(),
                     n=1,
                     cutoff=0.8
-               ) 
+                )
                 if close:
                     message_bot = reponses_courantes[close[0]]
-            
-                base_savoir = {
-                    # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
-                    "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
-                    "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
-                    "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
-                    "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
-                    "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
-                    "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-                    "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
-                    "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
-                    "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
-                    "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
-                    "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
-                    "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
-                    "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
-                    "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
-                    "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
-                    "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
-                    "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-                    "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
-                    "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
-                    "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
-                    "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
-                    "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
-                    "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
-                    "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
-                    "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
-                    "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
-                    "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
-                }
-                questions_connues = list(base_savoir.keys())
 
-                # Modèle chargé une seule fois, en début de fichier
-                @st.cache_resource
-                def load_semantic_model():
-                    return SentenceTransformer("all-MiniLM-L6-v2")
-                model_semantic = load_semantic_model()
-
-            # 2.5) Matching sémantique si toujours rien
+            # E) Matching sémantique si toujours rien
             if not message_bot:
-                # ta base_savoir doit être définie en amont (hors du if)
                 questions_connues = list(base_savoir.keys())
                 vecteurs_base     = model_semantic.encode(questions_connues)
                 vecteur_question  = model_semantic.encode([question_clean])[0]
                 sims              = cosine_similarity([vecteur_question], vecteurs_base)[0]
-
                 meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
 
-            # 2.6) Dernier recours : appel à ta fonction principale
+            # F) Fallback ultime
             if not message_bot:
-            message_bot = obtenir_reponse_ava(question_raw)
+                message_bot = obtenir_reponse_ava(question_raw)
 
-        # 3) Affichage final
+        # ─── 6. Affichage ───────────────────────────────────────────────────────────
         if message_bot:
             st.write(message_bot)
-        
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
