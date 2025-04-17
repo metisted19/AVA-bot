@@ -25,23 +25,19 @@ import unicodedata, re
 import difflib
 from fonctions_chat import obtenir_reponse_ava 
 
-# ─── Configuration de la page ─────────────────────────────
+# 1) Config page + modèle
 st.set_page_config(page_title="Chat AVA", layout="centered")
-
-# ─── Chargement du modèle sémantique ─────────────────────
 @st.cache_resource
 def load_semantic_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
 model_semantic = load_semantic_model()
 
-# ─── Fonction de nettoyage ───────────────────────────────
+# 2) Nettoyage
 def nettoyer_texte(texte: str) -> str:
     texte = unicodedata.normalize("NFKC", texte)
     texte = texte.lower().strip()
     texte = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", texte)
-    texte = re.sub(r"\s+", " ", texte)
-    return texte
-
+    return re.sub(r"\s+", " ", texte)
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -1141,7 +1137,35 @@ if question:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
         # ─── 4. Base sémantique statique  
-        base_savoir = {
+        # B) Réponses directes « hard‑codées »
+        reponses_courantes = {
+            "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+            "ça va": "Je vais bien, merci de demander ! Et vous ?",
+            "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+            "hello": "Hello! How can I assist you today?",
+            "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+            "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+            "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+            "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+            "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+            "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+            "tu m'entends": "Je vous entends fort et clair 🎧",
+            "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+            "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+            "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+            "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+            "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+            "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+            "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+            "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+            "re": "Re bienvenue à bord ! On continue notre mission ?",
+            "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+            "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+            "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+            "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+            "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
+        }
+            base_savoir = {
             # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
             "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
             "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
@@ -1171,68 +1195,38 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
+        # 4) Lecture de l’input
         question_raw = st.text_input("Posez votre question :", key="chat_input")
-        message_bot  = None
 
+        # 5) Calcul de la réponse
+        message_bot = None
         if question_raw:
-            question_clean = nettoyer_texte(question_raw)
+            qc = nettoyer_texte(question_raw)
 
-            # 1) Direct
-            reponses_courantes = {
-                "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-                # … tes autres clés …
-            }
-            message_bot = reponses_courantes.get(question_clean)
+            # 5.a) direct
+            message_bot = reponses_courantes.get(qc)
 
-            # B) Réponses directes « hard‑codées »
-            reponses_courantes = {
-                "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
-                "ça va": "Je vais bien, merci de demander ! Et vous ?",
-                "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-                "hello": "Hello! How can I assist you today?",
-                "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-                "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-                "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-                "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-                "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-                "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-                "tu m'entends": "Je vous entends fort et clair 🎧",
-                "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-                "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-                "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
-                "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-                "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
-                "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-                "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
-                "re": "Re bienvenue à bord ! On continue notre mission ?",
-                "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-                "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-                "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-                "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
-                "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
-            }
-            message_bot = reponses_courantes.get(question_clean)
-
-            # 2) Fuzzy
+            # 5.b) fuzzy
             if not message_bot:
-                close = difflib.get_close_matches(question_clean,
-                                                  reponses_courantes.keys(),
-                                                   n=1, cutoff=0.8)
+                close = difflib.get_close_matches(qc, reponses_courantes.keys(), n=1, cutoff=0.8)
                 if close:
                     message_bot = reponses_courantes[close[0]]
 
-            # 3) Sémantique
+            # 5.c) sémantique
             if not message_bot:
-                # … encodage + comparaison …
+                keys = list(base_savoir.keys())
+                vb = model_semantic.encode(keys)
+                vq = model_semantic.encode([qc])[0]
+                sims = cosine_similarity([vq], vb)[0]
+                best, score = max(zip(keys, sims), key=lambda x: x[1])
                 if score > 0.7:
-                    message_bot = base_savoir[meilleure_q]
+                    message_bot = base_savoir[best]
 
-            # 4) Fallback
+            # 5.d) fallback
             if not message_bot:
                 message_bot = obtenir_reponse_ava(question_raw)
 
-        # ——— N’APPELLE ST.WRITE(message_bot) QU’UNE SEULE FOIS ———
+        # 6) Affichage **une seule fois**
         if message_bot:
             st.write(message_bot)
 
