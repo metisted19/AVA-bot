@@ -1149,12 +1149,17 @@ if question:
             "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
             "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
         ]
-        # --- Gestion de la demande de recette ---
+        # Gestion de la demande de recette
         if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
             if 'derniere_recette' not in st.session_state:
                 st.session_state['derniere_recette'] = random.choice(recettes)
+            message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
+
 
             message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
+        # Gestion de la demande "encore un" ou "plus" pour les recettes
+        if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
+            message_bot = f"🍽️ Voici une autre idée de recette :\n\n{random.choice(recettes)}"    
 
 
         # --- Bloc Mini base générale (culture quotidienne) ---
