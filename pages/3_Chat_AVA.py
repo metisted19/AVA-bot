@@ -1131,16 +1131,9 @@ if question:
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
-        # 1️⃣ Un seul champ de saisie, avec key
-        question_raw = st.text_input("Posez votre question :", key="chat_input")
-        message_bot  = None
-
-        # 2️⃣ Si l’utilisateur a tapé quelque chose…
         if question_raw:
-            # A) Nettoyage
-            question_clean = question_raw.lower().strip
-            st.write("DEBUG – question_clean :", repr(question_clean))
-            st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])    
+        # 1) Nettoyage
+        question_clean = nettoyer_texte(question_raw)  
 
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
@@ -1180,7 +1173,8 @@ if question:
                                                   cutoff=0.8)
             if close:
                 message_bot = reponses_courantes[close[0]]
-  
+            st.write("DEBUG – question_clean :", repr(question_clean))
+            st.write("DEBUG – clés dispo  :", [repr(k) for k in reponses_courantes.keys()])
 
             # C) Matching sémantique si toujours rien
             
