@@ -1078,7 +1078,22 @@ if question:
                 "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
                 "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
                 "🐠 Certains poissons changent de sexe au cours de leur vie.",
-                "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie."
+                "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie.",
+                "🦷 Les requins ont une infinité de dents : dès qu’une tombe, une autre pousse instantanément.",
+                "🌌 On connaît mieux la surface de Mars que les fonds marins de la Terre.",
+                "🥦 Le brocoli contient plus de protéines que certains morceaux de bœuf… oui, vraiment.",
+                "🛏️ On passe environ un tiers de notre vie à dormir, soit environ 25 ans !",
+                "📚 La bibliothèque du Vatican contient des textes qui n’ont pas été lus depuis des siècles.",
+                "🦵 Les autruches peuvent courir plus vite qu’un cheval… et changer de direction net sans freiner.",
+                "🪐 Sur Vénus, un jour dure plus longtemps qu’une année complète !",
+                "🦜 Certains perroquets peuvent apprendre plus de 100 mots humains… et les utiliser à bon escient.",
+                "🥚 En moyenne, une poule pond environ 300 œufs par an.",
+                "🌻 Les tournesols suivent réellement le soleil dans le ciel quand ils grandissent. C’est l’héliotropisme.",
+                "📏 Si tu pouvais plier une feuille de papier 42 fois, elle atteindrait la Lune.",
+                "🥶 Le sang d’un poisson antarctique peut rester liquide même en dessous de 0°C grâce à une protéine antigel.",
+                "🧃 Le Coca-Cola serait vert sans colorant.",
+                "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
+                "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
 
             ]
             message_bot = random.choice(faits_insolites)
