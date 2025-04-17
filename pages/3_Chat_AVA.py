@@ -1154,7 +1154,7 @@ if question:
             if 'derniere_recette' not in st.session_state:
                 st.session_state['derniere_recette'] = random.choice(recettes)
 
-            message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}""
+        message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}""
 
    
 
