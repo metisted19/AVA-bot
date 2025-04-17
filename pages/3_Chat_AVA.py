@@ -24,10 +24,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 1️⃣ Unique text_input, avec key pour éviter tout doublon
-question_raw = st.text_input("Posez votre question :", key="chat_input")
-message_bot  = None
-
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -1126,15 +1122,14 @@ if question:
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
-        # Récupération de la saisie utilisateur
-        question_raw = st.text_input("Posez votre question :")
+        # 1️⃣ Un seul champ de saisie, avec key
+        question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot  = None
 
-        # 3) Bloc sémantique
         # 2️⃣ Si l’utilisateur a tapé quelque chose…
         if question_raw:
-            # A. Nettoyage basique : minuscules + suppression des espaces superflus
-            question_clean = question_raw.lower().strip()
+            # A) Nettoyage
+            question_clean = question_raw.lower().strip
 
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
@@ -1165,14 +1160,17 @@ if question:
             }
             # Essai d'accès direct
             message_bot = reponses_courantes.get(question_clean)
-    
-            # C. Matching sémantique si pas de correspondance exacte
+
+            # B.2) Si rien, tentative fuzzy (tolérance 80%)
             if not message_bot:
-                # Chargement (ou cache) du modèle
-                @st.cache_resource
-                def load_model():
-                    return SentenceTransformer("all-MiniLM-L6-v2")
-                model = load_model()
+                close = difflib.get_close_matches(question_clean,
+                                                  reponses_courantes.keys(),
+                                                  n=1,
+                                                  cutoff=0.8)
+            if close:
+                message_bot = reponses_courantes[close[0]]
+
+            # C) Matching sémantique si toujours rien
             
                 base_savoir = {
                     # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
@@ -1205,15 +1203,24 @@ if question:
                     "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
                 }
                 questions_connues = list(base_savoir.keys())
-                vecteurs_base    = model.encode(questions_connues)
-                vecteur_q        = model.encode([question_clean])[0]
-                sims             = cosine_similarity([vecteur_q], vecteurs_base)[0]
-        
-                meilleure_q, score = max(zip(questions_connues, sims), key=lambda x: x[1])
+
+                # Modèle chargé une seule fois, en début de fichier
+                @st.cache_resource
+                def load_semantic_model():
+                    return SentenceTransformer("all-MiniLM-L6-v2")
+                model_semantic = load_semantic_model()
+
+                # Encodage + similarité
+                vecteurs_base    = model_semantic.encode(questions_connues)
+                vecteur_question = model_semantic.encode([question_clean])[0]
+                sims             = cosine_similarity([vecteur_question], vecteurs_base)[0]
+
+                meilleure_q, score = max(zip(questions_connues, sims),
+                                        key=lambda x: x[1])
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
-    
-            # D. Fallback ultime vers ta fonction générale
+
+            # D) Dernier recours : appel à ta fonction principale
             if not message_bot:
                 message_bot = obtenir_reponse_ava(question_raw)
 
