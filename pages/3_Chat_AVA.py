@@ -202,29 +202,24 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-        # --- Bloc météo amélioré ---
-        if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
-            villes_connues = [
-                "paris", "lyon", "marseille", "lille", "bordeaux", "nantes", "strasbourg", "toulouse", "rennes",
-                "nice", "angers", "dijon", "montpellier", "bayonne", "nancy", "reims", "clermont-ferrand", "besançon",
-                "le havre", "rouen", "poitiers", "metz", "caen", "avignon", "tours", "amiens", "perpignan"
-            ]
-            ville_detectee = "paris"
-            mots_question = question_clean.split()
-            ville_proche = difflib.get_close_matches(" ".join(mots_question), villes_connues, n=1, cutoff=0.6)
-            if not ville_proche:
-                for mot in mots_question:
-                    ville_proche = difflib.get_close_matches(mot, villes_connues, n=1, cutoff=0.8)
-                    if ville_proche:
-                        break
-            if ville_proche:
-                ville_detectee = ville_proche[0]
+            # --- Bloc météo intelligent (villages inclus) ---
+            if not horoscope_repondu and ("météo" in question_clean or "quel temps" in question_clean):
+                ville_detectee = "paris"  # valeur par défaut
+                mots_question = question_clean.split()
+
+            # On filtre les mots utiles (pas trop courts, alphabétiques, pas trop génériques)
+            mots_utiles = [mot for mot in mots_question if len(mot) > 3 and mot.isalpha()]
+            if mots_utiles:
+                ville_detectee = mots_utiles[-1]  # on prend le dernier mot utile comme nom de ville
+
             ville_detectee_cap = ville_detectee.capitalize()
             meteo = get_meteo_ville(ville_detectee_cap)
+
             if "erreur" in meteo.lower():
                 message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville."
             else:
                 message_bot += f"🌦️ **Météo à {ville_detectee_cap}** :\n{meteo}\n\n"
+
             meteo_repondu = True
 
         # --- Actualités améliorées ---
