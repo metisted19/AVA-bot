@@ -207,38 +207,40 @@ if question:
             except Exception as e:
                 message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
-        # --- Bloc météo intelligent ---
+        # --- Bloc météo intelligent (villages inclus) ---
         if not horoscope_repondu and not analyse_complete \
            and any(kw in question_clean for kw in ["météo", "quel temps"]):
 
-            # 1) on initialise un fallback
+            # fallback
             ville_detectee = "Paris"
 
-            # 2) on essaye d’attraper “à Bayonne”, “dans Lyon” etc.
+            # 1) on essaye de choper "à X", "dans Y", etc.
             match_geo = re.search(
                 r"(?:à|au|aux|dans|sur|en)\s+([A-Za-zÀ-ÿ' -]+)",
                 question_clean
-             )
-
-            # 3) si pas trouvé, on attrape “météo Bayonne” ou “météo  lyon”  
-            if not match_geo:
-                match_geo = re.search(
-                    r"m[eé]t[eé]o\s+([A-Za-zÀ-ÿ' -]+)",
-                    question_clean
             )
 
-            if match_geo:
-                ville_detectee = match_geo.group(1).strip().title()
+            # 2) si rien, on capture tout ce qui suit "météo "
+            if not match_geo:
+                match_geo = re.search(
+                    r"m[eé]t[eé]o\s+(.+)$",
+                    question_clean
+                )
 
-            # 4) on appelle l’API
+            if match_geo:
+                # on enlève ponctuation résiduelle et on garde la casse propre
+                lieu = match_geo.group(1).strip().rstrip(" ?.!;")
+                ville_detectee = lieu.title()
+
             meteo = get_meteo_ville(ville_detectee)
 
             if "erreur" in meteo.lower():
-                message_bot += f"⚠️ Je n'ai pas trouvé la météo pour **{ville_detectee}**. Essayez une autre ville.\n\n"
+                message_bot += f"⚠️ Je n'ai pas trouvé la météo pour **{ville_detectee}**. Essayez un autre lieu.\n\n"
             else:
                 message_bot += f"🌦️ **Météo à {ville_detectee}** :\n{meteo}\n\n"
 
             meteo_repondu = True
+
 
 
         # --- Actualités améliorées ---
