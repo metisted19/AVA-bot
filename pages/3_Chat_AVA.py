@@ -1165,7 +1165,7 @@ if question:
             "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
             "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
         }
-            base_savoir = {
+        base_savoir = {
             # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
             "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
             "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
