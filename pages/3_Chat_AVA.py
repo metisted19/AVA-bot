@@ -1231,7 +1231,7 @@ if question:
 
         # 6) Affichage
         if message_bot:
-            st.write(message_bot
+            st.write(message_bot)
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
