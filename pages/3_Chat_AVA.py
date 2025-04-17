@@ -20,6 +20,7 @@ from newsapi import NewsApiClient
 from forex_python.converter import CurrencyRates, CurrencyCodes  # Ces imports peuvent rester si vous en avez besoin pour d'autres parties
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+
 model_semantic = SentenceTransformer("all-MiniLM-L6-v2")
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -208,16 +209,17 @@ if question:
                 # On essaie d'extraire le lieu après "à", "au", "aux", "dans"
                 match_ville = re.search(r"(?:à|au|aux|dans|sur|en)\s+([a-zA-ZÀ-ÿ\-'\s]+)", question_clean)
                 if match_ville:
-                    ville_detectee = match_ville.group(1).strip()
-
+                    ville_extraite = match_ville.group(1).strip()
                 # On retire les mots trop génériques ou très courts
                 mots_exclus = ["météo", "temps", "quel", "quelle", "ville", "jour", "fait", "il"]
-                if ville_detectee.lower() in mots_exclus or len(ville_detectee) < 3:
-                    ville_detectee = "paris"
-
+                mots_valides = [mot for mot in ville_extraite.split() if mot.lower() not in mots_exclus and len(mot) > 2]
+                if mots_valides:
+                    ville_detectee = " ".join(mots_valides)
+                # Formatage du nom de la ville
                 ville_detectee_cap = ville_detectee.title()  # première lettre en majuscule
+                 # Récupération météo
                 meteo = get_meteo_ville(ville_detectee_cap)
-
+                
                 if "erreur" in meteo.lower():
                     message_bot += f"⚠️ Je n'ai pas trouvé de météo pour **{ville_detectee_cap}**. Essayez une autre ville ou village."
                 else:
