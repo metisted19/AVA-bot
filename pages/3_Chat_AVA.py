@@ -759,7 +759,23 @@ if question:
                     "qui a écrit harry potter": "📚 C’est **J.K. Rowling** qui a écrit la saga *Harry Potter*.",
                     "quelle est la température de l’eau qui bout": "💧 L’eau bout à **100°C** à pression atmosphérique normale.",
                     "quel est le pays le plus peuplé": "👥 **La Chine** est actuellement le pays le plus peuplé du monde.",
-                    "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone."
+                    "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+                    "qui a découvert l’amérique": "🗺️ C’est **Christophe Colomb** qui a découvert l’Amérique en 1492, du moins pour l’Europe.",
+                    "quelle est la planète la plus grosse": "🪐 **Jupiter** est la plus grosse planète du système solaire.",
+                    "quelle est la vitesse de la lumière": "⚡ La lumière voyage à environ **299 792 km/s** dans le vide.",
+                    "combien de jours dans une année bissextile": "📅 Une année bissextile dure **366 jours**.",
+                    "quelle est la capitale de l’italie": "🇮🇹 La capitale de l’Italie est **Rome**.",
+                    "qui a écrit les misérables": "📖 C’est **Victor Hugo** qui a écrit *Les Misérables*.",
+                    "quelle est la capitale de l’allemagne": "🇩🇪 La capitale de l’Allemagne est **Berlin**.",
+                    "qui est le président de la france": "🇫🇷 Le président actuel de la France est **Emmanuel Macron** (en 2025).",
+                    "quelle est la profondeur de la fosse des mariannes": "🌊 La fosse des Mariannes atteint environ **11 000 mètres** de profondeur.",
+                    "qui a inventé le téléphone": "📞 **Alexander Graham Bell** est l’inventeur du téléphone.",
+                    "quelle est la langue officielle du brésil": "🇧🇷 La langue officielle du Brésil est **le portugais**.",
+                    "combien de muscles dans le corps humain": "💪 Le corps humain compte environ **650 muscles**.",
+                    "quelle est la capitale de la russie": "🇷🇺 La capitale de la Russie est **Moscou**.",
+                    "quand a eu lieu la révolution française": "⚔️ La Révolution française a commencé en **1789**.",
+                    "qui est le créateur de facebook": "🌐 **Mark Zuckerberg** a cofondé Facebook en 2004.",
+                    "quelle est la capitale de la chine": "🇨🇳 La capitale de la Chine est **Pékin**."
             }
             for question_cle, reponse in base_connaissances.items():
                 if question_cle in question_clean:
