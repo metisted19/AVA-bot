@@ -1098,7 +1098,7 @@ if question:
         if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
             if 'derniere_fait' not in st.session_state:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
-        message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
+            message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
         # --- Gestion de la demande "encore un" ou "plus" pour les faits insolites ---
         elif any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
