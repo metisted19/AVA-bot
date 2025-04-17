@@ -1131,13 +1131,16 @@ if question:
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
-        # ─── Bloc d’intelligence sémantique locale ───
-        if question_raw and not message_bot:
+        # Récupération de la saisie utilisateur
+        question_raw = st.text_input("Posez votre question :")
+        message_bot  = None
+
+        # --- Bloc d'intelligence sémantique locale ---
+        if question_raw:
             # 1️⃣ Nettoyage
             question_clean = nettoyer_texte(question_raw)
 
             # 2️⃣ Réponses « hard‑codées »
-
             reponses_courantes = {
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
                 "ça va": "Je vais bien, merci de demander ! Et vous ?",
@@ -1201,18 +1204,23 @@ if question:
                     "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
                     "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
                 }
-                questions_connues  = list(base_savoir.keys())
-                vecteurs_base      = model_semantic.encode(questions_connues)
-                vecteur_question   = model_semantic.encode([question_clean])[0]
-                similarites        = cosine_similarity([vecteur_question], vecteurs_base)[0]
+                questions_connues   = list(base_savoir.keys())
+                vecteurs_base       = model_semantic.encode(questions_connues)
+                vecteur_question    = model_semantic.encode([question_clean])[0]
+                similarites         = cosine_similarity([vecteur_question], vecteurs_base)[0]
 
-                meilleure_q, score = max(zip(questions_connues, similarites),
+                meilleure_q, score  = max(zip(questions_connues, similarites),
                                         key=lambda x: x[1])
-
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
-                else:
-                    message_bot = "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
+
+        # 4️⃣ Fallback vers la fonction principale si toujours aucune réponse
+        if question_raw and not message_bot:
+            message_bot = obtenir_reponse_ava(question_raw)
+
+        # 5️⃣ Affichage du résultat
+        if message_bot:
+            st.write(message_bot)
 
         
 
