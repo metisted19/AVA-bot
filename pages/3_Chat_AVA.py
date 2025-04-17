@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(page_title="Chat AVA", layout="centered")
+
 
 # Imports système
 import os
@@ -22,11 +22,13 @@ from fonctions_meteo import obtenir_meteo, get_meteo_ville  # À redéfinir just
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
 
-# 1️⃣ Toujours tout de suite après les imports
-question_raw = st.text_input("Posez votre question :")
+st.set_page_config(page_title="Chat AVA", layout="centered")
+
+# 1) Un seul st.text_input, avec key unique
+question_raw = st.text_input("Posez votre question :", key="chat_input")
 message_bot  = None
 
-# 2️⃣ Chargement du modèle en cache
+# 2) Chargement du modèle (cache)
 @st.cache_resource
 def load_semantic_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
