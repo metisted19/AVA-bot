@@ -1100,11 +1100,8 @@ if question:
 
 
         # --- Bloc Recettes rapides ---
-        elif any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
-            # Initialisation de 'derniere_recette' si elle n'existe pas encore
-            if 'derniere_recette' not in st.session_state:
-                st.session_state['derniere_recette'] = random.choice(recettes)
-            recettes = [
+        # Liste des recettes rapides (définie une seule fois)
+        recettes = [
             "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
             "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
             "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
@@ -1142,21 +1139,22 @@ if question:
             "🧀 **Boulettes express** : steak haché + chapelure + épices, façonnées et dorées en 5 min à la poêle.",
             "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
             "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
+        ]
 
-            ]
-            # Gestion de la demande de recette
-            if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
-                if 'derniere_recette' not in st.session_state:
-                    st.session_state['derniere_recette'] = random.choice(recettes)
+        # Gestion de la demande de recette
+        if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+            if 'derniere_recette' not in st.session_state:
+                st.session_state['derniere_recette'] = random.choice(recettes)
 
-                message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
+        message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
 
-            # Gestion de la demande "encore un" ou "plus" pour les recettes
-            if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
-                if st.session_state['derniere_recette']:
-                    message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
-                else:
+        # Gestion de la demande "encore un" ou "plus" pour les recettes
+        if any(mot in question_clean for mot in ["encore un", "plus", "encore", "autre", "un autre"]):
+            if st.session_state['derniere_recette']:
+                message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
+            else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
+
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
