@@ -313,6 +313,7 @@ if question:
             elif "transpire" in question_clean or "j'ai froid" in question_clean:
                 message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
 
+            
         # --- Bloc Remèdes naturels ---
         if not message_bot and any(phrase in question_clean for phrase in [
                 "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
@@ -344,6 +345,34 @@ if question:
                 message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
             elif "crampes" in question_clean:
                 message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
+            elif "dépression" in question_clean:
+                message_bot = "🖤 Millepertuis (à surveiller si tu prends déjà un traitement), lumière naturelle quotidienne, et activités créatives relaxantes."
+            elif "allergie" in question_clean:
+                message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
+            elif "eczéma" in question_clean or "démangeaisons" in question_clean:
+                message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
+            elif "arthrose" in question_clean or "articulations" in question_clean:
+                message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
+            elif "ballonnements" in question_clean:
+                message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
+            elif "anxiété" in question_clean:
+                message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
+            elif "brûlure légère" in question_clean or "brûlure" in question_clean:
+                message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
+            elif "circulation" in question_clean or "jambes lourdes" in question_clean:
+                message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
+            elif "foie" in question_clean or "digestion difficile" in question_clean:
+                message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
+            elif "yeux fatigués" in question_clean:
+                message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
+            elif "système immunitaire" in question_clean or "immunité" in question_clean:
+                message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
+            elif "tensions musculaires" in question_clean:
+                message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
+            elif "transpiration excessive" in question_clean:
+                message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
+            elif "inflammation" in question_clean:
+                message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
             else:
                 message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
 
