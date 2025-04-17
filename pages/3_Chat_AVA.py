@@ -21,7 +21,16 @@ from fonctions_chat import obtenir_reponse_ava
 from fonctions_meteo import obtenir_meteo, get_meteo_ville  # À redéfinir juste après
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
+import unicodedata, re
 
+def nettoyer_texte(texte: str) -> str:
+    # Normalisation Unicode (combine et décompose les caractères)
+    texte = unicodedata.normalize('NFKC', texte)
+    # minuscules + suppression espaces de début/fin
+    texte = texte.lower().strip()
+    # fusion des multiples espaces en un seul
+    texte = re.sub(r'\s+', ' ', texte)
+    return texte
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
 
