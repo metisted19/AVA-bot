@@ -1171,13 +1171,18 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
-        # ─── Saisie utilisateur ───────────────────────────────────
         question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot  = None
 
         if question_raw:
-            # 1) Nettoyage  
-            uestion_clean = nettoyer_texte(question_raw)
+            question_clean = nettoyer_texte(question_raw)
+
+            # 1) Direct
+            reponses_courantes = {
+                "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+                # … tes autres clés …
+            }
+            message_bot = reponses_courantes.get(question_clean)
 
             # B) Réponses directes « hard‑codées »
             reponses_courantes = {
@@ -1209,33 +1214,27 @@ if question:
             }
             message_bot = reponses_courantes.get(question_clean)
 
-            # 3) Fuzzy matching si besoin
+            # 2) Fuzzy
             if not message_bot:
                 close = difflib.get_close_matches(question_clean,
                                                   reponses_courantes.keys(),
-                                                  n=1,
-                                                  cutoff=0.8)
+                                                   n=1, cutoff=0.8)
                 if close:
                     message_bot = reponses_courantes[close[0]]
 
-            # 4) Matching sémantique si toujours rien
+            # 3) Sémantique
             if not message_bot:
-                questions_connues = list(base_savoir.keys())
-                vecteurs_base     = model_semantic.encode(questions_connues)
-                vecteur_question  = model_semantic.encode([question_clean])[0]
-                sims              = cosine_similarity([vecteur_question], vecteurs_base)[0]
-                meilleure_q, score = max(zip(questions_connues, sims),
-                                 key=lambda x: x[1])
+                # … encodage + comparaison …
                 if score > 0.7:
                     message_bot = base_savoir[meilleure_q]
-            # 5) Fallback ultime
+
+            # 4) Fallback
             if not message_bot:
                 message_bot = obtenir_reponse_ava(question_raw)
 
-        # ─── Affichage (une seule fois) ────────────────────────────
+        # ——— N’APPELLE ST.WRITE(message_bot) QU’UNE SEULE FOIS ———
         if message_bot:
             st.write(message_bot)
-
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
