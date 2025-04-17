@@ -25,16 +25,16 @@ import unicodedata, re
 import difflib
 from fonctions_chat import obtenir_reponse_ava 
 
-# ─── 1) Config Streamlit ───────────────────────────────────────────────────
+# 1) Config Streamlit
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# ─── 2) Chargement du modèle sémantique ────────────────────────────────────
+# 2) Chargement du modèle sémantique (cache)
 @st.cache_resource
 def load_semantic_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
 model_semantic = load_semantic_model()
 
-# ─── 3) Nettoyage du texte ─────────────────────────────────────────────────
+# 3) Fonction de nettoyage
 def nettoyer_texte(texte: str) -> str:
     texte = unicodedata.normalize("NFKC", texte)
     texte = texte.lower().strip()
@@ -1197,42 +1197,40 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
-        # ─── 5) Saisie utilisateur ─────────────────────────────────────────────────
+        # 5) Saisie utilisateur
         question_raw = st.text_input("Posez votre question :", key="chat_input")
         message_bot  = None
 
         if question_raw:
             qc = nettoyer_texte(question_raw)
 
-            # 5.a) **Override** direct pour “quoi de neuf”
+            # 5.a) Override pour “quoi de neuf”
             if qc == "quoi de neuf":
                 message_bot = "Rien de spécial, juste en train d'aider les utilisateurs comme vous !"
 
-            # 5.b) Lookup direct parmi les réponses codées
+             # 5.b) Lookup direct
             elif qc in reponses_courantes:
                 message_bot = reponses_courantes[qc]
 
-            # 5.c) Fuzzy matching
             else:
+                # 5.c) Fuzzy matching
                 close = difflib.get_close_matches(qc, reponses_courantes.keys(), n=1, cutoff=0.8)
                 if close:
                     message_bot = reponses_courantes[close[0]]
+                else:
+                    # 5.d) Matching sémantique
+                    keys = list(base_savoir.keys())
+                    vb   = model_semantic.encode(keys)
+                    vq   = model_semantic.encode([qc])[0]
+                    sims = cosine_similarity([vq], vb)[0]
+                    best, score = max(zip(keys, sims), key=lambda x: x[1])
+                    if score > 0.7:
+                        message_bot = base_savoir[best]
+                    else:
+                        # 5.e) Fallback ultime
+                        message_bot = obtenir_reponse_ava(question_raw)
 
-            # 5.d) Matching sémantique si toujours rien
-            if not message_bot:
-                keys = list(base_savoir.keys())
-                vb   = model_semantic.encode(keys)
-                vq   = model_semantic.encode([qc])[0]
-                sims = cosine_similarity([vq], vb)[0]
-                best, score = max(zip(keys, sims), key=lambda x: x[1])
-                if score > 0.7:
-                    message_bot = base_savoir[best]
-
-            # 5.e) Fallback ultime
-            if not message_bot:
-                message_bot = obtenir_reponse_ava(question_raw)
-
-        # ─── 6) Affichage **une seule fois** ────────────────────────────────────────
+        # 6) Affichage unique
         if message_bot:
             st.write(message_bot)
 
