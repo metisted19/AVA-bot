@@ -22,6 +22,7 @@ from fonctions_meteo import obtenir_meteo, get_meteo_ville  # À redéfinir just
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
 import unicodedata, re
+import difflib
 
 def nettoyer_texte(texte: str) -> str:
     # Normalisation Unicode (combine et décompose les caractères)
