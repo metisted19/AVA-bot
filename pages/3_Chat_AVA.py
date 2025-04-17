@@ -384,7 +384,10 @@ if question:
             "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
             "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne","bradycardie", "tachycardie", "psoriasis", "fibromyalgie", "thyroïde", "cystite", "glaucome", "bruxisme",
             "arthrose", "hernie discale", "spasmophilie", "urticaire", "coup de chaleur", "luxation", "anxiété",
-            "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique"
+            "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique","eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite", "pneumonie",
+            "zona", "épilepsie", "coupure profonde", "hépatite C", "phlébite",
+            "gastro-entérite", "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
+
 
             ]):
             reponses_medic = {
@@ -454,7 +457,22 @@ if question:
                 "eczéma de contact": "🌿 Réaction cutanée suite à un contact avec une substance. Évitez le produit irritant et appliquez une crème apaisante.",
                 "hypoglycémie": "🩸 Baisse de sucre dans le sang : fatigue, sueurs, vertiges. Une boisson sucrée ou un fruit aident à rétablir rapidement.",
                 "apnée du sommeil": "😴 Arrêts respiratoires nocturnes. Somnolence, fatigue. Une consultation spécialisée est recommandée.",
-                "brûlure chimique": "🧪 Rincer abondamment à l’eau tiède (15-20 minutes) et consulter rapidement. Ne pas appliquer de produit sans avis médical."
+                "brûlure chimique": "🧪 Rincer abondamment à l’eau tiède (15-20 minutes) et consulter rapidement. Ne pas appliquer de produit sans avis médical.",
+                "eczéma atopique": "🧴 Forme chronique d’eczéma liée à des allergies. Utilisez des crèmes hydratantes et évitez les allergènes connus.",
+                "syndrome des jambes sans repos": "🦵 Sensations désagréables dans les jambes le soir, besoin de bouger. Une bonne hygiène de sommeil peut aider.",
+                "colique néphrétique": "🧊 Douleur intense dans le dos ou le côté, souvent due à un calcul rénal. Hydratation et consultation urgente recommandées.",
+                "hépatite": "🩸 Inflammation du foie, souvent virale. Fatigue, jaunisse, nausées. Nécessite un suivi médical.",
+                "pneumonie": "🫁 Infection pulmonaire sérieuse, accompagnée de fièvre, toux, et douleur thoracique. Consultez rapidement.",
+                "zona": "🔥 Éruption douloureuse sur une partie du corps. Cause : réactivation du virus de la varicelle. Consultez dès les premiers signes.",
+                "épilepsie": "⚡ Trouble neurologique provoquant des crises. Suivi médical strict indispensable.",
+                "coupure profonde": "🩹 Nettoyez, appliquez une pression pour arrêter le saignement et consultez si elle est profonde ou large.",
+                "hépatite C": "🧬 Infection virale du foie souvent silencieuse. Un dépistage est important pour un traitement efficace.",
+                "phlébite": "🦵 Caillot dans une veine, souvent au mollet. Douleur, rougeur, chaleur. Consultez en urgence.",
+                "gastro-entérite": "🤢 Diarrhée, vomissements, crampes. Repos, hydratation et alimentation légère sont essentiels.",
+                "blessure musculaire": "💪 Repos, glace et compression. Évitez de forcer. Étirement progressif après quelques jours.",
+                "tendinopathie": "🎾 Inflammation des tendons suite à un effort. Repos, glace et parfois kinésithérapie sont recommandés.",
+                "œil rouge": "👁️ Allergie, infection ou fatigue ? Si douleur ou vision floue, consultez rapidement.",
+                "perte d'odorat": "👃 Souvent liée à un virus comme la COVID-19. Hydratez-vous et surveillez les autres symptômes."
 
             }
             for cle, rep in reponses_medic.items():
