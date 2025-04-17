@@ -1168,11 +1168,7 @@ if question:
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
-        if any(mot in question_clean for mot in ["encore un", "un autre"]):
-            if 'derniere_recette' in st.session_state:
-                message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
-            else:
-                message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
+        
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
