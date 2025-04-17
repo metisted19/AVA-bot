@@ -985,7 +985,18 @@ if question:
                 "tu m'entends": "Je vous entends fort et clair 🎧",
                 "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
                 "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous."
+                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+                "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+                "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+                "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+                "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+                "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+                "re": "Re bienvenue à bord ! On continue notre mission ?",
+                "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+                "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+                "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+                "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+                "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
 
             # Réponse ciblée si la phrase est dans le dictionnaire
