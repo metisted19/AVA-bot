@@ -1219,20 +1219,6 @@ if question:
             return "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !"
 
 
-        # --- Interface test
-        st.title("🧪 Test AVA Light")
-
-        question_raw = st.chat_input("Tapez une phrase comme : salut / ça va / quoi de neuf")
-
-        if question_raw:
-            message_bot = trouver_reponse(question_raw)
-
-            with st.chat_message("user"):
-                st.markdown(question_raw)
-
-            with st.chat_message("assistant"):
-                st.markdown(message_bot)
-
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
