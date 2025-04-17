@@ -1419,8 +1419,8 @@ if question:
                 if question_base in qc:
                     message_bot = reponse_base
                     break
-                 # --- Modules personnalisés (à enrichir) ---
-            def gerer_modules_speciaux(qc):
+        # --- Fonction modules personnalisés (à placer en toute fin avant l'interface) ---
+        def gerer_modules_speciaux(qc):
             if "analyse" in qc and "btc" in qc:
                 return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
             if "horoscope" in qc:
@@ -1435,7 +1435,7 @@ if question:
                 ]
                 return random.choice(blagues)
             return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
-              
+
         # --- Interface utilisateur ---
         st.title("💬 Chat AVA")
 
@@ -1450,8 +1450,8 @@ if question:
             with st.chat_message("assistant"):
                 st.markdown(message_bot)
 
-            
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
         st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+
 
