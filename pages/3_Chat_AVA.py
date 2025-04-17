@@ -1105,7 +1105,7 @@ if question:
             if 'derniere_fait' in st.session_state:
                 message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
             else:
-                message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !""
+                message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
 
 
