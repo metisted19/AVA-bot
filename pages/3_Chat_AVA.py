@@ -18,6 +18,7 @@ import difflib
 import re  # Pour le bloc sécurité, le traitement géographique et l'analyse
 import unicodedata  # Pour supprimer les accents
 from newsapi import NewsApiClient
+import urllib.parse
 from forex_python.converter import CurrencyRates, CurrencyCodes  # Ces imports peuvent rester si vous en avez besoin pour d'autres parties
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -32,22 +33,45 @@ def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
-# Nouvelle fonction get_meteo_ville utilisant l'API OpenWeatherMap
+
+API_KEY = "3b2ff0b77dd65559ba4a1a69769221d5"
+
+def geocode_location(lieu):
+    """Retourne (lat, lon) via le geocoding OWM, ou (None, None)."""
+    q = urllib.parse.quote(remove_accents(lieu))
+    url = f"http://api.openweathermap.org/geo/1.0/direct?q={q}&limit=1&appid={API_KEY}"
+    resp = requests.get(url, timeout=5)
+    if resp.status_code == 200 and resp.json():
+        data = resp.json()[0]
+        return data["lat"], data["lon"]
+    return None, None
+
 def get_meteo_ville(city):
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid=3b2ff0b77dd65559ba4a1a69769221d5&units=metric&lang=fr"
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            description = data["weather"][0]["description"].capitalize()
-            temperature = data["main"]["temp"]
-            humidity = data["main"].get("humidity", "N/A")
-            wind_speed = data["wind"].get("speed", "N/A")
-            return f"{description} avec {temperature}°C, humidité : {humidity}%, vent : {wind_speed} m/s."
-        else:
-            return "Erreur: données météo non disponibles."
-    except Exception as e:
-        return "Erreur: " + str(e)
+    """1) Géocode 2) Récupère la météo par lat/lon, 3) fallback sur city brut."""
+    lat, lon = geocode_location(city)
+    if lat is not None and lon is not None:
+        url = (
+            f"http://api.openweathermap.org/data/2.5/weather?"
+            f"lat={lat}&lon={lon}&appid={API_KEY}&units=metric&lang=fr"
+        )
+    else:
+        # fallback : requête par nom
+        url = (
+            f"http://api.openweathermap.org/data/2.5/weather?"
+            f"q={urllib.parse.quote(city)}&appid={API_KEY}&units=metric&lang=fr"
+        )
+
+    resp = requests.get(url, timeout=5)
+    if resp.status_code != 200:
+        return "Erreur: données météo non disponibles."
+
+    data = resp.json()
+    desc = data["weather"][0]["description"].capitalize()
+    temp = data["main"]["temp"]
+    hum  = data["main"].get("humidity", "N/A")
+    vent = data["wind"].get("speed", "N/A")
+    return f"{desc} avec {temp}°C, humidité : {hum}%, vent : {vent} m/s."
+
 
 # Nouvelle fonction get_general_news() avec la modification pour NewsAPI
 def get_general_news():
