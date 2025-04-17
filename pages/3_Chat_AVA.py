@@ -27,12 +27,6 @@ def load_semantic_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
 model_semantic = load_semantic_model()
 
-# 3) Fonction de nettoyage
-def nettoyer_texte(texte: str) -> str:
-    texte = unicodedata.normalize("NFKC", texte)
-    texte = texte.lower().strip()
-    texte = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", texte)
-    return re.sub(r"\s+", " ", texte)
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -1190,49 +1184,57 @@ if question:
             "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
              "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
         }
-        # 3) Fonction de nettoyage
+        # --- Nettoyage robuste ---
         def nettoyer_texte(txt):
-            return txt.lower().strip()
+            txt = unicodedata.normalize("NFKC", txt)  # Uniformiser les caractères spéciaux
+            txt = txt.lower().strip()
+            txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)  # Supprimer la ponctuation
+            txt = re.sub(r"\s+", " ", txt)  # Réduire les espaces multiples
+            return txt
 
-        # 4) Fonction de recherche
+        # --- Moteur de réponse ---
         def trouver_reponse(question):
             qc = nettoyer_texte(question)
             base_complet = {**base_savoir, **reponses_courantes}
 
-            # 4.a) Direct
+            # 1. Recherche directe
             if qc in base_complet:
                 return base_complet[qc]
 
-            # 4.b) Fuzzy
+            # 2. Fuzzy matching
             proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
             if proche:
                 return base_complet[proche[0]]
-
-            # 4.c) Sémantique
+            
+            # 3. Sémantique
             keys = list(base_complet.keys())
             vb = model_semantic.encode(keys)
             vq = model_semantic.encode([qc])[0]
             sims = cosine_similarity([vq], vb)[0]
             best, score = max(zip(keys, sims), key=lambda x: x[1])
+
             if score > 0.7:
                 return base_complet[best]
 
-            # 4.d) Fallback ultime
+            # 4. Fallback
             return "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !"
 
-        # 5) Interface utilisateur
+        # --- Interface utilisateur ---
         st.title("💬 Chat AVA")
 
         question_raw = st.chat_input("Posez votre question ici :")
+
         if question_raw:
             message_bot = trouver_reponse(question_raw)
+    
             with st.chat_message("user"):
                 st.markdown(question_raw)
+        
             with st.chat_message("assistant"):
                 st.markdown(message_bot)
-
-        # --- Bloc Mini base générale (culture quotidienne) ---
-        if not message_bot:
+                # --- Bloc Mini base générale (culture quotidienne) ---
+                if not message_bot:
+                    
             base_generale = {
                 # 🌍 Météo & nature
                 "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
