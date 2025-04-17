@@ -961,49 +961,6 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
         
-        # --- Bloc Salutations Simples ---
-        if not message_bot and any(mot in question_clean for mot in ["salut", "bonjour", "bonsoir", "yo", "coucou", "hey", "ça va", "quoi de neuf", "tu fais quoi", "tu es là", "tu m'entends", "tu vas bien", "qui es-tu", "t'es qui", "bonne nuit", "bonne journée"]):
-    
-            reponses_salut_simples = [
-                "👾 Hey ! Moi c’est AVA, votre copilote futuriste.",
-                "🎯 Toujours connectée ! Que puis-je faire pour vous ?",
-                "🧠 Présente et prête à analyser les signaux !",
-                "😎 Yo ! Prêt pour une session d’analyse ou un peu de culture ?",
-                "✨ Hello ! Vous voulez une blague, une info bourse ou un fait insolite ?"
-            ]
-
-            reponses_salut_precises = {
-                "quoi de neuf": "Pas mal de choses en réalité ! Le monde bouge vite... et moi aussi 😄",
-                "ça va": "Toujours au top, prêt(e) à vous aider ! Et vous ?",
-                "salut": "Salut à vous ! Que puis-je faire aujourd’hui ?",
-                "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-                "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-                "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-                "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-                "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-                "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-                "tu m'entends": "Je vous entends fort et clair 🎧",
-                "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-                "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-                "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
-                "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-                "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
-                "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-                "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
-                "re": "Re bienvenue à bord ! On continue notre mission ?",
-                "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-                "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-                "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-                "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
-                "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
-            }
-
-            # Réponse ciblée si la phrase est dans le dictionnaire
-            if question_clean in reponses_salut_precises:
-                message_bot = reponses_salut_precises[question_clean]
-            else:
-                message_bot = random.choice(reponses_salut_simples)
 
         
         # --- Bloc Quiz de culture générale ---
@@ -1410,7 +1367,28 @@ if question:
                 "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
                 "ça va": "Je vais bien, merci de demander ! Et vous ?",
                 "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-                "hello": "Hello! How can I assist you today?"
+                "hello": "Hello! How can I assist you today?",
+                "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+                "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+                "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+                "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+                "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+                "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+                "tu m'entends": "Je vous entends fort et clair 🎧",
+                "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+                "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+                "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+                "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+                "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+                "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+                "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+                "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+                "re": "Re bienvenue à bord ! On continue notre mission ?",
+                "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+                "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+                "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+                "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+                "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌"
             }
             base_savoir = {
                 # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
