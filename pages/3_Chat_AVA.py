@@ -232,36 +232,8 @@ def gerer_modules_speciaux(question_clean):
         )
         analyse_complete = True
 
-    # 2) Horoscope
-    if not message_bot and any(w in question_clean for w in ["horoscope", "signe", "astrologie"]):
-        # Exemples de signe détectables
-        signes = ["bélier","taureau","gémeaux","cancer","lion","vierge",
-                  "balance","scorpion","sagittaire","capricorne","verseau","poissons"]
-        signe = next((s for s in signes if s in question_clean), None)
-        if signe:
-            try:
-                url = "https://kayoo123.github.io/astroo-api/jour.json"
-                resp = requests.get(url, timeout=5)
-                data = resp.json().get("signes") or resp.json()
-                horoscope = data.get(signe.capitalize(), {}).get("horoscope")
-                message_bot = f"🔮 Horoscope pour **{signe.capitalize()}** :\n> {horoscope}\n" if horoscope else \
-                    f"🔍 Horoscope indisponible pour **{signe.capitalize()}**."
-            except Exception:
-                message_bot = "⚠️ Impossible d'obtenir l'horoscope pour le moment."
-        else:
-            message_bot = (
-                "🔮 Pour obtenir votre horoscope, indiquez votre signe (ex : Lion, Vierge...)."
-            )
-        horoscope_repondu = True
 
-    # 3) Météo (générique)
-    if not message_bot and any(w in question_clean for w in ["météo", "meteo"]):
-        # extraction de la ville
-        match = re.search(r"(?:à|dans|en)\s+([A-Za-zÀ-ÿ' -]+)", question_clean)
-        ville = match.group(1).strip() if match else "Paris"
-        meteo = get_meteo_ville(ville)
-        message_bot = f"🌦️ Météo à {ville.title()} :\n{meteo}"
-        meteo_repondu = True
+
 
     # 4) Actualités générales
     if not message_bot and any(w in question_clean for w in ["actualité", "news"]):
@@ -602,7 +574,7 @@ def gerer_modules_speciaux(question_clean):
         return message_bot
 
     # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
-    elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
+    if not message_bot and any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
         pays_detecte = None
         match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
         if match:
