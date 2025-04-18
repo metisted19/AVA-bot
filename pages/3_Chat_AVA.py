@@ -274,11 +274,6 @@ def gerer_modules_speciaux(question_clean):
                 message_bot += f"- [{titre}]({lien})\n"
         actus_repondu = True
 
-    # Retour final
-    return message_bot if message_bot else None
-
-
-
 
     # --- Partie Horoscope ---
     if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
@@ -1533,7 +1528,7 @@ def gerer_modules_speciaux(question_clean):
 
     if message_bot:
         return message_bot
-
+    
 
         
     # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
@@ -1554,7 +1549,7 @@ def gerer_modules_speciaux(question_clean):
     if not message_bot:
         message_bot = "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"
     return message_bot
-     
+    return None 
         
 
 # Récupération de la question utilisateur
