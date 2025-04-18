@@ -1069,76 +1069,76 @@ if question:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
             
-    # --- Bloc faits insolites (anecdotes) ---
-    if not message_bot and any(
-        mot in qc for mot in [
-            "fait insolite", "truc fou", "surprends-moi",
-            "anecdote", "incroyable mais vrai"
-        ]
-    ):
-        faits_insolites = [
-            "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
-            "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
-            "🐌 Un escargot peut dormir pendant trois ans d’affilée.",
-            "🌋 Il y a plus de volcans sous l’eau que sur la terre ferme.",
-            "📦 Amazon a été fondée dans un garage... et maintenant, ils livrent même des frigos !",
-            "🧠 Le cerveau humain génère assez d’électricité pour allumer une petite ampoule.",
-            "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
-            "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
-            "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
-            "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !",
-            "🧊 Les manchots proposent parfois des galets comme cadeau de séduction.",
-            "🚀 Les astronautes peuvent grandir de quelques centimètres dans l’espace à cause de la microgravité.",
-            "🥶 L’eau chaude peut geler plus vite que l’eau froide. C’est l’effet Mpemba.",
-            "🐥 Les canetons s’attachent à la première chose qu’ils voient — c’est l’empreinte.",
-            "🍕 En Italie, il existe une pizza avec 111 sortes de fromages dessus !",
-            "🎵 Les abeilles peuvent reconnaître des visages humains… et elles adorent les sons aigus.",
-            "🌍 Il y a plus d’arbres sur Terre que d’étoiles dans la Voie lactée.",
-            "👅 La langue est aussi unique qu’une empreinte digitale.",
-            "🚿 En moyenne, une personne passe **6 mois de sa vie sous la douche**.",
-            "🎈 Une banane est techniquement une baie. Mais pas la fraise !",
-            "🦙 Les alpagas peuvent cracher… mais seulement s’ils sont vraiment énervés.",
-            "⏳ Les crocodiles peuvent vivre plus de 100 ans… et certains ne meurent que de vieillesse.",
-            "🐓 Les poules peuvent se souvenir de plus de 100 visages humains ou animaux.",
-            "🦇 Les chauves-souris tournent toujours à gauche en sortant d’une grotte.",
-            "🛸 Il existe un endroit sur Terre où la gravité semble inversée : la Mystery Spot en Californie.",
-            "🎮 Un gamer japonais détient le record mondial du plus long temps passé à jouer sans pause : 35 heures !",
-            "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
-            "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
-            "🐠 Certains poissons changent de sexe au cours de leur vie.",
-            "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie.",
-            "🦷 Les requins ont une infinité de dents : dès qu’une tombe, une autre pousse instantanément.",
-            "🌌 On connaît mieux la surface de Mars que les fonds marins de la Terre.",
-            "🥦 Le brocoli contient plus de protéines que certains morceaux de bœuf… oui, vraiment.",
-            "🛏️ On passe environ un tiers de notre vie à dormir, soit environ 25 ans !",
-            "📚 La bibliothèque du Vatican contient des textes qui n’ont pas été lus depuis des siècles.",
-            "🦵 Les autruches peuvent courir plus vite qu’un cheval… et changer de direction net sans freiner.",
-            "🪐 Sur Vénus, un jour dure plus longtemps qu’une année complète !",
-            "🦜 Certains perroquets peuvent apprendre plus de 100 mots humains… et les utiliser à bon escient.",
-            "🥚 En moyenne, une poule pond environ 300 œufs par an.",
-            "🌻 Les tournesols suivent réellement le soleil dans le ciel quand ils grandissent. C’est l’héliotropisme.",
-            "📏 Si tu pouvais plier une feuille de papier 42 fois, elle atteindrait la Lune.",
-            "🥶 Le sang d’un poisson antarctique peut rester liquide même en dessous de 0°C grâce à une protéine antigel.",
-            "🧃 Le Coca-Cola serait vert sans colorant.",
-            "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
-            "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
-        ]
-        # Si c'est la toute première anecdote demandée
+        # --- Bloc faits insolites (anecdotes) ---
+        if not message_bot and any(
+            mot in qc for mot in [
+                "fait insolite", "truc fou", "surprends-moi",
+                "anecdote", "incroyable mais vrai"
+            ]
+        ):
+            faits_insolites = [
+                "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
+                "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
+                "🐌 Un escargot peut dormir pendant trois ans d’affilée.",
+                "🌋 Il y a plus de volcans sous l’eau que sur la terre ferme.",
+                "📦 Amazon a été fondée dans un garage... et maintenant, ils livrent même des frigos !",
+                "🧠 Le cerveau humain génère assez d’électricité pour allumer une petite ampoule.",
+                "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
+                "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
+                "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
+                "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !",
+                "🧊 Les manchots proposent parfois des galets comme cadeau de séduction.",
+                "🚀 Les astronautes peuvent grandir de quelques centimètres dans l’espace à cause de la microgravité.",
+                "🥶 L’eau chaude peut geler plus vite que l’eau froide. C’est l’effet Mpemba.",
+                "🐥 Les canetons s’attachent à la première chose qu’ils voient — c’est l’empreinte.",
+                "🍕 En Italie, il existe une pizza avec 111 sortes de fromages dessus !",
+                "🎵 Les abeilles peuvent reconnaître des visages humains… et elles adorent les sons aigus.",
+                "🌍 Il y a plus d’arbres sur Terre que d’étoiles dans la Voie lactée.",
+                "👅 La langue est aussi unique qu’une empreinte digitale.",
+                "🚿 En moyenne, une personne passe **6 mois de sa vie sous la douche**.",
+                "🎈 Une banane est techniquement une baie. Mais pas la fraise !",
+                "🦙 Les alpagas peuvent cracher… mais seulement s’ils sont vraiment énervés.",
+                "⏳ Les crocodiles peuvent vivre plus de 100 ans… et certains ne meurent que de vieillesse.",
+                "🐓 Les poules peuvent se souvenir de plus de 100 visages humains ou animaux.",
+                "🦇 Les chauves-souris tournent toujours à gauche en sortant d’une grotte.",
+                "🛸 Il existe un endroit sur Terre où la gravité semble inversée : la Mystery Spot en Californie.",
+                "🎮 Un gamer japonais détient le record mondial du plus long temps passé à jouer sans pause : 35 heures !",
+                "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
+                "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
+                "🐠 Certains poissons changent de sexe au cours de leur vie.",
+                "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie.",
+                "🦷 Les requins ont une infinité de dents : dès qu’une tombe, une autre pousse instantanément.",
+                "🌌 On connaît mieux la surface de Mars que les fonds marins de la Terre.",
+                "🥦 Le brocoli contient plus de protéines que certains morceaux de bœuf… oui, vraiment.",
+                "🛏️ On passe environ un tiers de notre vie à dormir, soit environ 25 ans !",
+                "📚 La bibliothèque du Vatican contient des textes qui n’ont pas été lus depuis des siècles.",
+                "🦵 Les autruches peuvent courir plus vite qu’un cheval… et changer de direction net sans freiner.",
+                "🪐 Sur Vénus, un jour dure plus longtemps qu’une année complète !",
+                "🦜 Certains perroquets peuvent apprendre plus de 100 mots humains… et les utiliser à bon escient.",
+                "🥚 En moyenne, une poule pond environ 300 œufs par an.",
+                "🌻 Les tournesols suivent réellement le soleil dans le ciel quand ils grandissent. C’est l’héliotropisme.",
+                "📏 Si tu pouvais plier une feuille de papier 42 fois, elle atteindrait la Lune.",
+                "🥶 Le sang d’un poisson antarctique peut rester liquide même en dessous de 0°C grâce à une protéine antigel.",
+                "🧃 Le Coca-Cola serait vert sans colorant.",
+                "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
+                "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
+            ]
+            # Si c'est la toute première anecdote demandée
             if 'derniere_fait' not in st.session_state:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
-        message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
+            message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
-    # --- Bloc « encore un » pour faits insolites ---
-    if not message_bot and any(
-        mot in qc for mot in ["encore un", "un autre", "encore"]
-    ):
-        if 'derniere_fait' in st.session_state:
-            message_bot = (
-                "✨ Voici une autre anecdote :\n\n"
-                f"{random.choice(faits_insolites)}"
-            )
-        else:
-            message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
+        # --- Bloc « encore un » pour faits insolites ---
+        if not message_bot and any(
+            mot in qc for mot in ["encore un", "un autre", "encore"]
+        ):
+            if 'derniere_fait' in st.session_state:
+                message_bot = (
+                    "✨ Voici une autre anecdote :\n\n"
+                    f"{random.choice(faits_insolites)}"
+                )
+            else:
+                message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
 
         # --- Bloc Recettes rapides
