@@ -81,6 +81,19 @@ def get_meteo_ville(city):
     return f"{desc} avec {temp}°C, humidité : {hum}%, vent : {vent} m/s."
 
 
+def humeur_du_jour():
+    heure = datetime.now().hour
+    if heure < 8:
+        return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
+    elif heure < 12:
+        return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
+    elif heure < 17:
+        return "💼 Focus total sur les marchés, on décortique tout ensemble !"
+    elif heure < 21:
+        return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
+    else:
+        return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
+        
 # Nouvelle fonction get_general_news() avec la modification pour NewsAPI
 def get_general_news():
     try:
@@ -669,18 +682,7 @@ if question:
                     message_bot = rep
                     break
 
-        def humeur_du_jour():
-            heure = datetime.now().hour
-            if heure < 8:
-                return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
-            elif heure < 12:
-                return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
-            elif heure < 17:
-                return "💼 Focus total sur les marchés, on décortique tout ensemble !"
-            elif heure < 21:
-                return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
-            else:
-                return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
+
 
         # --- Bloc Remèdes naturels ---
         if not message_bot and any(phrase in qc for phrase in [
