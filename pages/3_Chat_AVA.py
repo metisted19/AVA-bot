@@ -159,7 +159,7 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 # --- Moteur central de réponse AVA ---
 def trouver_reponse(question):
-    question_clean = question.lower().strip()
+    question_clean = remove_accents(nettoyer_texte(question))
     reponse = gerer_modules_speciaux(question_clean)
     if reponse:
         return reponse
