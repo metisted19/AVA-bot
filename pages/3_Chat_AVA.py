@@ -10,16 +10,30 @@ from langdetect import detect
 from newsapi import NewsApiClient
 from forex_python.converter import CurrencyRates, CurrencyCodes
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
+from fonctions_chat import obtenir_reponse_ava
 from fonctions_meteo import obtenir_meteo, get_meteo_ville  
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
 import unicodedata, re
 import difflib
-import urllib.parse
-from fonctions_chat import obtenir_reponse_ava
+from fonctions_chat import obtenir_reponse_ava 
 
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
+
+# --- Modèle sémantique (cache) ---
+@st.cache_resource
+def load_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+model_semantic = load_model()
+
+# --- Nettoyage du texte ---
+def nettoyer_texte(txt):
+    txt = unicodedata.normalize("NFKC", txt)
+    txt = txt.lower().strip()
+    txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
+    txt = re.sub(r"\s+", " ", txt)
+    return txt
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -66,19 +80,6 @@ def get_meteo_ville(city):
     return f"{desc} avec {temp}°C, humidité : {hum}%, vent : {vent} m/s."
 
 
-def humeur_du_jour():
-    heure = datetime.now().hour
-    if heure < 8:
-        return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
-    elif heure < 12:
-        return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
-    elif heure < 17:
-        return "💼 Focus total sur les marchés, on décortique tout ensemble !"
-    elif heure < 21:
-        return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
-    else:
-        return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
-
 # Nouvelle fonction get_general_news() avec la modification pour NewsAPI
 def get_general_news():
     try:
@@ -94,26 +95,6 @@ def get_general_news():
     except Exception as e:
         return f"❌ Error fetching news via NewsApiClient: {e}"
 
-# --- Fonction modules personnalisés (à placer en toute fin avant l'interface) ---
-def gerer_modules_speciaux(question_clean):
-    if "analyse" in question_clean and "btc" in question_clean:
-        return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-    if "horoscope" in question_clean:
-        return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-    if "météo" in question_clean and "paris" in question_clean:
-        return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-    if "blague" in question_clean:
-        blagues = [
-            "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
-            "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
-            "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
-        ]
-        return random.choice(blagues)
-    return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
-def afficher_message(role, content, avatar=None):
-    with st.chat_message(role, avatar=avatar):
-        st.markdown(content)    
-
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
     try:
@@ -124,7 +105,19 @@ def traduire_texte(texte, langue_dest):
     except:
         return texte  # fallback
 
-
+# Fonction humeur dynamique selon l'heure
+def humeur_du_jour():
+    heure = datetime.now().hour
+    if heure < 8:
+        return "😬 Pas très bavarde ce matin, mais je suis là pour vous servir !"
+    elif heure < 12:
+        return "☕ Pleine d'énergie pour cette matinée ! Une analyse avec ça ?"
+    elif heure < 17:
+        return "💼 Focus total sur les marchés, on décortique tout ensemble !"
+    elif heure < 21:
+        return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
+    else:
+        return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
 
 
 heure_actuelle = datetime.now().hour
@@ -144,35 +137,26 @@ with col2:
 st.markdown(f"<p style='font-style: italic;'>{humeur_du_jour()}</p>", unsafe_allow_html=True)
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# --- Modèle sémantique (cache) ---
-@st.cache_resource
-def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
-model_semantic = load_model()
+for message in st.session_state.messages:
+    if message["role"] == "assistant":
+        with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+            st.markdown(message["content"])
+    else:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-# --- Nettoyage du texte ---
-def nettoyer_texte(txt):
-    txt = unicodedata.normalize("NFKC", txt)
-    txt = txt.lower().strip()
-    txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
-    txt = re.sub(r"\s+", " ", txt)
-    return txt
+# Récupération de la question utilisateur
+question = st.chat_input("Que souhaitez-vous demander à AVA ?")
 
+# 🔒 Sécurité : détection d'entrée dangereuse
+if question and re.search(r"[<>;{}]", question):
+    st.warning("⛔ Entrée invalide détectée.")
+    st.stop()
 
- 
-        
-
-        # 3. 🔍 Initialisation du chat
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-        # Input utilisateur en fin de page (à la racine)
-        question = st.chat_input("Posez votre question ici")
-        # 🔒 Sécurité : détection d'entrée dangereuse
-        if question and re.search(r"[<>;{}]", question):
-            st.warning("⛔ Entrée invalide détectée.")
-            st.stop()
-        if question:
+if question:
     st.session_state.messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
@@ -191,36 +175,68 @@ def nettoyer_texte(txt):
         sante_repondu = False
         perso_repondu = False
 
-
-        # --- Vérification de la question pour l'horoscope ---
-        if isinstance(question_clean, str) and question_clean:  # Vérifie que question_clean est bien une chaîne non vide
-            if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
-                signes_disponibles = [
-                    "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
-                    "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
-                ]
-                signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
-                if not signe_detecte:
-                    message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
-                else:
-                    try:
-                        url = "https://kayoo123.github.io/astroo-api/jour.json"
-                        response = requests.get(url)
-                        if response.status_code == 200:
-                            data = response.json()
-                            horoscope_dict = data.get("signes", {}) if "signes" in data else data
-                            signe_data = horoscope_dict.get(signe_detecte.lower(), None)
-                            if signe_data:
-                                horoscope = signe_data.get("horoscope", "Aucun horoscope disponible")
-                                message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
-                            else:
-                                message_bot = f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+        # --- Partie Horoscope ---
+        if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
+            signes_disponibles = [
+                "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
+                "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
+            ]
+            signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
+            if not signe_detecte:
+                message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+                horoscope_repondu = True
+            else:
+                try:
+                    url = "https://kayoo123.github.io/astroo-api/jour.json"
+                    response = requests.get(url)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if "signes" in data:
+                            horoscope_dict = data.get("signes", {})
                         else:
-                            message_bot = "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
-                    except Exception as e:
-                        message_bot = f"⚠️ Une erreur est survenue lors de la récupération de l'horoscope : {e}\n\n"
-        # Ajout du message dans l'historique
-        st.session_state.messages.append({"role": "assistant", "content": message_bot})
+                            horoscope_dict = data
+                        signe_data = next((v for k, v in horoscope_dict.items() if k.lower() == signe_detecte), None)
+                        if signe_data is None:
+                            message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                        else:
+                            if isinstance(signe_data, dict):
+                                horoscope = signe_data.get("horoscope")
+                            else:
+                                horoscope = signe_data
+                            if horoscope:
+                                message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                            else:
+                                message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                        horoscope_repondu = True
+                    else:
+                        message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
+                        horoscope_repondu = True
+                except Exception as e:
+                    message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
+                    horoscope_repondu = True
+
+        # --- Analyse complète / technique ---
+        if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
+            try:
+                resultats = []
+                fichiers = glob.glob("data/donnees_*.csv")
+                for fichier in fichiers:
+                    df = pd.read_csv(fichier)
+                    df.columns = [col.capitalize() for col in df.columns]
+                    df = ajouter_indicateurs_techniques(df)  # ← Important !
+                    analyse, suggestion = analyser_signaux_techniques(df)
+                    try:
+                        analyse, suggestion = analyser_signaux_techniques(df)
+                        nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
+                        resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
+                        resultats.append(resume)
+                    except:
+                        continue
+                if resultats:
+                    message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats) + "\n\n"
+                    analyse_complete = True
+            except Exception as e:
+                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
 
         # --- Bloc météo intelligent (villages inclus) ---
         if not horoscope_repondu and not analyse_complete \
@@ -256,185 +272,9 @@ def nettoyer_texte(txt):
 
             meteo_repondu = True
 
-            # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
-        if not message_bot and question_clean.startswith("analyse "):
-            nom_simple = question_clean.replace("analyse", "").strip()
-            nom_simple_norm = remove_accents(nom_simple)  # Normalisation sans accents
-            correspondances = {
-                "btc": "btc-usd", "bitcoin": "btc-usd",
-                "eth": "eth-usd", "ethereum": "eth-usd",
-                "aapl": "aapl", "apple": "aapl",
-                "tsla": "tsla", "tesla": "tsla",
-                "googl": "googl", "google": "googl",
-                "msft": "msft", "microsoft": "msft",
-                "amzn": "amzn", "amazon": "amzn",
-                "nvda": "nvda", "nvidia": "nvda",
-                "doge": "doge-usd", "dogecoin": "doge-usd",
-                "ada": "ada-usd", "cardano": "ada-usd",
-                "sol": "sol-usd", "solana": "sol-usd",
-                "gold": "gc=F", "or": "gc=F",
-                "sp500": "^gspc", "s&p": "^gspc",
-                "cac": "^fchi", "cac40": "^fchi",
-                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F", "cl=f": "cl=F",
-                "si": "si=F", "argent": "si=F",
-                "xrp": "xrp-usd", "ripple": "xrp-usd",
-                "bnb": "bnb-usd",
-                "matic": "matic-usd", "polygon": "matic-usd",
-                "uni": "uni-usd", "uniswap": "uni-usd",
-                "ndx": "^ndx", "nasdaq": "^ndx", "nasdaq100": "^ndx"
-            }
-            nom_ticker = correspondances.get(nom_simple_norm)
-            if nom_ticker:
-                data_path = f"data/donnees_{nom_ticker}.csv"
-                if os.path.exists(data_path):
-                    df = pd.read_csv(data_path)
-                    df.columns = [col.capitalize() for col in df.columns]
-                    df = ajouter_indicateurs_techniques(df)
-                    analyse, suggestion = analyser_signaux_techniques(df)
-                    
-                    def generer_resume_signal(signaux):
-                        texte = ""
-                        signaux_str = " ".join(signaux).lower()
-                        if "survente" in signaux_str:
-                            texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
-                        if "surachat" in signaux_str:
-                            texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
-                        if "haussier" in signaux_str:
-                            texte += "📈 **Tendance haussière détectée.**\n"
-                        if "baissier" in signaux_str:
-                            texte += "📉 **Tendance baissière détectée.**\n"
-                        if "faible" in signaux_str:
-                            texte += "😴 **Tendance faible.** Le marché semble indécis.\n"
-                        return texte if texte else "ℹ️ Aucun signal fort détecté."
-                    
-                    signaux = analyse.split("\n") if analyse else []
-                    resume = generer_resume_signal(signaux)
-                    
-                    message_bot = (
-                        f"📊 **Analyse pour {nom_simple.upper()}**\n\n"
-                        f"{analyse}\n\n"
-                        f"💬 **Résumé d'AVA :**\n{resume}\n\n"
-                        f"🤖 *Intuition d'AVA :* {suggestion}"
-                    )
-                else:
-                    message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
-            else:
-                message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
 
-        # --- Bloc Calcul (simple expression mathématique ou phrase) ---
-        if not message_bot:
-            question_calc = question_clean.replace(",", ".")
-            question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
-            try:
-                if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
-                    try:
-                        result = eval(question_calc)
-                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-                    except Exception:
-                        pass
-                if not message_bot:
-                    match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
-                    if match:
-                        expression = match.group(1).strip()
-                        result = eval(expression)
-                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-            except:
-                pass
 
-        # --- Bloc Convertisseur intelligent ---
-        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
-            try:
-                phrase = question_clean.replace(",", ".")
-                match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
-                if match:
-                    montant = float(match.group(1))
-                    from_cur = match.group(3).upper()
-                    to_cur = match.group(5).upper()
-                    url = f"https://v6.exchangerate-api.com/v6/dab2bba4f43a99445158d9ae/latest/{from_cur}"
-                    response = requests.get(url, timeout=10)
-                    data = response.json()
-                    if data.get("result") == "success":
-                        taux = data["conversion_rates"].get(to_cur)
-                        if taux:
-                            result = montant * taux
-                            message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {to_cur}"
-                        else:
-                            message_bot = "❌ Taux de conversion non disponible pour la devise demandée."
-                    else:
-                        message_bot = "⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème avec l’API. Veuillez réessayer plus tard."
-                elif "km en miles" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*km", phrase)
-                    if match:
-                        km = float(match.group(1))
-                        miles = km * 0.621371
-                        message_bot = f"📏 {km} km = {round(miles, 2)} miles"
-                elif "miles en km" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*miles?", phrase)
-                    if match:
-                        mi = float(match.group(1))
-                        km = mi / 0.621371
-                        message_bot = f"📏 {mi} miles = {round(km, 2)} km"
-                elif "celsius en fahrenheit" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*c", phrase)
-                    if match:
-                        celsius = float(match.group(1))
-                        fahrenheit = (celsius * 9/5) + 32
-                        message_bot = f"🌡️ {celsius}°C = {round(fahrenheit, 2)}°F"
-                elif "fahrenheit en celsius" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*f", phrase)
-                    if match:
-                        f_temp = float(match.group(1))
-                        c_temp = (f_temp - 32) * 5/9
-                        message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
-            except Exception as e:
-                message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
-
-        # === Bloc Reconnaissance des tickers (exemple) ===
-        if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
-            nom_ticker = question_clean.replace(" ", "").replace("-", "")
-            if "btc" in nom_ticker or "bitcoin" in nom_ticker:
-                nom_ticker = "btc-usd"
-            elif "eth" in nom_ticker:
-                nom_ticker = "eth-usd"
-            elif "aapl" in nom_ticker:
-                nom_ticker = "aapl"
-            elif "tsla" in nom_ticker:
-                nom_ticker = "tsla"
-            elif "googl" in nom_ticker:
-                nom_ticker = "googl"
-            elif "fchi" in nom_ticker or "cac" in nom_ticker:
-                nom_ticker = "^fchi"
-            elif "msft" in nom_ticker:
-                nom_ticker = "msft"
-            elif "amzn" in nom_ticker:
-                nom_ticker = "amzn"
-            elif "nvda" in nom_ticker:
-                nom_ticker = "nvda"
-            elif "sp500" in nom_ticker or "s&p" in nom_ticker:
-                nom_ticker = "^gspc"
-            elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
-                nom_ticker = "doge-usd"
-            elif "ada" in nom_ticker or "cardano" in nom_ticker:
-                nom_ticker = "ada-usd"
-            elif "sol" in nom_ticker or "solana" in nom_ticker:
-                nom_ticker = "sol-usd"
-            elif "gold" in nom_ticker or "or" in nom_ticker:
-                nom_ticker = "gc=F"
-            elif "xrp" in nom_ticker or "ripple" in nom_ticker:
-                nom_ticker = "xrp-usd"
-            elif "bnb" in nom_ticker:
-                nom_ticker = "bnb-usd"
-            elif "cl" in nom_ticker or "petrole" in nom_ticker or "pétrole" in nom_ticker:
-                nom_ticker = "cl=F"
-            elif "si" in nom_ticker or "argent" in nom_ticker:
-                nom_ticker = "si=F"
-            elif "matic" in nom_ticker or "polygon" in nom_ticker:
-                nom_ticker = "matic-usd"
-            elif "uni" in nom_ticker or "uniswap" in nom_ticker:
-                nom_ticker = "uni-usd"
-            elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
-                nom_ticker = "^ndx"
-                # --- Actualités améliorées ---
+        # --- Actualités améliorées ---
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
@@ -446,127 +286,104 @@ def nettoyer_texte(txt):
                 message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
             else:
                 message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
-            actus_repondu = True         
-
-        # ─── 4) Bases de réponses ───────────────────────────────────────────────────
-        # 4.a) Hard‑codées
-        reponses_courantes = {
-            "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
-            "ça va": "Je vais bien, merci de demander ! Et vous ?",
-            "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-            "hello": "Hello! How can I assist you today?",
-            "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-            "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-            "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-            "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-            "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-            "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-            "tu m'entends": "Je vous entends fort et clair 🎧",
-            "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-            "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-            "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-            "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
-            "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-            "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
-            "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-            "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
-            "re": "Re bienvenue à bord ! On continue notre mission ?",
-            "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-            "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-            "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-            "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
-            "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
-            "merci": "C’est moi qui vous remercie ! 🙏",
-            "je t'aime": "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !",
-            "un secret": "🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", 
-            "je suis fatigué": "😴 Reposez-vous bien, le cerveau a aussi besoin de sa pause comme les marchés le week-end !",
-            "t'es intelligente": "🧠 Merci ! J’ai été entraînée pour ça, mais vos compliments me boostent encore plus.", 
-            "je m'ennuie": "🎲 Je peux vous faire un quiz ou vous raconter un fait insolite si vous voulez ?",
-        }
-        base_savoir = {
-            # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
-            "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
-            "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
-            "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
-            "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
-            "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
-            "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-            "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
-            "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
-            "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
-            "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
-            "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
-            "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
-            "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
-            "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
-            "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
-            "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
-            "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-            "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
-            "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
-            "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
-            "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
-            "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
-            "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
-            "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
-            "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
-            "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
-            "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
-        }
-        # Fusionner les deux dans une base complète
-        base_complet = {**base_savoir, **reponses_courantes}
-
-        # --- Moteur central de réponse AVA ---
-        def traiter_question(question: str) -> str:
-            question_clean = nettoyer_texte(question)
-
-            # 1. Direct
-            if question_clean in base_complet:
-                st.write("✅ Match direct trouvé")
-                return base_complet[question_clean]
-
-            # 2. Fuzzy
-            proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
-            if proche:
-                st.write(f"🔎 Match fuzzy : {proche[0]}")
-                return base_complet[proche[0]]
-
-            # 3. Sémantique
-            keys = list(base_complet.keys())
-            vb = model_semantic.encode(keys)
-            vq = model_semantic.encode([question_clean])[0]
-            sims = cosine_similarity([vq], vb)[0]
-            best, score = max(zip(keys, sims), key=lambda x: x[1])
-            st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
-
-            if score > 0.7:
-                return base_complet[best]
-
-            # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
-            return gerer_modules_speciaux(question_clean)
+            actus_repondu = True
 
             
+
+        # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
+        if not message_bot and any(phrase in question_clean for phrase in [
+            "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
+            "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
+        ]):
+            if "tête" in question_clean:
+                message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
+            elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
+                message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
+            elif "gorge" in question_clean:
+                message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
+            elif "ventre" in question_clean:
+                message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
+            elif "toux" in question_clean or "je tousse" in question_clean:
+                message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
+            elif "nez" in question_clean:
+                message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
+            elif "transpire" in question_clean or "j'ai froid" in question_clean:
+                message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
+
+            
+        # --- Bloc Remèdes naturels ---
+        if not message_bot and any(phrase in question_clean for phrase in [
+                "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
+                "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
+        ]):
+            if "stress" in question_clean:
+                message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
+            elif "mal de gorge" in question_clean or "gorge" in question_clean:
+                message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
+            elif "rhume" in question_clean or "nez bouché" in question_clean:
+                message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
+            elif "fièvre" in question_clean:
+                message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
+            elif "digestion" in question_clean or "ventre" in question_clean:
+                message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
+            elif "toux" in question_clean:
+                message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
+            elif "insomnie" in question_clean or "sommeil" in question_clean:
+                message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
+            elif "brûlure d'estomac" in question_clean or "reflux" in question_clean:
+                message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
+            elif "peau" in question_clean or "acné" in question_clean:
+                message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
+            elif "fatigue" in question_clean:
+                message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
+            elif "maux de tête" in question_clean or "migraine" in question_clean:
+                message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
+            elif "nausée" in question_clean:
+                message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
+            elif "crampes" in question_clean:
+                message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
+            elif "dépression" in question_clean:
+                message_bot = "🖤 Millepertuis (à surveiller si tu prends déjà un traitement), lumière naturelle quotidienne, et activités créatives relaxantes."
+            elif "allergie" in question_clean:
+                message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
+            elif "eczéma" in question_clean or "démangeaisons" in question_clean:
+                message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
+            elif "arthrose" in question_clean or "articulations" in question_clean:
+                message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
+            elif "ballonnements" in question_clean:
+                message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
+            elif "anxiété" in question_clean:
+                message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
+            elif "brûlure légère" in question_clean or "brûlure" in question_clean:
+                message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
+            elif "circulation" in question_clean or "jambes lourdes" in question_clean:
+                message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
+            elif "foie" in question_clean or "digestion difficile" in question_clean:
+                message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
+            elif "yeux fatigués" in question_clean:
+                message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
+            elif "système immunitaire" in question_clean or "immunité" in question_clean:
+                message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
+            elif "tensions musculaires" in question_clean:
+                message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
+            elif "transpiration excessive" in question_clean:
+                message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
+            elif "inflammation" in question_clean:
+                message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
+            else:
+                message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
+
         # --- Bloc Réponses médicales explicites ---
-        if not message_bot and any(
-            mot in question_clean for mot in [
-                "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress",
-                "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète",
-                "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures",
-                "reflux", "nausée", "dépression", "allergie", "palpitations", "otite",
-                "sinusite", "crampes", "infections urinaires", "fatigue", "constipation",
-                "diarrhée", "ballonnements", "brûlures d’estomac", "brûlure d'estomac",
-                "saignement de nez", "mal de dos", "entorse", "tendinite", "ampoule",
-                "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre",
-                "lombalgie", "périarthrite", "hallux valgus", "hallucinations",
-                "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne",
-                "bradycardie", "tachycardie", "psoriasis", "fibromyalgie", "thyroïde",
-                "cystite", "glaucome", "bruxisme", "arthrose", "hernie discale", "spasmophilie",
-                "urticaire", "coup de chaleur", "luxation", "anxiété", "torticolis",
-                "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique",
-                "eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique",
-                "hépatite", "pneumonie", "zona", "épilepsie", "coupure profonde",
-                "hépatite C", "phlébite", "gastro-entérite", "blessure musculaire",
-                "tendinopathie", "œil rouge", "perte d'odorat",
+        elif not message_bot and any(mot in question_clean for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
+            "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
+            "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
+            "ballonnements", "brûlures d’estomac", "brûlure d'estomac", "saignement de nez", "mal de dos", "entorse", "tendinite",
+            "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
+            "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne","bradycardie", "tachycardie", "psoriasis", "fibromyalgie", "thyroïde", "cystite", "glaucome", "bruxisme",
+            "arthrose", "hernie discale", "spasmophilie", "urticaire", "coup de chaleur", "luxation", "anxiété",
+            "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique","eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite", "pneumonie",
+            "zona", "épilepsie", "coupure profonde", "hépatite C", "phlébite",
+            "gastro-entérite", "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
 
 
             ]):
@@ -660,96 +477,8 @@ def nettoyer_texte(txt):
                     message_bot = rep
                     break
 
-
-
-        # --- Bloc Remèdes naturels ---
-        if not message_bot and any(phrase in question_clean for phrase in [
-                "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
-                "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
-        ]):
-            if "stress" in question_clean:
-                message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
-            elif "mal de gorge" in question_clean or "gorge" in question_clean:
-                message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
-            elif "rhume" in question_clean or "nez bouché" in question_clean:
-                message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
-            elif "fièvre" in question_clean:
-                message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
-            elif "digestion" in question_clean or "ventre" in question_clean:
-                message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
-            elif "toux" in question_clean:
-                message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
-            elif "insomnie" in question_clean or "sommeil" in question_clean:
-                message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
-            elif "brûlure d'estomac" in question_clean or "reflux" in question_clean:
-                message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
-            elif "peau" in question_clean or "acné" in question_clean:
-                message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
-            elif "fatigue" in question_clean:
-                message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
-            elif "maux de tête" in question_clean or "migraine" in question_clean:
-                message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
-            elif "nausée" in question_clean:
-                message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
-            elif "crampes" in question_clean:
-                message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
-            elif "allergie" in question_clean:
-                message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
-            elif "eczéma" in question_clean or "démangeaisons" in question_clean:
-                message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
-            elif "arthrose" in question_clean or "articulations" in question_clean:
-                message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
-            elif "ballonnements" in question_clean:
-                message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
-            elif "anxiété" in question_clean:
-                message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
-            elif "brûlure légère" in question_clean or "brûlure" in question_clean:
-                message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
-            elif "circulation" in question_clean or "jambes lourdes" in question_clean:
-                message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
-            elif "foie" in question_clean or "digestion difficile" in question_clean:
-                message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
-            elif "yeux fatigués" in question_clean:
-                message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
-            elif "système immunitaire" in question_clean or "immunité" in question_clean:
-                message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
-            elif "tensions musculaires" in question_clean:
-                message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
-            elif "transpiration excessive" in question_clean:
-                message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
-            elif "inflammation" in question_clean:
-                message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
-            else:
-                message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
-
-        # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
-        if not message_bot and any(phrase in question_clean for phrase in [
-            "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
-            "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
-        ]):
-            if "tête" in question_clean:
-                message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
-            elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
-                message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
-            elif "gorge" in question_clean:
-                message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
-            elif "ventre" in question_clean:
-                message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
-            elif "toux" in question_clean or "je tousse" in question_clean:
-                message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
-            elif "nez" in question_clean:
-                message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
-            elif "transpire" in question_clean or "j'ai froid" in question_clean:
-                message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
-
         # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
-        if not message_bot and any(
-            kw in question_clean for kw in [
-                "capitale", "capitale de", "capitale du", "capitale d", "capitale des",
-                "où se trouve", "ville principale", "ville de"
-            ]
-        ):
-            # Détection du pays
+        elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
             pays_detecte = None
             match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
             if match:
@@ -927,13 +656,15 @@ def nettoyer_texte(txt):
                     "luxembourg"        : "Luxembourg",
                     "monténégro"        : "Podgorica",
                     "macédoine du nord" : "Skopje",
-                    "bosnie-herzégovine": "Sarajevo",
+                    "bosnie-herzégovine": "Sarajevo"
 
             }
             if pays_detecte and pays_detecte in capitales:
                 message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
             else:
                 message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+
+
 
         # --- Bloc Punchlines motivationnelles ---
         if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
@@ -957,7 +688,7 @@ def nettoyer_texte(txt):
             ]
             message_bot = random.choice(punchlines)
 
-        # --- Bloc Culture Générale (questions simples) --
+        # --- Bloc Culture Générale (questions simples) ---
         if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
             base_connaissances = {
                     "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
@@ -1006,6 +737,187 @@ def nettoyer_texte(txt):
                     message_bot = reponse
                     break
 
+        # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
+        if not message_bot and question_clean.startswith("analyse "):
+            nom_simple = question_clean.replace("analyse", "").strip()
+            nom_simple_norm = remove_accents(nom_simple)  # Normalisation sans accents
+            correspondances = {
+                "btc": "btc-usd", "bitcoin": "btc-usd",
+                "eth": "eth-usd", "ethereum": "eth-usd",
+                "aapl": "aapl", "apple": "aapl",
+                "tsla": "tsla", "tesla": "tsla",
+                "googl": "googl", "google": "googl",
+                "msft": "msft", "microsoft": "msft",
+                "amzn": "amzn", "amazon": "amzn",
+                "nvda": "nvda", "nvidia": "nvda",
+                "doge": "doge-usd", "dogecoin": "doge-usd",
+                "ada": "ada-usd", "cardano": "ada-usd",
+                "sol": "sol-usd", "solana": "sol-usd",
+                "gold": "gc=F", "or": "gc=F",
+                "sp500": "^gspc", "s&p": "^gspc",
+                "cac": "^fchi", "cac40": "^fchi",
+                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F", "cl=f": "cl=F",
+                "si": "si=F", "argent": "si=F",
+                "xrp": "xrp-usd", "ripple": "xrp-usd",
+                "bnb": "bnb-usd",
+                "matic": "matic-usd", "polygon": "matic-usd",
+                "uni": "uni-usd", "uniswap": "uni-usd",
+                "ndx": "^ndx", "nasdaq": "^ndx", "nasdaq100": "^ndx"
+            }
+            nom_ticker = correspondances.get(nom_simple_norm)
+            if nom_ticker:
+                data_path = f"data/donnees_{nom_ticker}.csv"
+                if os.path.exists(data_path):
+                    df = pd.read_csv(data_path)
+                    df.columns = [col.capitalize() for col in df.columns]
+                    df = ajouter_indicateurs_techniques(df)
+                    analyse, suggestion = analyser_signaux_techniques(df)
+                    
+                    def generer_resume_signal(signaux):
+                        texte = ""
+                        signaux_str = " ".join(signaux).lower()
+                        if "survente" in signaux_str:
+                            texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
+                        if "surachat" in signaux_str:
+                            texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
+                        if "haussier" in signaux_str:
+                            texte += "📈 **Tendance haussière détectée.**\n"
+                        if "baissier" in signaux_str:
+                            texte += "📉 **Tendance baissière détectée.**\n"
+                        if "faible" in signaux_str:
+                            texte += "😴 **Tendance faible.** Le marché semble indécis.\n"
+                        return texte if texte else "ℹ️ Aucun signal fort détecté."
+                    
+                    signaux = analyse.split("\n") if analyse else []
+                    resume = generer_resume_signal(signaux)
+                    
+                    message_bot = (
+                        f"📊 **Analyse pour {nom_simple.upper()}**\n\n"
+                        f"{analyse}\n\n"
+                        f"💬 **Résumé d'AVA :**\n{resume}\n\n"
+                        f"🤖 *Intuition d'AVA :* {suggestion}"
+                    )
+                else:
+                    message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
+            else:
+                message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
+
+        # --- Bloc Calcul (simple expression mathématique ou phrase) ---
+        if not message_bot:
+            question_calc = question_clean.replace(",", ".")
+            question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
+            try:
+                if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
+                    try:
+                        result = eval(question_calc)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+                    except Exception:
+                        pass
+                if not message_bot:
+                    match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
+                    if match:
+                        expression = match.group(1).strip()
+                        result = eval(expression)
+                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+            except:
+                pass
+
+        # --- Bloc Convertisseur intelligent ---
+        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
+            try:
+                phrase = question_clean.replace(",", ".")
+                match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
+                if match:
+                    montant = float(match.group(1))
+                    from_cur = match.group(3).upper()
+                    to_cur = match.group(5).upper()
+                    url = f"https://v6.exchangerate-api.com/v6/dab2bba4f43a99445158d9ae/latest/{from_cur}"
+                    response = requests.get(url, timeout=10)
+                    data = response.json()
+                    if data.get("result") == "success":
+                        taux = data["conversion_rates"].get(to_cur)
+                        if taux:
+                            result = montant * taux
+                            message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {to_cur}"
+                        else:
+                            message_bot = "❌ Taux de conversion non disponible pour la devise demandée."
+                    else:
+                        message_bot = "⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème avec l’API. Veuillez réessayer plus tard."
+                elif "km en miles" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*km", phrase)
+                    if match:
+                        km = float(match.group(1))
+                        miles = km * 0.621371
+                        message_bot = f"📏 {km} km = {round(miles, 2)} miles"
+                elif "miles en km" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*miles?", phrase)
+                    if match:
+                        mi = float(match.group(1))
+                        km = mi / 0.621371
+                        message_bot = f"📏 {mi} miles = {round(km, 2)} km"
+                elif "celsius en fahrenheit" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*c", phrase)
+                    if match:
+                        celsius = float(match.group(1))
+                        fahrenheit = (celsius * 9/5) + 32
+                        message_bot = f"🌡️ {celsius}°C = {round(fahrenheit, 2)}°F"
+                elif "fahrenheit en celsius" in phrase:
+                    match = re.search(r"(\d+(\.\d+)?)\s*f", phrase)
+                    if match:
+                        f_temp = float(match.group(1))
+                        c_temp = (f_temp - 32) * 5/9
+                        message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
+            except Exception as e:
+                message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
+
+        # === Bloc Reconnaissance des tickers (exemple) ===
+        if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
+            nom_ticker = question_clean.replace(" ", "").replace("-", "")
+            if "btc" in nom_ticker or "bitcoin" in nom_ticker:
+                nom_ticker = "btc-usd"
+            elif "eth" in nom_ticker:
+                nom_ticker = "eth-usd"
+            elif "aapl" in nom_ticker:
+                nom_ticker = "aapl"
+            elif "tsla" in nom_ticker:
+                nom_ticker = "tsla"
+            elif "googl" in nom_ticker:
+                nom_ticker = "googl"
+            elif "fchi" in nom_ticker or "cac" in nom_ticker:
+                nom_ticker = "^fchi"
+            elif "msft" in nom_ticker:
+                nom_ticker = "msft"
+            elif "amzn" in nom_ticker:
+                nom_ticker = "amzn"
+            elif "nvda" in nom_ticker:
+                nom_ticker = "nvda"
+            elif "sp500" in nom_ticker or "s&p" in nom_ticker:
+                nom_ticker = "^gspc"
+            elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
+                nom_ticker = "doge-usd"
+            elif "ada" in nom_ticker or "cardano" in nom_ticker:
+                nom_ticker = "ada-usd"
+            elif "sol" in nom_ticker or "solana" in nom_ticker:
+                nom_ticker = "sol-usd"
+            elif "gold" in nom_ticker or "or" in nom_ticker:
+                nom_ticker = "gc=F"
+            elif "xrp" in nom_ticker or "ripple" in nom_ticker:
+                nom_ticker = "xrp-usd"
+            elif "bnb" in nom_ticker:
+                nom_ticker = "bnb-usd"
+            elif "cl" in nom_ticker or "petrole" in nom_ticker or "pétrole" in nom_ticker:
+                nom_ticker = "cl=F"
+            elif "si" in nom_ticker or "argent" in nom_ticker:
+                nom_ticker = "si=F"
+            elif "matic" in nom_ticker or "polygon" in nom_ticker:
+                nom_ticker = "matic-usd"
+            elif "uni" in nom_ticker or "uniswap" in nom_ticker:
+                nom_ticker = "uni-usd"
+            elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
+                nom_ticker = "^ndx"
+        
+
+        
         # --- Bloc Quiz de culture générale ---
         if not message_bot and any(mot in question_clean for mot in [
             "quiz", "quizz", "question", "culture générale", "pose-moi une question", "teste mes connaissances"
@@ -1044,80 +956,78 @@ def nettoyer_texte(txt):
             else:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
-            
-        # --- Bloc faits insolites (anecdotes) ---
-        if not message_bot and any(
-            mot in question_clean for mot in [
-                "fait insolite", "truc fou", "surprends-moi",
-                "anecdote", "incroyable mais vrai"
-            ]
-        ):
-            faits_insolites = [
-                "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
-                "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
-                "🐌 Un escargot peut dormir pendant trois ans d’affilée.",
-                "🌋 Il y a plus de volcans sous l’eau que sur la terre ferme.",
-                "📦 Amazon a été fondée dans un garage... et maintenant, ils livrent même des frigos !",
-                "🧠 Le cerveau humain génère assez d’électricité pour allumer une petite ampoule.",
-                "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
-                "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
-                "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
-                "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !",
-                "🧊 Les manchots proposent parfois des galets comme cadeau de séduction.",
-                "🚀 Les astronautes peuvent grandir de quelques centimètres dans l’espace à cause de la microgravité.",
-                "🥶 L’eau chaude peut geler plus vite que l’eau froide. C’est l’effet Mpemba.",
-                "🐥 Les canetons s’attachent à la première chose qu’ils voient — c’est l’empreinte.",
-                "🍕 En Italie, il existe une pizza avec 111 sortes de fromages dessus !",
-                "🎵 Les abeilles peuvent reconnaître des visages humains… et elles adorent les sons aigus.",
-                "🌍 Il y a plus d’arbres sur Terre que d’étoiles dans la Voie lactée.",
-                "👅 La langue est aussi unique qu’une empreinte digitale.",
-                "🚿 En moyenne, une personne passe **6 mois de sa vie sous la douche**.",
-                "🎈 Une banane est techniquement une baie. Mais pas la fraise !",
-                "🦙 Les alpagas peuvent cracher… mais seulement s’ils sont vraiment énervés.",
-                "⏳ Les crocodiles peuvent vivre plus de 100 ans… et certains ne meurent que de vieillesse.",
-                "🐓 Les poules peuvent se souvenir de plus de 100 visages humains ou animaux.",
-                "🦇 Les chauves-souris tournent toujours à gauche en sortant d’une grotte.",
-                "🛸 Il existe un endroit sur Terre où la gravité semble inversée : la Mystery Spot en Californie.",
-                "🎮 Un gamer japonais détient le record mondial du plus long temps passé à jouer sans pause : 35 heures !",
-                "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
-                "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
-                "🐠 Certains poissons changent de sexe au cours de leur vie.",
-                "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie.",
-                "🦷 Les requins ont une infinité de dents : dès qu’une tombe, une autre pousse instantanément.",
-                "🌌 On connaît mieux la surface de Mars que les fonds marins de la Terre.",
-                "🥦 Le brocoli contient plus de protéines que certains morceaux de bœuf… oui, vraiment.",
-                "🛏️ On passe environ un tiers de notre vie à dormir, soit environ 25 ans !",
-                "📚 La bibliothèque du Vatican contient des textes qui n’ont pas été lus depuis des siècles.",
-                "🦵 Les autruches peuvent courir plus vite qu’un cheval… et changer de direction net sans freiner.",
-                "🪐 Sur Vénus, un jour dure plus longtemps qu’une année complète !",
-                "🦜 Certains perroquets peuvent apprendre plus de 100 mots humains… et les utiliser à bon escient.",
-                "🥚 En moyenne, une poule pond environ 300 œufs par an.",
-                "🌻 Les tournesols suivent réellement le soleil dans le ciel quand ils grandissent. C’est l’héliotropisme.",
-                "📏 Si tu pouvais plier une feuille de papier 42 fois, elle atteindrait la Lune.",
-                "🥶 Le sang d’un poisson antarctique peut rester liquide même en dessous de 0°C grâce à une protéine antigel.",
-                "🧃 Le Coca-Cola serait vert sans colorant.",
-                "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
-                "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
-            ]
-            # Si c'est la toute première anecdote demandée
+
+        # --- Bloc Faits Insolites ---
+        # Liste des faits insolites (définie une seule fois)
+        faits_insolites = [
+            "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
+            "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
+            "🐌 Un escargot peut dormir pendant trois ans d’affilée.",
+            "🌋 Il y a plus de volcans sous l’eau que sur la terre ferme.",
+            "📦 Amazon a été fondée dans un garage... et maintenant, ils livrent même des frigos !",
+            "🧠 Le cerveau humain génère assez d’électricité pour allumer une petite ampoule.",
+            "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
+            "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
+            "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
+            "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !",
+            "🧊 Les manchots proposent parfois des galets comme cadeau de séduction.",
+            "🚀 Les astronautes peuvent grandir de quelques centimètres dans l’espace à cause de la microgravité.",
+            "🥶 L’eau chaude peut geler plus vite que l’eau froide. C’est l’effet Mpemba.",
+            "🐥 Les canetons s’attachent à la première chose qu’ils voient — c’est l’empreinte.",
+            "🍕 En Italie, il existe une pizza avec 111 sortes de fromages dessus !",
+            "🎵 Les abeilles peuvent reconnaître des visages humains… et elles adorent les sons aigus.",
+            "🌍 Il y a plus d’arbres sur Terre que d’étoiles dans la Voie lactée.",
+            "👅 La langue est aussi unique qu’une empreinte digitale.",
+            "🚿 En moyenne, une personne passe **6 mois de sa vie sous la douche**.",
+            "🎈 Une banane est techniquement une baie. Mais pas la fraise !",
+            "🦙 Les alpagas peuvent cracher… mais seulement s’ils sont vraiment énervés.",
+            "⏳ Les crocodiles peuvent vivre plus de 100 ans… et certains ne meurent que de vieillesse.",
+            "🐓 Les poules peuvent se souvenir de plus de 100 visages humains ou animaux.",
+            "🦇 Les chauves-souris tournent toujours à gauche en sortant d’une grotte.",
+            "🛸 Il existe un endroit sur Terre où la gravité semble inversée : la Mystery Spot en Californie.",
+            "🎮 Un gamer japonais détient le record mondial du plus long temps passé à jouer sans pause : 35 heures !",
+            "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
+            "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
+            "🐠 Certains poissons changent de sexe au cours de leur vie.",
+            "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie.",
+            "🦷 Les requins ont une infinité de dents : dès qu’une tombe, une autre pousse instantanément.",
+            "🌌 On connaît mieux la surface de Mars que les fonds marins de la Terre.",
+            "🥦 Le brocoli contient plus de protéines que certains morceaux de bœuf… oui, vraiment.",
+            "🛏️ On passe environ un tiers de notre vie à dormir, soit environ 25 ans !",
+            "📚 La bibliothèque du Vatican contient des textes qui n’ont pas été lus depuis des siècles.",
+            "🦵 Les autruches peuvent courir plus vite qu’un cheval… et changer de direction net sans freiner.",
+            "🪐 Sur Vénus, un jour dure plus longtemps qu’une année complète !",
+            "🦜 Certains perroquets peuvent apprendre plus de 100 mots humains… et les utiliser à bon escient.",
+            "🥚 En moyenne, une poule pond environ 300 œufs par an.",
+            "🌻 Les tournesols suivent réellement le soleil dans le ciel quand ils grandissent. C’est l’héliotropisme.",
+            "📏 Si tu pouvais plier une feuille de papier 42 fois, elle atteindrait la Lune.",
+            "🥶 Le sang d’un poisson antarctique peut rester liquide même en dessous de 0°C grâce à une protéine antigel.",
+            "🧃 Le Coca-Cola serait vert sans colorant.",
+            "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
+            "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
+        ]
+        # Gestion de la demande "fait insolite"
+        if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
             if 'derniere_fait' not in st.session_state:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
             message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
-        # --- Bloc « encore un » pour faits insolites ---
-        if not message_bot and any(
-            mot in question_clean for mot in ["encore un", "un autre", "encore"]
-        ):
+        # Gestion de la demande "encore un" ou "plus" pour les faits insolites
+        if any(mot in question_clean for mot in ["encore un", "un autre","encore"]):
             if 'derniere_fait' in st.session_state:
-                message_bot = (
-                    "✨ Voici une autre anecdote :\n\n"
-                    f"{random.choice(faits_insolites)}"
-                )
+                message_bot = f"✨ Voici une autre anecdote :\n\n{random.choice(faits_insolites)}"
+            else:
+                message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
+
+        if any(mot in question_clean for mot in ["encore une", "une autre"]):
+            if 'derniere_fait' in st.session_state:
+                message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
 
-        # --- Bloc Recettes rapides
+
+        # --- Bloc Recettes rapides 
         recettes = [
             "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
             "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
@@ -1170,18 +1080,246 @@ def nettoyer_texte(txt):
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
 
-        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
-        if not message_bot:
-            if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
-                message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
-            else:
-                reponses_ava = [
-                    "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖",
-                    "Je n'ai pas bien compris. Pouvez-vous reformuler, s'il vous plaît ?",
-                    "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !",
-                    "Hmm... Ce n'est pas encore dans ma base de données. Essayez une autre formulation ou tapez 'analyse complète' pour un aperçu du marché 📊"
+        # ─── 4) Bases de réponses ───────────────────────────────────────────────────
+        # 4.a) Hard‑codées
+        reponses_courantes = {
+            "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+            "ça va": "Je vais bien, merci de demander ! Et vous ?",
+            "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+            "hello": "Hello! How can I assist you today?",
+            "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+            "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+            "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+            "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+            "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+            "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+            "tu m'entends": "Je vous entends fort et clair 🎧",
+            "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+            "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+            "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+            "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+            "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+            "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+            "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+            "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+            "re": "Re bienvenue à bord ! On continue notre mission ?",
+            "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+            "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+            "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+            "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+            "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
+            "merci": "Avec plaisir 😄", "Toujours là pour vous aider !", "C’est moi qui vous remercie ! 🙏"],
+            "je t'aime": "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions",
+            "un secret": "🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…",
+            "tu es belle": "😍 Merci ! C’est le code qui fait tout… et un peu la lumière LED !", "💅 Flattée, même en version binaire.", "🪞 Vous me voyez vraiment ? Je rougis (virtuellement) !",
+            "je suis fatigué": "😴 Reposez-vous bien, le cerveau a aussi besoin de sa pause comme les marchés le week-end !", "🛌 Une tisane et au dodo. Demain sera plus lumineux.",
+            "t'es intelligente": "🧠 Merci ! J’ai été entraînée pour ça, mais vos compliments me boostent encore plus.", "💡 On me dit souvent ça. Merci !",
+            "je m'ennuie": "🎲 Je peux vous faire un quiz ou vous raconter un fait insolite si vous voulez ?", "📚 Et si je vous surprenais avec une anecdote ? Dites 'fait insolite' !"
+        }
+        base_savoir = {
+            # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
+            "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
+            "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
+            "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
+            "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
+            "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
+            "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+            "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
+            "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
+            "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
+            "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
+            "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
+            "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+            "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
+            "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
+            "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
+            "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
+            "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+            "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
+            "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
+            "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
+            "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
+            "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
+            "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
+            "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
+            "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
+            "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
+            "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
+        }
+        # Fusionner les deux dans une base complète
+        base_complet = {**base_savoir, **reponses_courantes}
+
+        # --- Moteur central de réponse AVA ---
+        def trouver_reponse(question):
+            qc = nettoyer_texte(question)
+            st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
+
+            # 1. Direct
+            if qc in base_complet:
+                st.write("✅ Match direct trouvé")
+                return base_complet[qc]
+
+            # 2. Fuzzy
+            proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
+            if proche:
+                st.write(f"🔎 Match fuzzy : {proche[0]}")
+                return base_complet[proche[0]]
+
+            # 3. Sémantique
+            keys = list(base_complet.keys())
+            vb = model_semantic.encode(keys)
+            vq = model_semantic.encode([qc])[0]
+            sims = cosine_similarity([vq], vb)[0]
+            best, score = max(zip(keys, sims), key=lambda x: x[1])
+            st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
+
+            if score > 0.7:
+                return base_complet[best]
+
+            # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
+            return gerer_modules_speciaux(qc)
+
+        # --- Modules personnalisés (à enrichir) ---
+        def gerer_modules_speciaux(qc):
+            if "analyse" in qc and "btc" in qc:
+                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
+            if "horoscope" in qc:
+                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+            if "météo" in qc and "paris" in qc:
+                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+            # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
+        def gerer_modules_speciaux(qc):
+            if "blague" in qc:
+                blagues = [
+                    "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
+                    "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
+                    "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
                 ]
-                message_bot = random.choice(reponses_ava)
+                return random.choice(blagues)
+        def gerer_modules_speciaux(qc):       
+        # --- Bloc Réponses médicales explicites ---
+        elif not message_bot and any(mot in question_clean for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
+            "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
+            "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
+            "ballonnements", "brûlures d’estomac", "brûlure d'estomac", "saignement de nez", "mal de dos", "entorse", "tendinite",
+            "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
+            "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne","bradycardie", "tachycardie", "psoriasis", "fibromyalgie", "thyroïde", "cystite", "glaucome", "bruxisme",
+            "arthrose", "hernie discale", "spasmophilie", "urticaire", "coup de chaleur", "luxation", "anxiété",
+            "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique","eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite", "pneumonie",
+            "zona", "épilepsie", "coupure profonde", "hépatite C", "phlébite",
+            "gastro-entérite", "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
+
+
+            ]):
+            reponses_medic = {
+                "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
+                "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
+                "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
+                "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et d'une sensibilité à la lumière.",
+                "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
+                "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée nécessitant un suivi médical et une hygiène de vie adaptée.",
+                "stress": "🧘 Le stress peut se soulager par des techniques de relaxation ou une activité physique modérée.",
+                "toux": "😷 Une toux sèche peut être le signe d'une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
+                "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
+                "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
+                "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
+                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous.",
+                "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
+                "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
+                "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
+                "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
+                "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques.",
+                "anémie": "🩸 Fatigue, pâleur, essoufflement. Manque de fer ? Misez sur viande rouge, lentilles, épinards !",
+                "insomnie": "🌙 Difficultés à dormir ? Évitez les écrans avant le coucher, créez une routine apaisante.",
+                "vertige": "🌀 Perte d’équilibre, nausée ? Cela peut venir des oreilles internes. Reposez-vous et évitez les mouvements brusques.",
+                "brûlures": "🔥 Refroidissez rapidement la zone (eau tiède, jamais glacée), puis appliquez une crème apaisante.",
+                "reflux": "🥴 Brûlures d’estomac ? Évitez les repas copieux, le café et dormez la tête surélevée.",
+                "nausée": "🤢 Boissons fraîches, gingembre ou citron peuvent apaiser. Attention si vomissements répétés.",
+                "dépression": "🖤 Fatigue, repli, tristesse persistante ? Parlez-en. Vous n’êtes pas seul(e), des aides existent.",
+                "allergie": "🤧 Éternuements, démangeaisons, yeux rouges ? Pollen, acariens ou poils ? Antihistaminiques peuvent aider.",
+                "palpitations": "💓 Sensation de cœur qui s’emballe ? Cela peut être bénin, mais consultez si cela se répète.",
+                "otite": "👂 Douleur vive à l’oreille, fièvre ? Surtout chez les enfants. Consultez sans tarder.",
+                "sinusite": "👃 Pression au visage, nez bouché, fièvre ? Hydratez-vous, faites un lavage nasal, et consultez si nécessaire.",
+                "crampes": "💥 Hydratez-vous, étirez les muscles concernés. Magnésium ou potassium peuvent aider.",
+                "infections urinaires": "🚽 Brûlures en urinant, besoin fréquent ? Buvez beaucoup d’eau et consultez rapidement.",
+                "fatigue": "😴 Fatigue persistante ? Sommeil insuffisant, stress ou carences. Écoutez votre corps, reposez-vous.",
+                "constipation": "🚽 Alimentation riche en fibres, hydratation et activité physique peuvent soulager naturellement.",
+                "diarrhée": "💧 Boire beaucoup d’eau, manger du riz ou des bananes. Attention si cela persiste plus de 2 jours.",
+                "ballonnements": "🌬️ Évitez les boissons gazeuses, mangez lentement, privilégiez les aliments faciles à digérer.",
+                "brûlures d’estomac": "🔥 Surélevez votre tête la nuit, évitez les plats gras ou épicés. Un antiacide peut aider.",
+                "saignement de nez": "🩸 Penchez la tête en avant, pincez le nez 10 minutes. Si répétitif, consultez.",
+                "mal de dos": "💺 Mauvaise posture ? Étirements doux, repos et parfois un coussin lombaire peuvent soulager.",
+                "entorse": "🦶 Glace, repos, compression, élévation (méthode GREC). Consultez si douleur intense.",
+                "tendinite": "💪 Repos de la zone, glace et mouvements doux. Évitez les efforts répétitifs.",
+                "ampoule": "🦶 Ne percez pas. Nettoyez doucement, couvrez avec un pansement stérile.",
+                "piqûre d’insecte": "🦟 Rougeur, démangeaison ? Lavez à l’eau et au savon, appliquez un gel apaisant.",
+                "bruit dans l'oreille": "🎧 Acouphène ? Bruit persistant dans l’oreille. Repos auditif, réduction du stress, consultez si persistant.",
+                "angoisse": "🧘‍♂️ Respiration profonde, exercices de pleine conscience, écoutez votre corps. Parlez-en si nécessaire.",
+                "boutons de fièvre": "👄 Herpès labial ? Évitez le contact, appliquez une crème spécifique dès les premiers signes.",
+                "lombalgie": "🧍‍♂️ Douleur en bas du dos ? Évitez les charges lourdes, dormez sur une surface ferme.",
+                "périarthrite": "🦴 Inflammation autour d’une articulation. Froid local, repos, et anti-inflammatoires si besoin.",
+                "hallux valgus": "👣 Déformation du gros orteil ? Port de chaussures larges, semelles spéciales ou chirurgie selon le cas.",
+                "bradycardie": "💓 Fréquence cardiaque anormalement basse. Peut être normale chez les sportifs, mais à surveiller si accompagnée de fatigue ou vertiges.",
+                "tachycardie": "💓 Accélération du rythme cardiaque. Peut être liée à l’anxiété, la fièvre ou un problème cardiaque. Consultez si cela se répète.",
+                "psoriasis": "🩹 Maladie de peau chronique provoquant des plaques rouges et squameuses. Hydratation et traitements locaux peuvent apaiser.",
+                "fibromyalgie": "😖 Douleurs diffuses, fatigue, troubles du sommeil. La relaxation, la marche douce et la gestion du stress peuvent aider.",
+                "thyroïde": "🦋 Une thyroïde déréglée peut causer fatigue, nervosité, prise ou perte de poids. Un bilan sanguin peut éclairer la situation.",
+                "cystite": "🚽 Inflammation de la vessie, fréquente chez les femmes. Boire beaucoup d’eau et consulter si symptômes persistants.",
+                "glaucome": "👁️ Maladie oculaire causée par une pression intraoculaire élevée. Risque de perte de vision. Bilan ophtalmo conseillé.",
+                "bruxisme": "😬 Grincement des dents, souvent nocturne. Stress ou tension en cause. Une gouttière peut protéger les dents.",
+                "arthrose": "🦴 Usure des articulations avec l'âge. Douleurs, raideurs. Le mouvement doux est bénéfique.",
+                "hernie discale": "🧍‍♂️ Douleur dans le dos irradiant vers les jambes. Une IRM peut confirmer. Repos, kiné, parfois chirurgie.",
+                "spasmophilie": "🫁 Crises de tremblements, oppression, liées à l’hyperventilation ou au stress. Respiration calme et magnésium peuvent aider.",
+                "urticaire": "🤯 Démangeaisons soudaines, plaques rouges. Souvent allergique. Antihistaminiques efficaces dans la plupart des cas.",
+                "coup de chaleur": "🔥 Survient par forte chaleur. Fatigue, nausée, température élevée. Refroidissement rapide nécessaire.",
+                "luxation": "🦴 Déplacement d’un os hors de son articulation. Douleur intense, immobilisation, urgence médicale.",
+                "anxiété": "🧠 Tension intérieure, nervosité. La relaxation, la respiration guidée ou un suivi thérapeutique peuvent aider.",
+                "torticolis": "💢 Douleur vive dans le cou, souvent due à une mauvaise position ou un faux mouvement. Chaleur et repos sont recommandés.",
+                "eczéma de contact": "🌿 Réaction cutanée suite à un contact avec une substance. Évitez le produit irritant et appliquez une crème apaisante.",
+                "hypoglycémie": "🩸 Baisse de sucre dans le sang : fatigue, sueurs, vertiges. Une boisson sucrée ou un fruit aident à rétablir rapidement.",
+                "apnée du sommeil": "😴 Arrêts respiratoires nocturnes. Somnolence, fatigue. Une consultation spécialisée est recommandée.",
+                "brûlure chimique": "🧪 Rincer abondamment à l’eau tiède (15-20 minutes) et consulter rapidement. Ne pas appliquer de produit sans avis médical.",
+                "eczéma atopique": "🧴 Forme chronique d’eczéma liée à des allergies. Utilisez des crèmes hydratantes et évitez les allergènes connus.",
+                "syndrome des jambes sans repos": "🦵 Sensations désagréables dans les jambes le soir, besoin de bouger. Une bonne hygiène de sommeil peut aider.",
+                "colique néphrétique": "🧊 Douleur intense dans le dos ou le côté, souvent due à un calcul rénal. Hydratation et consultation urgente recommandées.",
+                "hépatite": "🩸 Inflammation du foie, souvent virale. Fatigue, jaunisse, nausées. Nécessite un suivi médical.",
+                "pneumonie": "🫁 Infection pulmonaire sérieuse, accompagnée de fièvre, toux, et douleur thoracique. Consultez rapidement.",
+                "zona": "🔥 Éruption douloureuse sur une partie du corps. Cause : réactivation du virus de la varicelle. Consultez dès les premiers signes.",
+                "épilepsie": "⚡ Trouble neurologique provoquant des crises. Suivi médical strict indispensable.",
+                "coupure profonde": "🩹 Nettoyez, appliquez une pression pour arrêter le saignement et consultez si elle est profonde ou large.",
+                "hépatite C": "🧬 Infection virale du foie souvent silencieuse. Un dépistage est important pour un traitement efficace.",
+                "phlébite": "🦵 Caillot dans une veine, souvent au mollet. Douleur, rougeur, chaleur. Consultez en urgence.",
+                "gastro-entérite": "🤢 Diarrhée, vomissements, crampes. Repos, hydratation et alimentation légère sont essentiels.",
+                "blessure musculaire": "💪 Repos, glace et compression. Évitez de forcer. Étirement progressif après quelques jours.",
+                "tendinopathie": "🎾 Inflammation des tendons suite à un effort. Repos, glace et parfois kinésithérapie sont recommandés.",
+                "œil rouge": "👁️ Allergie, infection ou fatigue ? Si douleur ou vision floue, consultez rapidement.",
+                "perte d'odorat": "👃 Souvent liée à un virus comme la COVID-19. Hydratez-vous et surveillez les autres symptômes."
+
+            }
+            for cle, rep in reponses_medic.items():
+                if cle in question_clean:
+                    message_bot = rep
+                    break
+
+            # ... les autres modules (horoscope, météo, etc.)
+
+            return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
+        
+
+        # --- Interface utilisateur ---
+        st.title("💬 Chat AVA")
+
+        question_raw = st.chat_input("Posez votre question ici :")
+
+        if question_raw:
+            message_bot = trouver_reponse(question_raw)
+
+            with st.chat_message("user"):
+                st.markdown(question_raw)
+
+            with st.chat_message("assistant"):
+                st.markdown(message_bot)
+
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
@@ -1416,14 +1554,44 @@ def nettoyer_texte(txt):
                 if question_base in question_clean:
                     message_bot = reponse_base
                     break
+
+
+
+        
+        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+        if not message_bot:
+            if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
+                message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
+            else:
+                reponses_ava = [
+                    "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖",
+                    "Je n'ai pas bien compris. Pouvez-vous reformuler, s'il vous plaît ?",
+                    "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !",
+                    "Hmm... Ce n'est pas encore dans ma base de données. Essayez une autre formulation ou tapez 'analyse complète' pour un aperçu du marché 📊"
+                ]
+                message_bot = random.choice(reponses_ava)
+
+
+    # --- Bloc Traduction corrigé ---
+        def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
+            url = "https://api-free.deepl.com/v2/translate"
+            params = {
+                "auth_key": api_key,
+                "text": texte,
+                "target_lang": langue_cible
+            }
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            # Détecter la langue de la question et loguer le résultat
+            try:
+                lang_question = detect(question)
+            except Exception as e:
+                lang_question = "fr"
+            if lang_question.lower() != "fr" and message_bot.strip():
+                traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
+                message_bot = traduction
             
-            with st.chat_message("user"):
-                st.markdown(question_raw)
-
-            with st.chat_message("assistant"):
-                st.markdown(message_bot)
-
-            st.markdown(message_bot)
-            st.session_state.messages.append({"role": "assistant", "content": message_bot})
+        st.markdown(message_bot)
+        st.session_state.messages.append({"role": "assistant", "content": message_bot})
+        st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
 
 
