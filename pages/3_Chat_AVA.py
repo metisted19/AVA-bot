@@ -468,6 +468,7 @@ if question:
         
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
         # 4.a) Hard‑codées
+        if not message_bot:
         reponses_courantes = {
             "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
             "ça va": "Je vais bien, merci de demander ! Et vous ?",
@@ -1056,6 +1057,7 @@ if question:
             message_bot = f"🧠 **Quiz Culture G** :\n{question_choisie['question']}\n\nRépondez directement !"
 
         # --- Vérification de la réponse au quiz ---
+        if not message_bot:
         elif "quiz_attendu" in st.session_state and st.session_state["quiz_attendu"]:
             reponse_attendue = st.session_state["quiz_attendu"]
             if question_clean.lower() == reponse_attendue:
