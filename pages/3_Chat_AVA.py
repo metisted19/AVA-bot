@@ -713,11 +713,11 @@ def gerer_modules_speciaux(question_clean):
 
             }
             if pays_detecte and pays_detecte in capitales:
-            message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
-            return message_bot
-        else:
-            message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
-            return message_bot
+                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
+            else:
+                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+
+            return message_bot  # Ce return doit être au même niveau que l'if-else
 
 
 
