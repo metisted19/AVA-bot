@@ -195,49 +195,7 @@ def gerer_modules_speciaux(question_clean):
         ]
         return random.choice(blagues)
 
-    # ... les autres modules (horoscope, météo, etc.)
-
-    return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
-        
-
-# Récupération de la question utilisateur
-question = st.chat_input("Que souhaitez-vous demander à AVA ?")
-if question:
-    reponse = trouver_reponse(question)
-
-    with st.chat_message("user"):
-        st.markdown(question)
-
-    with st.chat_message("assistant"):
-        st.markdown(reponse)
-
-    st.session_state.messages.append({"role": "assistant", "content": reponse})
-    
-# 🔒 Sécurité : détection d'entrée dangereuse
-if question and re.search(r"[<>;{}]", question):
-    st.warning("⛔ Entrée invalide détectée.")
-    st.stop()
-
-if question:
-    st.session_state.messages.append({"role": "user", "content": question})
-    with st.chat_message("user"):
-        st.markdown(question)
-    with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-        # Traitement de la question en minuscule
-        question_clean = question.lower().strip()
-        message_bot = ""
-        horoscope_repondu = False
-        meteo_repondu = False
-        actus_repondu = False
-        blague_repondu = False
-        analyse_complete = False
-
-        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
-        geographie_repondu = False
-        sante_repondu = False
-        perso_repondu = False
-
-        # --- Partie Horoscope ---
+    # --- Partie Horoscope ---
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
             signes_disponibles = [
                 "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
@@ -1457,6 +1415,49 @@ if question:
                 message_bot = random.choice(reponses_ava)
 
 
+    # ... les autres modules (horoscope, météo, etc.)
+
+    return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
+        
+
+# Récupération de la question utilisateur
+question = st.chat_input("Que souhaitez-vous demander à AVA ?")
+if question:
+    reponse = trouver_reponse(question)
+
+    with st.chat_message("user"):
+        st.markdown(question)
+
+    with st.chat_message("assistant"):
+        st.markdown(reponse)
+
+    st.session_state.messages.append({"role": "assistant", "content": reponse})
+
+# 🔒 Sécurité : détection d'entrée dangereuse
+if question and re.search(r"[<>;{}]", question):
+    st.warning("⛔ Entrée invalide détectée.")
+    st.stop()
+
+if question:
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.markdown(question)
+    with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+        # Traitement de la question en minuscule
+        question_clean = question.lower().strip()
+        message_bot = ""
+        horoscope_repondu = False
+        meteo_repondu = False
+        actus_repondu = False
+        blague_repondu = False
+        analyse_complete = False
+
+        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
+        geographie_repondu = False
+        sante_repondu = False
+        perso_repondu = False
+
+        
     # --- Bloc Traduction corrigé ---
         def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
             url = "https://api-free.deepl.com/v2/translate"
