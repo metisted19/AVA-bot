@@ -17,7 +17,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import unicodedata, re
 import difflib
 import urllib.parse
-
+from fonctions_chat import trouver_reponse
 
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
