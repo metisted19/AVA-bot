@@ -438,25 +438,28 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
 
-        if question:
-            # Ajouter la question de l'utilisateur dans les messages de session
-            st.session_state.messages.append({"role": "user", "content": question})
+        # Input utilisateur en fin de page (à la racine)
+        question = st.chat_input("Posez votre question ici")
 
-            # Afficher la question de l'utilisateur
+        if question:
+            # Affichage du message utilisateur
             with st.chat_message("user"):
                 st.markdown(question)
 
-            # Nettoyer la question avant de la traiter
+            # Stocker la question
+            st.session_state.messages.append({"role": "user", "content": question})
+
+            # Nettoyage pour traitement
             question_clean = question.lower().strip()
 
-            # Obtenir la réponse de l'IA
+            # Obtenir réponse AVA (ta fonction personnalisée)
             message_bot = obtenir_reponse_ava(question_clean)
 
-            # Afficher la réponse de l'IA
+            # Affichage de la réponse AVA
             with st.chat_message("assistant", avatar="assets/ava_logo.png"):
                 st.markdown(message_bot)
 
-            # Ajouter la réponse de l'IA dans les messages de session
+            # Stocker la réponse AVA
             st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 
