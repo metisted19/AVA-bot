@@ -357,7 +357,7 @@ def gerer_modules_speciaux(question_clean):
             elif "transpire" in question_clean or "j'ai froid" in question_clean:
                 message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
 
-         return message_bot
+        return message_bot
 
         # --- Bloc Remèdes naturels ---
         if not message_bot and any(phrase in question_clean for phrase in [
