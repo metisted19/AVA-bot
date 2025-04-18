@@ -215,6 +215,7 @@ def gerer_modules_speciaux(question_clean):
      13. Quiz de culture générale
      14. Faits insolites
      15. Recettes rapides
+     16.SALUTATIONS COURANTES
     Retourne la réponse ou None si aucun module ne match.
     """
     # Initialisation
@@ -232,7 +233,38 @@ def gerer_modules_speciaux(question_clean):
         )
         analyse_complete = True
 
-
+    # --- Bloc Salutations courantes ---
+    SALUTATIONS_COURANTES = {
+        "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+        "ça va": "Je vais bien, merci de demander ! Et vous ?",
+        "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+        "hello": "Hello! How can I assist you today?",
+        "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+        "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+        "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+        "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+        "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+        "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+        "tu m'entends": "Je vous entends fort et clair 🎧",
+        "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+        "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+        "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+        "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+        "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+        "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+        "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+        "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+        "re": "Re bienvenue à bord ! On continue notre mission ?",
+        "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+        "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+        "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+        "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+        "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
+        "salut çava": "Salut ! Je vais très bien, merci 😊 Et vous ?",
+    }   
+    question_clean = question.lower().strip()
+    if question_clean in SALUTATIONS_COURANTES:
+        message_bot = SALUTATIONS_COURANTES[question_clean]
 
 
     # 4) Actualités générales
