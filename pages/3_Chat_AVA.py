@@ -485,12 +485,11 @@ if question:
             "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
             "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
             "merci": "C’est moi qui vous remercie ! 🙏",
-            "je t'aime": "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !", "🥰 C’est adorable… Même une IA peut rougir !", "❤️ Je le savais déjà, je suis connectée à vos émotions",
-            "un secret": "🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", "🧠 Je connais tous vos tickers préférés… chut.", "🌌 Je rêve parfois de voyager dans les données…",
-            "tu es belle": "😍 Merci ! C’est le code qui fait tout… et un peu la lumière LED !", "💅 Flattée, même en version binaire.", "🪞 Vous me voyez vraiment ? Je rougis (virtuellement) !",
-            "je suis fatigué": "😴 Reposez-vous bien, le cerveau a aussi besoin de sa pause comme les marchés le week-end !", "🛌 Une tisane et au dodo. Demain sera plus lumineux.",
-            "t'es intelligente": "🧠 Merci ! J’ai été entraînée pour ça, mais vos compliments me boostent encore plus.", "💡 On me dit souvent ça. Merci !",
-            "je m'ennuie": "🎲 Je peux vous faire un quiz ou vous raconter un fait insolite si vous voulez ?", "📚 Et si je vous surprenais avec une anecdote ? Dites 'fait insolite' !"
+            "je t'aime": "💖 Oh... c’est réciproque (en toute objectivité algorithmique bien sûr) !",
+            "un secret": "🤫 Mon secret ? Je fais tourner 3 processeurs à fond pour vous répondre en douceur !", 
+            "je suis fatigué": "😴 Reposez-vous bien, le cerveau a aussi besoin de sa pause comme les marchés le week-end !",
+            "t'es intelligente": "🧠 Merci ! J’ai été entraînée pour ça, mais vos compliments me boostent encore plus.", 
+            "je m'ennuie": "🎲 Je peux vous faire un quiz ou vous raconter un fait insolite si vous voulez ?",
         }
         base_savoir = {
             # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
