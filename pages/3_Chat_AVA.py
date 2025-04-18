@@ -184,14 +184,14 @@ if question:
         if question:
             # Ajouter la question dans les messages de session
             st.session_state.messages.append({"role": "user", "content": question})
-    
-            # Afficher le message de l'utilisateur dans le chat
+
+            # Afficher la question de l'utilisateur dans le chat
             with st.chat_message("user"):
                 st.markdown(question)
 
             # Traitement de la question en minuscule et nettoyage
             question_clean = question.lower().strip()
-    
+
             # Appel à la fonction de réponse en utilisant la question nettoyée
             message_bot = obtenir_reponse_ava(question_clean)
 
@@ -201,6 +201,7 @@ if question:
 
             # Ajouter la réponse de l'IA dans les messages de session
             st.session_state.messages.append({"role": "assistant", "content": message_bot})
+
 
         # --- Vérification de la question pour l'horoscope ---
         if isinstance(question_clean, str) and question_clean:  # Vérifie que question_clean est bien une chaîne non vide
