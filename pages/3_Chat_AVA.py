@@ -1465,7 +1465,6 @@ if question:
         if question_raw:
             question_clean = question_raw.lower()
             qc = question_raw.lower()  # 👈 Très important pour éviter les erreurs plus bas
-
             message_bot = trouver_reponse(qc)
 
             with st.chat_message("user"):
