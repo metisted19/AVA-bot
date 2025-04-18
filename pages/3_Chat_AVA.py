@@ -201,15 +201,7 @@ def gerer_modules_speciaux(question_clean):
         return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
     if "météo" in question_clean and "paris" in question_clean:
         return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-    # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
-def gerer_modules_speciaux(question_clean):
-    if "blague" in question_clean:
-        blagues = [
-            "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
-            "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
-            "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
-        ]
-        return random.choice(blagues)
+
 
     # --- Partie Horoscope ---
         if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
@@ -1438,6 +1430,11 @@ def gerer_modules_speciaux(question_clean):
 
 # Récupération de la question utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
+# 🔒 Sécurité : détection d'entrée dangereuse
+if question and re.search(r"[<>;{}]", question):
+    st.warning("⛔ Entrée invalide détectée.")
+    st.stop()
+
 if question:
     reponse = trouver_reponse(question)
 
@@ -1448,41 +1445,18 @@ if question:
         st.markdown(reponse)
 
     st.session_state.messages.append({"role": "assistant", "content": reponse})
+    # Nettoyage et traitement de la question
+    question_clean = question.lower().strip()
+    message_bot = trouver_reponse(question_clean)
 
-# 🔒 Sécurité : détection d'entrée dangereuse
-if question and re.search(r"[<>;{}]", question):
-    st.warning("⛔ Entrée invalide détectée.")
-    st.stop()
-
-if question:
-    st.session_state.messages.append({"role": "user", "content": question})
-    with st.chat_message("user"):
-        st.markdown(question)
-    with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-        # Traitement de la question en minuscule
-        question_clean = question.lower().strip()
-        message_bot = ""
-        horoscope_repondu = False
-        meteo_repondu = False
-        actus_repondu = False
-        blague_repondu = False
-        analyse_complete = False
-
-        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
-        geographie_repondu = False
-        sante_repondu = False
-        perso_repondu = False
-
-        
-    
-            # Détecter la langue de la question et loguer le résultat
-            try:
-                lang_question = detect(question)
-            except Exception as e:
-                lang_question = "fr"
-            if lang_question.lower() != "fr" and message_bot.strip():
-                traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
-                message_bot = traduction
+    # Détecter la langue de la question et loguer le résultat
+    try:
+        lang_question = detect(question)
+    except Exception as e:
+        lang_question = "fr"
+    if lang_question.lower() != "fr" and message_bot.strip():
+        traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
+        message_bot = traduction
             
         st.markdown(message_bot)
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
