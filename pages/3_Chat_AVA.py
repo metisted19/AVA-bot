@@ -124,6 +124,9 @@ def gerer_modules_speciaux(question_clean):
         ]
         return random.choice(blagues)
     return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
+def afficher_message(role, content, avatar=None):
+    with st.chat_message(role, avatar=avatar):
+        st.markdown(content)    
 
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
