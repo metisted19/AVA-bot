@@ -1128,7 +1128,8 @@ def gerer_modules_speciaux(question_clean):
         if 'derniere_fait' not in st.session_state:
             st.session_state['derniere_fait'] = random.choice(faits_insolites)
         message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
-
+    if message_bot:
+        return message_bot
     # --- Bloc Mini base générale (culture quotidienne) ---
     if not message_bot:
 
@@ -1363,9 +1364,6 @@ def gerer_modules_speciaux(question_clean):
                 message_bot = reponse_base
                 break
 
-    if message_bot:
-        return message_bot
-
     # Gestion de la demande "encore un" ou "plus" pour les faits insolites
     if not message_bot and any(m in question_clean for m in [
         "fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"
@@ -1381,7 +1379,8 @@ def gerer_modules_speciaux(question_clean):
         else:
             message_bot = "⚠️ Je n'ai pas encore de fait insolite. Demandez d'abord un fait !"
         return message_bot
-
+    if message_bot:
+        return message_bot
         
     # --- Bloc Recettes rapides 
     recettes = [
