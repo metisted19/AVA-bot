@@ -1136,6 +1136,7 @@ def gerer_modules_speciaux(question_clean):
             "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
             "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
             "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
+            "salut çava": "Salut ! Je vais très bien, merci 😊 Et vous ?",
         }   
         base_savoir = {
             # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
