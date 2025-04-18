@@ -16,7 +16,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import unicodedata, re
 import difflib
 import urllib.parse
-from fonctions_chat import trouver_reponse
+from fonctions_chat import obtenir_reponse_ava
 
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -180,32 +180,33 @@ if question:
 
         question_raw = st.chat_input("Posez votre question ici :")
 
-        # On définit qc à partir de la question de l'utilisateur
-        question_clean = question.lower().strip()
-        qc = question_clean  # Définit qc ici
+        # --- Récupération de la question utilisateur ---
+        if question:
+            st.session_state.messages.append({"role": "user", "content": question})
+            with st.chat_message("user"):
+                st.markdown(question)
+            with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+                # Traitement de la question en minuscule et nettoyage
+                question_clean = question.lower().strip()
+        
+                # Appel à la fonction de réponse en utilisant la question nettoyée
+                message_bot = obtenir_reponse_ava(question_clean)
 
-        # Vérification détaillée de qc avant de l'utiliser
-        print(f"Type de qc: {type(qc)}")
-        print(f"Valeur de qc: '{qc}'")  # Affiche qc avec des quotes pour mieux voir les espaces éventuels
-
-        # Ajout de strip() pour enlever les espaces inutiles
-        if isinstance(qc, str) and qc.strip():  # Vérifie que qc est bien une chaîne non vide
-            message_bot = trouver_reponse(qc)
-        else:
-            message_bot = "⚠️ Il semble y avoir un problème avec la question. Essayez de reformuler."
-
-
-
+                st.markdown(message_bot)
+                st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 
-        if isinstance(qc, str) and qc:  # Vérifie que qc est bien une chaîne non vide
-            if any(mot in qc for mot in ["horoscope", "signe", "astrologie"]):
+
+
+
+        if isinstance(question_clean, str) and question_clean:  
+            if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
                 # Ton code ici pour l'horoscope
                 signes_disponibles = [
                     "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
                     "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
                 ]
-                signe_detecte = next((s for s in signes_disponibles if s in qc), None)
+                signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
                 if not signe_detecte:
                     message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
                 else:
@@ -229,7 +230,7 @@ if question:
 
 
         # --- Analyse complète / technique ---
-        if not horoscope_repondu and any(phrase in qc for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
+        if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
                 resultats = []
                 fichiers = glob.glob("data/donnees_*.csv")
@@ -253,7 +254,7 @@ if question:
 
         # --- Bloc météo intelligent (villages inclus) ---
         if not horoscope_repondu and not analyse_complete \
-           and any(kw in qc for kw in ["météo", "quel temps"]):
+           and any(kw in question_clean for kw in ["météo", "quel temps"]):
 
             # fallback
             ville_detectee = "Paris"
@@ -288,7 +289,7 @@ if question:
 
 
         # --- Actualités améliorées ---
-        if not horoscope_repondu and ("actualité" in qc or "news" in qc):
+        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
                 message_bot += actus
@@ -387,7 +388,7 @@ if question:
                 pass
 
         # --- Bloc Convertisseur intelligent ---
-        if not message_bot and any(kw in qc for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
+        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
             try:
                 phrase = question_clean.replace(",", ".")
                 match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
@@ -435,7 +436,7 @@ if question:
                 message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
 
         # === Bloc Reconnaissance des tickers (exemple) ===
-        if any(symb in qc for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
+        if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             if "btc" in nom_ticker or "bitcoin" in nom_ticker:
                 nom_ticker = "btc-usd"
@@ -550,16 +551,16 @@ if question:
 
         # --- Moteur central de réponse AVA ---
         def trouver_reponse(question):
-            qc = nettoyer_texte(question)
-            st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
+            question_clean = nettoyer_texte(question)
+            st.write("🧼 Texte nettoyé :", question_clean)  # Debug temporaire
 
             # 1. Direct
-            if qc in base_complet:
+            if question_clean in base_complet:
                 st.write("✅ Match direct trouvé")
-                return base_complet[qc]
+                return base_complet[question_clean]
 
             # 2. Fuzzy
-            proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
+            proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
             if proche:
                 st.write(f"🔎 Match fuzzy : {proche[0]}")
                 return base_complet[proche[0]]
@@ -567,7 +568,7 @@ if question:
             # 3. Sémantique
             keys = list(base_complet.keys())
             vb = model_semantic.encode(keys)
-            vq = model_semantic.encode([qc])[0]
+            vq = model_semantic.encode([question_clean])[0]
             sims = cosine_similarity([vq], vb)[0]
             best, score = max(zip(keys, sims), key=lambda x: x[1])
             st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
@@ -576,12 +577,12 @@ if question:
                 return base_complet[best]
 
             # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
-            return gerer_modules_speciaux(qc)
+            return gerer_modules_speciaux(question_clean)
 
             
         # --- Bloc Réponses médicales explicites ---
         if not message_bot and any(
-            mot in qc for mot in [
+            mot in question_clean for mot in [
                 "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress",
                 "toux", "maux", "douleur", "asthme", "bronchite", "eczéma", "diabète",
                 "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures",
@@ -689,108 +690,106 @@ if question:
 
             }
             for cle, rep in reponses_medic.items():
-                if cle in qc:
+                if cle in question_clean:
                     message_bot = rep
                     break
 
 
 
         # --- Bloc Remèdes naturels ---
-        if not message_bot and any(phrase in qc for phrase in [
+        if not message_bot and any(phrase in question_clean for phrase in [
                 "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
                 "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
         ]):
-            if "stress" in qc:
+            if "stress" in question_clean:
                 message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
-            elif "mal de gorge" in qc or "gorge" in qc:
+            elif "mal de gorge" in question_clean or "gorge" in question_clean:
                 message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
-            elif "rhume" in qc or "nez bouché" in qc:
+            elif "rhume" in question_clean or "nez bouché" in question_clean:
                 message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
-            elif "fièvre" in qc:
+            elif "fièvre" in question_clean:
                 message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
-            elif "digestion" in qc or "ventre" in qc:
+            elif "digestion" in question_clean or "ventre" in question_clean:
                 message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
-            elif "toux" in qc:
+            elif "toux" in question_clean:
                 message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
-            elif "insomnie" in qc or "sommeil" in qc:
+            elif "insomnie" in question_clean or "sommeil" in question_clean:
                 message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
-            elif "brûlure d'estomac" in qc or "reflux" in qc:
+            elif "brûlure d'estomac" in question_clean or "reflux" in question_clean:
                 message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
-            elif "peau" in qc or "acné" in qc:
+            elif "peau" in question_clean or "acné" in question_clean:
                 message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
-            elif "fatigue" in qc:
+            elif "fatigue" in question_clean:
                 message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
-            elif "maux de tête" in qc or "migraine" in qc:
+            elif "maux de tête" in question_clean or "migraine" in question_clean:
                 message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
-            elif "nausée" in qc:
+            elif "nausée" in question_clean:
                 message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
-            elif "crampes" in qc:
+            elif "crampes" in question_clean:
                 message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
-            elif "dépression" in qc:
-                message_bot = "🖤 Millepertuis (à surveiller si tu prends déjà un traitement), lumière naturelle quotidienne, et activités créatives relaxantes."
-            elif "allergie" in qc:
+            elif "allergie" in question_clean:
                 message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
-            elif "eczéma" in qc or "démangeaisons" in qc:
+            elif "eczéma" in question_clean or "démangeaisons" in question_clean:
                 message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
-            elif "arthrose" in qc or "articulations" in qc:
+            elif "arthrose" in question_clean or "articulations" in question_clean:
                 message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
-            elif "ballonnements" in qc:
+            elif "ballonnements" in question_clean:
                 message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
-            elif "anxiété" in qc:
+            elif "anxiété" in question_clean:
                 message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
-            elif "brûlure légère" in qc or "brûlure" in qc:
+            elif "brûlure légère" in question_clean or "brûlure" in question_clean:
                 message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
-            elif "circulation" in qc or "jambes lourdes" in qc:
+            elif "circulation" in question_clean or "jambes lourdes" in question_clean:
                 message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
-            elif "foie" in qc or "digestion difficile" in qc:
+            elif "foie" in question_clean or "digestion difficile" in question_clean:
                 message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
-            elif "yeux fatigués" in qc:
+            elif "yeux fatigués" in question_clean:
                 message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
-            elif "système immunitaire" in qc or "immunité" in qc:
+            elif "système immunitaire" in question_clean or "immunité" in question_clean:
                 message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
-            elif "tensions musculaires" in qc:
+            elif "tensions musculaires" in question_clean:
                 message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
-            elif "transpiration excessive" in qc:
+            elif "transpiration excessive" in question_clean:
                 message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
-            elif "inflammation" in qc:
+            elif "inflammation" in question_clean:
                 message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
             else:
                 message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
 
         # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
-        if not message_bot and any(phrase in qc for phrase in [
+        if not message_bot and any(phrase in question_clean for phrase in [
             "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
             "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
         ]):
-            if "tête" in qc:
+            if "tête" in question_clean:
                 message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
-            elif "fièvre" in qc or "j'ai chaud" in qc:
+            elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
                 message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
-            elif "gorge" in qc:
+            elif "gorge" in question_clean:
                 message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
-            elif "ventre" in qc:
+            elif "ventre" in question_clean:
                 message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
-            elif "toux" in qc or "je tousse" in qc:
+            elif "toux" in question_clean or "je tousse" in question_clean:
                 message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
-            elif "nez" in qc:
+            elif "nez" in question_clean:
                 message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
-            elif "transpire" in qc or "j'ai froid" in qc:
+            elif "transpire" in question_clean or "j'ai froid" in question_clean:
                 message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
 
         # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
         if not message_bot and any(
-            kw in qc for kw in [
+            kw in question_clean for kw in [
                 "capitale", "capitale de", "capitale du", "capitale d", "capitale des",
                 "où se trouve", "ville principale", "ville de"
             ]
         ):
             # Détection du pays
             pays_detecte = None
-            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", qc)
+            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
             if match:
                 pays_detecte = match.group(1).strip().lower()
             else:
-                tokens = qc.split()
+                tokens = question_clean.split()
                 if len(tokens) >= 2:
                     pays_detecte = tokens[-1].strip(" ?!.,;").lower()
             capitales = {
@@ -971,7 +970,7 @@ if question:
                 message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
 
         # --- Bloc Punchlines motivationnelles ---
-        if not message_bot and any(kw in qc for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
+        if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
             punchlines = [
                 "🚀 *N’attends pas les opportunités. Crée-les.*",
                 "🔥 *Chaque bougie japonaise est une chance de rebondir.*",
@@ -993,7 +992,7 @@ if question:
             message_bot = random.choice(punchlines)
 
         # --- Bloc Culture Générale (questions simples) --
-        if not message_bot and any(mot in qc for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
+        if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
             base_connaissances = {
                     "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
                     "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de **Tesla**.",
@@ -1037,12 +1036,12 @@ if question:
                     "quelle est la capitale de la chine": "🇨🇳 La capitale de la Chine est **Pékin**."
             }
             for question_cle, reponse in base_connaissances.items():
-                if question_cle in qc:
+                if question_cle in question_clean:
                     message_bot = reponse
                     break
 
         # --- Bloc Quiz de culture générale ---
-        if not message_bot and any(mot in qc for mot in [
+        if not message_bot and any(mot in question_clean for mot in [
             "quiz", "quizz", "question", "culture générale", "pose-moi une question", "teste mes connaissances"
         ]):
             quizz_culture = [
@@ -1082,7 +1081,7 @@ if question:
             
         # --- Bloc faits insolites (anecdotes) ---
         if not message_bot and any(
-            mot in qc for mot in [
+            mot in question_clean for mot in [
                 "fait insolite", "truc fou", "surprends-moi",
                 "anecdote", "incroyable mais vrai"
             ]
@@ -1141,7 +1140,7 @@ if question:
 
         # --- Bloc « encore un » pour faits insolites ---
         if not message_bot and any(
-            mot in qc for mot in ["encore un", "un autre", "encore"]
+            mot in question_clean for mot in ["encore un", "un autre", "encore"]
         ):
             if 'derniere_fait' in st.session_state:
                 message_bot = (
@@ -1193,13 +1192,13 @@ if question:
             "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
         ]
         # Gestion de la demande "recette"
-        if any(mot in qc for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+        if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
             if 'derniere_recette' not in st.session_state:
                 st.session_state['derniere_recette'] = random.choice(recettes)
             message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
     
         # Gestion de la demande "encore un" ou "plus" pour les recettes
-        if any(mot in qc for mot in ["encore une", "une autre"]):
+        if any(mot in question_clean for mot in ["encore une", "une autre"]):
             if 'derniere_recette' in st.session_state:
                 message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
             else:
@@ -1207,7 +1206,7 @@ if question:
 
         # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
         if not message_bot:
-            if any(phrase in qc for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
+            if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
                 message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
             else:
                 reponses_ava = [
@@ -1448,18 +1447,18 @@ if question:
             }
 
             for question_base, reponse_base in base_generale.items():
-                if question_base in qc:
+                if question_base in question_clean:
                     message_bot = reponse_base
                     break
         # --- Fonction modules personnalisés (à placer en toute fin avant l'interface) ---
-        def gerer_modules_speciaux(qc):
-            if "analyse" in qc and "btc" in qc:
+        def gerer_modules_speciaux(question_clean):
+            if "analyse" in question_clean and "btc" in question_clean:
                 return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-            if "horoscope" in qc:
+            if "horoscope" in question_clean:
                 return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-            if "météo" in qc and "paris" in qc:
+            if "météo" in question_clean and "paris" in question_clean:
                 return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-            if "blague" in qc:
+            if "blague" in question_clean:
                 blagues = [
                     "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
                     "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
