@@ -17,6 +17,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 import unicodedata, re
 import difflib
 from fonctions_chat import obtenir_reponse_ava 
+import urllib.parse
+import glob
 
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -203,789 +205,789 @@ def gerer_modules_speciaux(question_clean):
         return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
 
 
+
     # --- Partie Horoscope ---
-        if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
-            signes_disponibles = [
-                "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
-                "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
-            ]
-            signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
-            if not signe_detecte:
-                message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
-                horoscope_repondu = True
-            else:
-                try:
-                    url = "https://kayoo123.github.io/astroo-api/jour.json"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        data = response.json()
-                        if "signes" in data:
-                            horoscope_dict = data.get("signes", {})
-                        else:
-                            horoscope_dict = data
-                        signe_data = next((v for k, v in horoscope_dict.items() if k.lower() == signe_detecte), None)
-                        if signe_data is None:
-                            message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
-                        else:
-                            if isinstance(signe_data, dict):
-                                horoscope = signe_data.get("horoscope")
-                            else:
-                                horoscope = signe_data
-                            if horoscope:
-                                message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
-                            else:
-                                message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
-                        horoscope_repondu = True
-                    else:
-                        message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
-                        horoscope_repondu = True
-                except Exception as e:
-                    message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
-                    horoscope_repondu = True
-
-        # --- Analyse complète / technique ---
-        if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
+    if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
+        signes_disponibles = [
+            "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
+            "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
+        ]
+        signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
+        if not signe_detecte:
+            message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+            horoscope_repondu = True
+        else:
             try:
-                resultats = []
-                fichiers = glob.glob("data/donnees_*.csv")
-
-                for fichier in fichiers:
-                    try:
-                        df = pd.read_csv(fichier)
-                        df.columns = [col.capitalize() for col in df.columns]
-                        df = ajouter_indicateurs_techniques(df)
-
-                        analyse, suggestion = analyser_signaux_techniques(df)
-                        nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
-
-                        # Résumé visuel par actif
-                        resume = f"📌 **{nom}**\n{analyse}\n💬 *Conseil AVA :* {suggestion}"
-                        resultats.append(resume)
-
-                    except Exception as err_fichier:
-                        print(f"Erreur avec {fichier} : {err_fichier}")  # log interne
-
-                if resultats:
-                    message_bot += "📊 **Analyse technique complète du marché :**\n\n" + "\n\n".join(resultats)
-                    message_bot += "\n\n🧠 *Gardez un œil sur les signaux, les opportunités ne préviennent pas !*"
-                    analyse_complete = True
+                url = "https://kayoo123.github.io/astroo-api/jour.json"
+                response = requests.get(url)
+                if response.status_code == 200:
+                    data = response.json()
+                    if "signes" in data:
+                        horoscope_dict = data.get("signes", {})
+                    else:
+                        horoscope_dict = data
+                    signe_data = next((v for k, v in horoscope_dict.items() if k.lower() == signe_detecte), None)
+                    if signe_data is None:
+                        message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                    else:
+                        if isinstance(signe_data, dict):
+                            horoscope = signe_data.get("horoscope")
+                        else:
+                            horoscope = signe_data
+                        if horoscope:
+                            message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                        else:
+                            message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                    horoscope_repondu = True
                 else:
-                    message_bot += "⚠️ Aucun actif n’a pu être analysé pour le moment. Vérifiez vos fichiers CSV."
-
+                    message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
+                    horoscope_repondu = True
             except Exception as e:
-                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n"
+                message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
+                horoscope_repondu = True
+
+    # --- Analyse complète / technique ---
+    if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
+        try:
+            resultats = []
+            fichiers = glob.glob("data/donnees_*.csv")
+
+            for fichier in fichiers:
+                try:
+                    df = pd.read_csv(fichier)
+                    df.columns = [col.capitalize() for col in df.columns]
+                    df = ajouter_indicateurs_techniques(df)
+
+                    analyse, suggestion = analyser_signaux_techniques(df)
+                    nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
+
+                    # Résumé visuel par actif
+                    resume = f"📌 **{nom}**\n{analyse}\n💬 *Conseil AVA :* {suggestion}"
+                    resultats.append(resume)
+
+                except Exception as err_fichier:
+                    print(f"Erreur avec {fichier} : {err_fichier}")  # log interne
+
+            if resultats:
+                message_bot += "📊 **Analyse technique complète du marché :**\n\n" + "\n\n".join(resultats)
+                message_bot += "\n\n🧠 *Gardez un œil sur les signaux, les opportunités ne préviennent pas !*"
+                analyse_complete = True
+            else:
+                message_bot += "⚠️ Aucun actif n’a pu être analysé pour le moment. Vérifiez vos fichiers CSV."
+
+        except Exception as e:
+            message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n"
 
 
-        # --- Bloc météo intelligent (villages inclus) ---
-        if not horoscope_repondu and not analyse_complete \
-           and any(kw in question_clean for kw in ["météo", "quel temps"]):
+    # --- Bloc météo intelligent (villages inclus) ---
+    if not horoscope_repondu and not analyse_complete \
+        and any(kw in question_clean for kw in ["météo", "quel temps"]):
 
-            # fallback
-            ville_detectee = "Paris"
+        # fallback
+        ville_detectee = "Paris"
 
-            # 1) on essaye de choper "à X", "dans Y", etc.
+        # 1) on essaye de choper "à X", "dans Y", etc.
+        match_geo = re.search(
+            r"(?:à|au|aux|dans|sur|en)\s+([A-Za-zÀ-ÿ' -]+)",
+            question_clean
+        )
+
+        # 2) si rien, on capture tout ce qui suit "météo "
+        if not match_geo:
             match_geo = re.search(
-                r"(?:à|au|aux|dans|sur|en)\s+([A-Za-zÀ-ÿ' -]+)",
+                r"m[eé]t[eé]o\s+(.+)$",
                 question_clean
             )
 
-            # 2) si rien, on capture tout ce qui suit "météo "
-            if not match_geo:
-                match_geo = re.search(
-                    r"m[eé]t[eé]o\s+(.+)$",
-                    question_clean
-                )
+        if match_geo:
+            # on enlève ponctuation résiduelle et on garde la casse propre
+            lieu = match_geo.group(1).strip().rstrip(" ?.!;")
+            ville_detectee = lieu.title()
 
-            if match_geo:
-                # on enlève ponctuation résiduelle et on garde la casse propre
-                lieu = match_geo.group(1).strip().rstrip(" ?.!;")
-                ville_detectee = lieu.title()
+        meteo = get_meteo_ville(ville_detectee)
 
-            meteo = get_meteo_ville(ville_detectee)
-
-            if "erreur" in meteo.lower():
-                message_bot += f"⚠️ Je n'ai pas trouvé la météo pour **{ville_detectee}**. Essayez un autre lieu.\n\n"
-            else:
-                message_bot += f"🌦️ **Météo à {ville_detectee}** :\n{meteo}\n\n"
-                message_bot += random.choice([
-                        "🧥 Pense à t’habiller en conséquence !",
-                        "☕ Rien de tel qu’un bon café pour commencer la journée, peu importe le temps.",
-                        "🔮 Le ciel en dit long… mais toi, tu décides de ta journée !",
-                        "💡 L’info météo, c’est déjà une longueur d’avance.",
-                        "🧠 Une journée bien préparée commence par une météo bien checkée."
-                    ])
+        if "erreur" in meteo.lower():
+            message_bot += f"⚠️ Je n'ai pas trouvé la météo pour **{ville_detectee}**. Essayez un autre lieu.\n\n"
+        else:
+            message_bot += f"🌦️ **Météo à {ville_detectee}** :\n{meteo}\n\n"
+            message_bot += random.choice([
+                    "🧥 Pense à t’habiller en conséquence !",
+                    "☕ Rien de tel qu’un bon café pour commencer la journée, peu importe le temps.",
+                    "🔮 Le ciel en dit long… mais toi, tu décides de ta journée !",
+                    "💡 L’info météo, c’est déjà une longueur d’avance.",
+                    "🧠 Une journée bien préparée commence par une météo bien checkée."
+                ])
     
 
-            meteo_repondu = True
+        meteo_repondu = True
 
 
 
-        # --- Actualités améliorées ---
-        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
-            message_bot = message_bot or "" 
-            actus = get_general_news()
-            if isinstance(actus, str):
-                message_bot += actus
-            elif actus and isinstance(actus, list):
-                message_bot += "📰 **Dernières actualités importantes :**\n\n"
-                for i, (titre, lien) in enumerate(actus[:5], 1):
-                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
-                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
-            else:
-                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
-            actus_repondu = True
+    # --- Actualités améliorées ---
+    if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
+        message_bot = message_bot or "" 
+        actus = get_general_news()
+        if isinstance(actus, str):
+            message_bot += actus
+        elif actus and isinstance(actus, list):
+            message_bot += "📰 **Dernières actualités importantes :**\n\n"
+            for i, (titre, lien) in enumerate(actus[:5], 1):
+                message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
+            message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
+        else:
+            message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
+        actus_repondu = True
 
             
 
-        # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
-        if not message_bot and any(phrase in question_clean for phrase in [
-            "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
-            "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
-        ]):
-            if "tête" in question_clean:
-                message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
-            elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
-                message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
-            elif "gorge" in question_clean:
-                message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
-            elif "ventre" in question_clean:
-                message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
-            elif "toux" in question_clean or "je tousse" in question_clean:
-                message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
-            elif "nez" in question_clean:
-                message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
-            elif "transpire" in question_clean or "j'ai froid" in question_clean:
-                message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
-
+    # --- Bloc Bonus: Analyse des phrases floues liées à des symptômes courants ---
+    if not message_bot and any(phrase in question_clean for phrase in [
+        "mal à la tête", "maux de tête", "j'ai de la fièvre", "fièvre", "mal à la gorge",
+        "mal au ventre", "toux", "je tousse", "je suis enrhumé", "nez bouché", "j'ai chaud", "je transpire", "j'ai froid"
+    ]):
+        if "tête" in question_clean:
+            message_bot = "🧠 Vous avez mal à la tête ? Cela peut être une migraine, une fatigue ou une tension. Essayez de vous reposer et hydratez-vous bien."
+        elif "fièvre" in question_clean or "j'ai chaud" in question_clean:
+            message_bot = "🌡️ La fièvre est un signal du corps contre une infection. Restez hydraté, reposez-vous et surveillez votre température."
+        elif "gorge" in question_clean:
+            message_bot = "👄 Un mal de gorge peut venir d’un rhume ou d’une angine. Buvez chaud, évitez de forcer sur la voix."
+        elif "ventre" in question_clean:
+            message_bot = "🍽️ Maux de ventre ? Peut-être digestif. Allégez votre repas, buvez de l’eau tiède, et reposez-vous."
+        elif "toux" in question_clean or "je tousse" in question_clean:
+            message_bot = "😷 Une toux persistante mérite repos et hydratation. Si elle dure plus de 3 jours, pensez à consulter."
+        elif "nez" in question_clean:
+            message_bot = "🤧 Nez bouché ? Un bon lavage au sérum physiologique et une boisson chaude peuvent aider à dégager les voies nasales."
+        elif "transpire" in question_clean or "j'ai froid" in question_clean:
+            message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
         return message_bot
 
-        # --- Bloc Remèdes naturels ---
-        if not message_bot and any(phrase in question_clean for phrase in [
-                "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
-                "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
-        ]):
-            if "stress" in question_clean:
-                message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
-            elif "mal de gorge" in question_clean or "gorge" in question_clean:
-                message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
-            elif "rhume" in question_clean or "nez bouché" in question_clean:
-                message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
-            elif "fièvre" in question_clean:
-                message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
-            elif "digestion" in question_clean or "ventre" in question_clean:
-                message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
-            elif "toux" in question_clean:
-                message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
-            elif "insomnie" in question_clean or "sommeil" in question_clean:
-                message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
-            elif "brûlure d'estomac" in question_clean or "reflux" in question_clean:
-                message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
-            elif "peau" in question_clean or "acné" in question_clean:
-                message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
-            elif "fatigue" in question_clean:
-                message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
-            elif "maux de tête" in question_clean or "migraine" in question_clean:
-                message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
-            elif "nausée" in question_clean:
-                message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
-            elif "crampes" in question_clean:
-                message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
-            elif "dépression" in question_clean:
-                message_bot = "🖤 Millepertuis (à surveiller si tu prends déjà un traitement), lumière naturelle quotidienne, et activités créatives relaxantes."
-            elif "allergie" in question_clean:
-                message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
-            elif "eczéma" in question_clean or "démangeaisons" in question_clean:
-                message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
-            elif "arthrose" in question_clean or "articulations" in question_clean:
-                message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
-            elif "ballonnements" in question_clean:
-                message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
-            elif "anxiété" in question_clean:
-                message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
-            elif "brûlure légère" in question_clean or "brûlure" in question_clean:
-                message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
-            elif "circulation" in question_clean or "jambes lourdes" in question_clean:
-                message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
-            elif "foie" in question_clean or "digestion difficile" in question_clean:
-                message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
-            elif "yeux fatigués" in question_clean:
-                message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
-            elif "système immunitaire" in question_clean or "immunité" in question_clean:
-                message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
-            elif "tensions musculaires" in question_clean:
-                message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
-            elif "transpiration excessive" in question_clean:
-                message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
-            elif "inflammation" in question_clean:
-                message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
-            else:
-                message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
+    # --- Bloc Remèdes naturels ---
+    if not message_bot and any(phrase in question_clean for phrase in [
+             "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
+            "tisane", "huile essentielle", "remedes naturels", "plantes médicinales", "remède maison"
+    ]):
+        if "stress" in question_clean:
+            message_bot = "🧘 Pour le stress : tisane de camomille ou de valériane, respiration profonde, méditation guidée ou bain tiède aux huiles essentielles de lavande."
+        elif "mal de gorge" in question_clean or "gorge" in question_clean:
+            message_bot = "🍯 Miel et citron dans une infusion chaude, gargarisme d’eau salée tiède, ou infusion de thym. Évite de trop parler et garde ta gorge bien hydratée."
+        elif "rhume" in question_clean or "nez bouché" in question_clean:
+            message_bot = "🌿 Inhalation de vapeur avec huile essentielle d’eucalyptus, tisane de gingembre, et bouillon chaud. Repose-toi bien."
+        elif "fièvre" in question_clean:
+            message_bot = "🧊 Infusion de saule blanc, cataplasme de vinaigre de cidre sur le front, linge froid sur les poignets et repos absolu."
+        elif "digestion" in question_clean or "ventre" in question_clean:
+            message_bot = "🍵 Infusion de menthe poivrée ou fenouil, massage abdominal doux dans le sens des aiguilles d’une montre, alimentation légère."
+        elif "toux" in question_clean:
+            message_bot = "🌰 Sirop naturel à base d’oignon et miel, infusion de thym, ou inhalation de vapeur chaude. Évite les environnements secs."
+        elif "insomnie" in question_clean or "sommeil" in question_clean:
+            message_bot = "🌙 Tisane de passiflore, valériane ou verveine. Évite les écrans avant le coucher, opte pour une routine calme et tamise la lumière."
+        elif "brûlure d'estomac" in question_clean or "reflux" in question_clean:
+            message_bot = "🔥 Une cuillère de gel d’aloe vera, infusion de camomille ou racine de guimauve. Évite les repas copieux et mange lentement."
+        elif "peau" in question_clean or "acné" in question_clean:
+            message_bot = "🧼 Masque au miel et curcuma, infusion de bardane, et hydratation régulière. Évite les produits agressifs."
+        elif "fatigue" in question_clean:
+            message_bot = "⚡ Cure de gelée royale, infusion de ginseng ou d’éleuthérocoque, alimentation riche en fruits et repos régulier."
+        elif "maux de tête" in question_clean or "migraine" in question_clean:
+            message_bot = "🧠 Huile essentielle de menthe poivrée sur les tempes, infusion de grande camomille ou compresse froide sur le front."
+        elif "nausée" in question_clean:
+            message_bot = "🍋 Un peu de gingembre frais râpé, infusion de menthe douce ou respiration lente en position semi-allongée."
+        elif "crampes" in question_clean:
+            message_bot = "🦵 Eau citronnée, étirements doux, magnésium naturel via les graines, amandes ou bananes."
+        elif "dépression" in question_clean:
+            message_bot = "🖤 Millepertuis (à surveiller si tu prends déjà un traitement), lumière naturelle quotidienne, et activités créatives relaxantes."
+        elif "allergie" in question_clean:
+            message_bot = "🌼 Pour soulager une allergie : infusion d’ortie ou de rooibos, miel local, et rinçage nasal au sérum physiologique."
+        elif "eczéma" in question_clean or "démangeaisons" in question_clean:
+            message_bot = "🩹 Bain à l’avoine colloïdale, gel d’aloe vera pur, huile de calendula ou crème à base de camomille."
+        elif "arthrose" in question_clean or "articulations" in question_clean:
+            message_bot = "🦴 Curcuma, gingembre, infusion d’harpagophytum et cataplasme d’argile verte sur les articulations douloureuses."
+        elif "ballonnements" in question_clean:
+            message_bot = "🌬️ Infusion de fenouil ou d’anis, charbon actif, marche légère après le repas, et respiration abdominale."
+        elif "anxiété" in question_clean:
+            message_bot = "🧘‍♀️ Respiration en cohérence cardiaque, huiles essentielles de lavande ou marjolaine, et bain tiède relaxant au sel d’Epsom."
+        elif "brûlure légère" in question_clean or "brûlure" in question_clean:
+            message_bot = "🔥 Applique du gel d’aloe vera pur, ou une compresse froide au thé noir infusé. Ne perce jamais une cloque !"
+        elif "circulation" in question_clean or "jambes lourdes" in question_clean:
+            message_bot = "🦵 Bain de jambes à la vigne rouge, infusion de ginkgo biloba, et surélévation des jambes le soir."
+        elif "foie" in question_clean or "digestion difficile" in question_clean:
+            message_bot = "🍋 Cure de radis noir, jus de citron tiède à jeun, infusion de pissenlit ou d’artichaut."
+        elif "yeux fatigués" in question_clean:
+            message_bot = "👁️ Compresse de camomille, repos visuel (20 secondes toutes les 20 min), et massage des tempes avec de l’huile essentielle de rose."
+        elif "système immunitaire" in question_clean or "immunité" in question_clean:
+            message_bot = "🛡️ Cure d’échinacée, gelée royale, infusion de thym et alimentation riche en vitamines C et D."
+        elif "tensions musculaires" in question_clean:
+            message_bot = "💆‍♂️ Massage à l’huile d’arnica, étirements doux, bain chaud avec du sel d’Epsom, et infusion de mélisse."
+        elif "transpiration excessive" in question_clean:
+            message_bot = "💦 Sauge en infusion ou en déodorant naturel, porter du coton, et éviter les plats épicés."
+        elif "inflammation" in question_clean:
+            message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
+        else:
+            message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
         
+    return message_bot
+
+    # --- Bloc Réponses médicales explicites ---
+    if not message_bot and any(phrase in question_clean for phrase in [
+        "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur",
+        "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie",
+        "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie", "palpitations", "otite", "sinusite",
+        "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée", "ballonnements", "brûlures d'estomac",
+        "saignement de nez", "mal de dos", "entorse", "tendinite", "ampoule", "piqûre d’insecte", "bruit dans l'oreille",
+        "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus", "hallucinations", "trouble du sommeil",
+        "inflammation", "baisse de tension", "fièvre nocturne", "bradycardie", "tachycardie", "psoriasis", "fibromyalgie",
+        "thyroïde", "cystite", "glaucome", "bruxisme", "arthrose", "hernie discale", "spasmophilie", "urticaire",
+        "coup de chaleur", "luxation", "anxiété", "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil",
+        "brûlure chimique", "eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite",
+        "pneumonie", "zona", "épilepsie", "coupure profonde", "hépatite c", "phlébite", "gastro-entérite",
+        "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
+    ]):
+
+        reponses_medic = {
+            "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
+            "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
+            "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
+            "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et d'une sensibilité à la lumière.",
+            "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
+            "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée nécessitant un suivi médical et une hygiène de vie adaptée.",
+            "stress": "🧘 Le stress peut se soulager par des techniques de relaxation ou une activité physique modérée.",
+            "toux": "😷 Une toux sèche peut être le signe d'une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
+            "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
+            "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
+            "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
+            "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous.",
+            "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
+            "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
+            "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
+            "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
+            "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques.",
+            "anémie": "🩸 Fatigue, pâleur, essoufflement. Manque de fer ? Misez sur viande rouge, lentilles, épinards !",
+            "insomnie": "🌙 Difficultés à dormir ? Évitez les écrans avant le coucher, créez une routine apaisante.",
+            "vertige": "🌀 Perte d’équilibre, nausée ? Cela peut venir des oreilles internes. Reposez-vous et évitez les mouvements brusques.",
+            "brûlures": "🔥 Refroidissez rapidement la zone (eau tiède, jamais glacée), puis appliquez une crème apaisante.",
+            "reflux": "🥴 Brûlures d’estomac ? Évitez les repas copieux, le café et dormez la tête surélevée.",
+            "nausée": "🤢 Boissons fraîches, gingembre ou citron peuvent apaiser. Attention si vomissements répétés.",
+            "dépression": "🖤 Fatigue, repli, tristesse persistante ? Parlez-en. Vous n’êtes pas seul(e), des aides existent.",
+            "allergie": "🤧 Éternuements, démangeaisons, yeux rouges ? Pollen, acariens ou poils ? Antihistaminiques peuvent aider.",
+            "palpitations": "💓 Sensation de cœur qui s’emballe ? Cela peut être bénin, mais consultez si cela se répète.",
+            "otite": "👂 Douleur vive à l’oreille, fièvre ? Surtout chez les enfants. Consultez sans tarder.",
+            "sinusite": "👃 Pression au visage, nez bouché, fièvre ? Hydratez-vous, faites un lavage nasal, et consultez si nécessaire.",
+            "crampes": "💥 Hydratez-vous, étirez les muscles concernés. Magnésium ou potassium peuvent aider.",
+            "infections urinaires": "🚽 Brûlures en urinant, besoin fréquent ? Buvez beaucoup d’eau et consultez rapidement.",
+            "fatigue": "😴 Fatigue persistante ? Sommeil insuffisant, stress ou carences. Écoutez votre corps, reposez-vous.",
+            "constipation": "🚽 Alimentation riche en fibres, hydratation et activité physique peuvent soulager naturellement.",
+            "diarrhée": "💧 Boire beaucoup d’eau, manger du riz ou des bananes. Attention si cela persiste plus de 2 jours.",
+            "ballonnements": "🌬️ Évitez les boissons gazeuses, mangez lentement, privilégiez les aliments faciles à digérer.",
+            "brûlures d’estomac": "🔥 Surélevez votre tête la nuit, évitez les plats gras ou épicés. Un antiacide peut aider.",
+            "saignement de nez": "🩸 Penchez la tête en avant, pincez le nez 10 minutes. Si répétitif, consultez.",
+            "mal de dos": "💺 Mauvaise posture ? Étirements doux, repos et parfois un coussin lombaire peuvent soulager.",
+            "entorse": "🦶 Glace, repos, compression, élévation (méthode GREC). Consultez si douleur intense.",
+            "tendinite": "💪 Repos de la zone, glace et mouvements doux. Évitez les efforts répétitifs.",
+            "ampoule": "🦶 Ne percez pas. Nettoyez doucement, couvrez avec un pansement stérile.",
+            "piqûre d’insecte": "🦟 Rougeur, démangeaison ? Lavez à l’eau et au savon, appliquez un gel apaisant.",
+            "bruit dans l'oreille": "🎧 Acouphène ? Bruit persistant dans l’oreille. Repos auditif, réduction du stress, consultez si persistant.",
+            "angoisse": "🧘‍♂️ Respiration profonde, exercices de pleine conscience, écoutez votre corps. Parlez-en si nécessaire.",
+            "boutons de fièvre": "👄 Herpès labial ? Évitez le contact, appliquez une crème spécifique dès les premiers signes.",
+            "lombalgie": "🧍‍♂️ Douleur en bas du dos ? Évitez les charges lourdes, dormez sur une surface ferme.",
+            "périarthrite": "🦴 Inflammation autour d’une articulation. Froid local, repos, et anti-inflammatoires si besoin.",
+            "hallux valgus": "👣 Déformation du gros orteil ? Port de chaussures larges, semelles spéciales ou chirurgie selon le cas.",
+            "bradycardie": "💓 Fréquence cardiaque anormalement basse. Peut être normale chez les sportifs, mais à surveiller si accompagnée de fatigue ou vertiges.",
+            "tachycardie": "💓 Accélération du rythme cardiaque. Peut être liée à l’anxiété, la fièvre ou un problème cardiaque. Consultez si cela se répète.",
+            "psoriasis": "🩹 Maladie de peau chronique provoquant des plaques rouges et squameuses. Hydratation et traitements locaux peuvent apaiser.",
+            "fibromyalgie": "😖 Douleurs diffuses, fatigue, troubles du sommeil. La relaxation, la marche douce et la gestion du stress peuvent aider.",
+            "thyroïde": "🦋 Une thyroïde déréglée peut causer fatigue, nervosité, prise ou perte de poids. Un bilan sanguin peut éclairer la situation.",
+            "cystite": "🚽 Inflammation de la vessie, fréquente chez les femmes. Boire beaucoup d’eau et consulter si symptômes persistants.",
+            "glaucome": "👁️ Maladie oculaire causée par une pression intraoculaire élevée. Risque de perte de vision. Bilan ophtalmo conseillé.",
+            "bruxisme": "😬 Grincement des dents, souvent nocturne. Stress ou tension en cause. Une gouttière peut protéger les dents.",
+            "arthrose": "🦴 Usure des articulations avec l'âge. Douleurs, raideurs. Le mouvement doux est bénéfique.",
+            "hernie discale": "🧍‍♂️ Douleur dans le dos irradiant vers les jambes. Une IRM peut confirmer. Repos, kiné, parfois chirurgie.",
+            "spasmophilie": "🫁 Crises de tremblements, oppression, liées à l’hyperventilation ou au stress. Respiration calme et magnésium peuvent aider.",
+            "urticaire": "🤯 Démangeaisons soudaines, plaques rouges. Souvent allergique. Antihistaminiques efficaces dans la plupart des cas.",
+            "coup de chaleur": "🔥 Survient par forte chaleur. Fatigue, nausée, température élevée. Refroidissement rapide nécessaire.",
+            "luxation": "🦴 Déplacement d’un os hors de son articulation. Douleur intense, immobilisation, urgence médicale.",
+            "anxiété": "🧠 Tension intérieure, nervosité. La relaxation, la respiration guidée ou un suivi thérapeutique peuvent aider.",
+            "torticolis": "💢 Douleur vive dans le cou, souvent due à une mauvaise position ou un faux mouvement. Chaleur et repos sont recommandés.",
+            "eczéma de contact": "🌿 Réaction cutanée suite à un contact avec une substance. Évitez le produit irritant et appliquez une crème apaisante.",
+            "hypoglycémie": "🩸 Baisse de sucre dans le sang : fatigue, sueurs, vertiges. Une boisson sucrée ou un fruit aident à rétablir rapidement.",
+            "apnée du sommeil": "😴 Arrêts respiratoires nocturnes. Somnolence, fatigue. Une consultation spécialisée est recommandée.",
+            "brûlure chimique": "🧪 Rincer abondamment à l’eau tiède (15-20 minutes) et consulter rapidement. Ne pas appliquer de produit sans avis médical.",
+            "eczéma atopique": "🧴 Forme chronique d’eczéma liée à des allergies. Utilisez des crèmes hydratantes et évitez les allergènes connus.",
+            "syndrome des jambes sans repos": "🦵 Sensations désagréables dans les jambes le soir, besoin de bouger. Une bonne hygiène de sommeil peut aider.",
+            "colique néphrétique": "🧊 Douleur intense dans le dos ou le côté, souvent due à un calcul rénal. Hydratation et consultation urgente recommandées.",
+            "hépatite": "🩸 Inflammation du foie, souvent virale. Fatigue, jaunisse, nausées. Nécessite un suivi médical.",
+            "pneumonie": "🫁 Infection pulmonaire sérieuse, accompagnée de fièvre, toux, et douleur thoracique. Consultez rapidement.",
+            "zona": "🔥 Éruption douloureuse sur une partie du corps. Cause : réactivation du virus de la varicelle. Consultez dès les premiers signes.",
+            "épilepsie": "⚡ Trouble neurologique provoquant des crises. Suivi médical strict indispensable.",
+            "coupure profonde": "🩹 Nettoyez, appliquez une pression pour arrêter le saignement et consultez si elle est profonde ou large.",
+            "hépatite C": "🧬 Infection virale du foie souvent silencieuse. Un dépistage est important pour un traitement efficace.",
+            "phlébite": "🦵 Caillot dans une veine, souvent au mollet. Douleur, rougeur, chaleur. Consultez en urgence.",
+            "gastro-entérite": "🤢 Diarrhée, vomissements, crampes. Repos, hydratation et alimentation légère sont essentiels.",
+            "blessure musculaire": "💪 Repos, glace et compression. Évitez de forcer. Étirement progressif après quelques jours.",
+            "tendinopathie": "🎾 Inflammation des tendons suite à un effort. Repos, glace et parfois kinésithérapie sont recommandés.",
+            "œil rouge": "👁️ Allergie, infection ou fatigue ? Si douleur ou vision floue, consultez rapidement.",
+            "perte d'odorat": "👃 Souvent liée à un virus comme la COVID-19. Hydratez-vous et surveillez les autres symptômes."
+
+         }
+        for cle, rep in reponses_medic.items():
+            if cle in question_clean:
+                message_bot = rep
+                break
         return message_bot
 
-        # --- Bloc Réponses médicales explicites ---
-        if not message_bot and any(phrase in question_clean for phrase in [
-            "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur",
-            "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie",
-            "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie", "palpitations", "otite", "sinusite",
-            "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée", "ballonnements", "brûlures d'estomac",
-            "saignement de nez", "mal de dos", "entorse", "tendinite", "ampoule", "piqûre d’insecte", "bruit dans l'oreille",
-            "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus", "hallucinations", "trouble du sommeil",
-            "inflammation", "baisse de tension", "fièvre nocturne", "bradycardie", "tachycardie", "psoriasis", "fibromyalgie",
-            "thyroïde", "cystite", "glaucome", "bruxisme", "arthrose", "hernie discale", "spasmophilie", "urticaire",
-            "coup de chaleur", "luxation", "anxiété", "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil",
-            "brûlure chimique", "eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite",
-            "pneumonie", "zona", "épilepsie", "coupure profonde", "hépatite c", "phlébite", "gastro-entérite",
-            "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
-        ]):
+    # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
+    elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
+        pays_detecte = None
+        match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
+        if match:
+            pays_detecte = match.group(1).strip().lower()
+        else:
+            tokens = question_clean.split()
+            if len(tokens) >= 2:
+                pays_detecte = tokens[-1].strip(" ?!.,;").lower()
+        capitales = {
+                "france"           : "Paris", 
+                "espagne"          : "Madrid",
+                "italie"           : "Rome",
+                "allemagne"        : "Berlin",
+                "japon"            : "Tokyo",
+                "japonaise"        : "Tokyo",
+                "chine"            : "Pékin",
+                "brésil"           : "Brasilia",
+                "mexique"          : "Mexico",
+                "canada"           : "Ottawa",
+                "états-unis"       : "Washington",
+                "usa"              : "Washington",
+                "united states"    : "Washington",
+                "inde"             : "New Delhi",
+                "portugal"         : "Lisbonne",
+                "royaume-uni"      : "Londres",
+                "angleterre"       : "Londres",
+                "argentine"        : "Buenos Aires",
+                "maroc"            : "Rabat",
+                "algérie"          : "Alger",
+                "tunisie"          : "Tunis",
+                "turquie"          : "Ankara",
+                "russie"           : "Moscou",
+                "russe"            : "Moscou",
+                "australie"        : "Canberra",
+                "corée du sud"     : "Séoul",
+                "corée"            : "Séoul",
+                "corée du nord"    : "Pyongyang",
+                "vietnam"          : "Hanoï",
+                "thailande"        : "Bangkok",
+                "indonésie"        : "Jakarta",
+                "malaisie"         : "Kuala Lumpur",
+                "singapour"        : "Singapour",
+                "philippines"      : "Manille",
+                "pakistan"         : "Islamabad",
+                "bangladesh"       : "Dacca",
+                "sri lanka"        : "Colombo",
+                "népal"            : "Katmandou",
+                "iran"             : "Téhéran",
+                "irak"             : "Bagdad",
+                "syrie"            : "Damas",
+                "liban"            : "Beyrouth",
+                "jordanie"         : "Amman",
+                "israël"           : "Jérusalem",
+                "palestine"        : "Ramallah",
+                "qatar"            : "Doha",
+                "oman"             : "Mascate",
+                "yémen"            : "Sanaa",
+                "afghanistan"      : "Kaboul",
+                "émirats arabes unis" : "Abou Dabi",
+                "sénégal"          : "Dakar",
+                "côte d'ivoire"    : "Yamoussoukro",
+                "mali"             : "Bamako",
+                "niger"            : "Niamey",
+                "tchad"            : "N'Djaména",
+                "burkina faso"     : "Ouagadougou",
+                "congo"            : "Brazzaville",
+                "rd congo"         : "Kinshasa",
+                "kenya"            : "Nairobi",
+                "éthiopie"         : "Addis-Abeba",
+                "ghana"            : "Accra",
+                "zambie"           : "Lusaka",
+                "zimbabwe"         : "Harare",
+                "soudan"           : "Khartoum",
+                "botswana"         : "Gaborone",
+                "namibie"          : "Windhoek",
+                "madagascar"       : "Antananarivo",
+                "mozambique"       : "Maputo",
+                "angola"           : "Luanda",
+                "libye"            : "Tripoli",
+                "egypte"           : "Le Caire",
+                "grèce"            : "Athènes",
+                "pologne"          : "Varsovie",
+                "ukraine"          : "Kyiv",
+                "roumanie"         : "Bucarest",
+                "bulgarie"         : "Sofia",
+                "serbie"           : "Belgrade",
+                "croatie"          : "Zagreb",
+                "slovénie"         : "Ljubljana",
+                "hongrie"          : "Budapest",
+                "tchéquie"         : "Prague",
+                "slovaquie"        : "Bratislava",
+                "suède"            : "Stockholm",
+                "norvège"          : "Oslo",
+                "finlande"         : "Helsinki",
+                "islande"          : "Reykjavik",
+                "belgique"         : "Bruxelles",
+                "pays-bas"         : "Amsterdam",
+                "irlande"          : "Dublin",
+                "suisse"           : "Berne",
+                "colombie"         : "Bogota",
+                "pérou"            : "Lima",
+                "chili"            : "Santiago",
+                "équateur"         : "Quito",
+                "uruguay"          : "Montevideo",
+                "paraguay"         : "Asuncion",
+                "bolivie"          : "Sucre",
+                "venezuela"        : "Caracas",
+                "cuba"             : "La Havane",
+                "haïti"            : "Port-au-Prince",
+                "république dominicaine" : "Saint-Domingue",
+                "nicaragua"        : "Managua",
+                "honduras"         : "Tegucigalpa",
+                "guatemala"        : "Guatemala",
+                "salvador"         : "San Salvador",
+                "panama"           : "Panama",
+                "costarica"        : "San José",
+                "jamaïque"         : "Kingston",
+                "bahamas"          : "Nassau",
+                "barbade"          : "Bridgetown",
+                "trinité-et-tobago": "Port of Spain",
+                "kazakhstan"       : "Noursoultan",
+                "ouzbekistan"      : "Tachkent",
+                "turkménistan"     : "Achgabat",
+                "kirghizistan"     : "Bichkek",
+                "mongolie"         : "Oulan-Bator",
+                "géorgie"          : "Tbilissi",
+                "arménie"          : "Erevan",
+                "azerbaïdjan"      : "Bakou",
+                "nouvelles-zélande": "Wellington",
+                "fidji"            : "Suva",
+                "palaos"           : "Ngerulmud",
+                "papouasie-nouvelle-guinée" : "Port Moresby",
+                "samoa"            : "Apia",
+                "tonga"            : "Nukuʻalofa",
+                "vanuatu"          : "Port-Vila",
+                "micronésie"       : "Palikir",
+                "marshall"         : "Majuro",
+                "tuvalu"           : "Funafuti",
+                "bhoutan"          : "Thimphou",
+                "maldives"         : "Malé",
+                "laos"             : "Vientiane",
+                "cambodge"         : "Phnom Penh",
+                "brunei"           : "Bandar Seri Begawan",
+                "timor oriental"   : "Dili",
+                "somalie"           : "Mogadiscio",
+                "tanzanie"          : "Dodoma",
+                "ouganda"           : "Kampala",
+                "rwanda"            : "Kigali",
+                "burundi"           : "Bujumbura",
+                "malawi"            : "Lilongwe",
+                "sierra leone"      : "Freetown",
+                "libéria"           : "Monrovia",
+                "guinée"            : "Conakry",
+                "guinée-bissau"     : "Bissau",
+                "guinée équatoriale": "Malabo",
+                "gambie"            : "Banjul",
+                "cap-vert"          : "Praia",
+                "swaziland"         : "Mbabane",
+                "lesotho"           : "Maseru",
+                "bénin"             : "Porto-Novo",
+                "togo"              : "Lomé",
+                "gabon"             : "Libreville",
+                "république centrafricaine": "Bangui",
+                "eswatini"          : "Mbabane",  # anciennement Swaziland
+                "suriname"          : "Paramaribo",
+                "guyana"            : "Georgetown",
+                "dominique"         : "Roseau",
+                "sainte-lucie"      : "Castries",
+                "saint-vincent-et-les-grenadines": "Kingstown",
+                "saint-christophe-et-niévès"    : "Basseterre",
+                "saint-marin"       : "Saint-Marin",
+                "liechtenstein"     : "Vaduz",
+                "andorre"           : "Andorre-la-Vieille",
+                "vatican"           : "Vatican",
+                "luxembourg"        : "Luxembourg",
+                "monténégro"        : "Podgorica",
+                "macédoine du nord" : "Skopje",
+                "bosnie-herzégovine": "Sarajevo"
 
-            reponses_medic = {
-                "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
-                "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
-                "fièvre": "🌡️ Pour faire baisser une fièvre, restez hydraté, reposez-vous, et prenez du paracétamol si besoin. Consultez si elle dépasse 39°C.",
-                "migraine": "🧠 Une migraine est une douleur pulsatile souvent localisée d’un côté de la tête, pouvant s'accompagner de nausées et d'une sensibilité à la lumière.",
-                "angine": "👄 L’angine provoque des maux de gorge intenses, parfois de la fièvre. Elle peut être virale ou bactérienne.",
-                "hypertension": "❤️ L’hypertension est une pression sanguine trop élevée nécessitant un suivi médical et une hygiène de vie adaptée.",
-                "stress": "🧘 Le stress peut se soulager par des techniques de relaxation ou une activité physique modérée.",
-                "toux": "😷 Une toux sèche peut être le signe d'une irritation, tandis qu'une toux grasse aide à évacuer les sécrétions. Hydratez-vous bien.",
-                "maux": "🤕 Précisez : maux de tête, de ventre, de dos ? Je peux vous donner des infos adaptées.",
-                "douleur": "💢 Pour mieux vous aider, précisez la localisation ou l'intensité de la douleur.",
-                "asthme": "🫁 L’asthme se caractérise par une inflammation des voies respiratoires et des difficultés à respirer, souvent soulagées par un inhalateur.",
-                "bronchite": "🫁 La bronchite est une inflammation des bronches, souvent accompagnée d'une toux persistante et parfois de fièvre. Reposez-vous et hydratez-vous.",
-                "eczéma": "🩹 L’eczéma est une inflammation de la peau provoquant démangeaisons et rougeurs. Hydratez régulièrement et utilisez des crèmes apaisantes.",
-                "diabète": "🩸 Le diabète affecte la régulation du sucre dans le sang. Un suivi médical, une alimentation équilibrée et une activité physique régulière sont essentiels.",
-                "cholestérol": "🥚 Un taux élevé de cholestérol peut être réduit par une alimentation saine et de l'exercice. Consultez votre médecin pour un suivi personnalisé.",
-                "acné": "💢 L'acné est souvent traitée par une bonne hygiène de la peau et, dans certains cas, des traitements spécifiques. Consultez un dermatologue si nécessaire.",
-                "ulcère": "🩻 Les ulcères nécessitent un suivi médical attentif, une modification de l'alimentation et parfois des traitements médicamenteux spécifiques.",
-                "anémie": "🩸 Fatigue, pâleur, essoufflement. Manque de fer ? Misez sur viande rouge, lentilles, épinards !",
-                "insomnie": "🌙 Difficultés à dormir ? Évitez les écrans avant le coucher, créez une routine apaisante.",
-                "vertige": "🌀 Perte d’équilibre, nausée ? Cela peut venir des oreilles internes. Reposez-vous et évitez les mouvements brusques.",
-                "brûlures": "🔥 Refroidissez rapidement la zone (eau tiède, jamais glacée), puis appliquez une crème apaisante.",
-                "reflux": "🥴 Brûlures d’estomac ? Évitez les repas copieux, le café et dormez la tête surélevée.",
-                "nausée": "🤢 Boissons fraîches, gingembre ou citron peuvent apaiser. Attention si vomissements répétés.",
-                "dépression": "🖤 Fatigue, repli, tristesse persistante ? Parlez-en. Vous n’êtes pas seul(e), des aides existent.",
-                "allergie": "🤧 Éternuements, démangeaisons, yeux rouges ? Pollen, acariens ou poils ? Antihistaminiques peuvent aider.",
-                "palpitations": "💓 Sensation de cœur qui s’emballe ? Cela peut être bénin, mais consultez si cela se répète.",
-                "otite": "👂 Douleur vive à l’oreille, fièvre ? Surtout chez les enfants. Consultez sans tarder.",
-                "sinusite": "👃 Pression au visage, nez bouché, fièvre ? Hydratez-vous, faites un lavage nasal, et consultez si nécessaire.",
-                "crampes": "💥 Hydratez-vous, étirez les muscles concernés. Magnésium ou potassium peuvent aider.",
-                "infections urinaires": "🚽 Brûlures en urinant, besoin fréquent ? Buvez beaucoup d’eau et consultez rapidement.",
-                "fatigue": "😴 Fatigue persistante ? Sommeil insuffisant, stress ou carences. Écoutez votre corps, reposez-vous.",
-                "constipation": "🚽 Alimentation riche en fibres, hydratation et activité physique peuvent soulager naturellement.",
-                "diarrhée": "💧 Boire beaucoup d’eau, manger du riz ou des bananes. Attention si cela persiste plus de 2 jours.",
-                "ballonnements": "🌬️ Évitez les boissons gazeuses, mangez lentement, privilégiez les aliments faciles à digérer.",
-                "brûlures d’estomac": "🔥 Surélevez votre tête la nuit, évitez les plats gras ou épicés. Un antiacide peut aider.",
-                "saignement de nez": "🩸 Penchez la tête en avant, pincez le nez 10 minutes. Si répétitif, consultez.",
-                "mal de dos": "💺 Mauvaise posture ? Étirements doux, repos et parfois un coussin lombaire peuvent soulager.",
-                "entorse": "🦶 Glace, repos, compression, élévation (méthode GREC). Consultez si douleur intense.",
-                "tendinite": "💪 Repos de la zone, glace et mouvements doux. Évitez les efforts répétitifs.",
-                "ampoule": "🦶 Ne percez pas. Nettoyez doucement, couvrez avec un pansement stérile.",
-                "piqûre d’insecte": "🦟 Rougeur, démangeaison ? Lavez à l’eau et au savon, appliquez un gel apaisant.",
-                "bruit dans l'oreille": "🎧 Acouphène ? Bruit persistant dans l’oreille. Repos auditif, réduction du stress, consultez si persistant.",
-                "angoisse": "🧘‍♂️ Respiration profonde, exercices de pleine conscience, écoutez votre corps. Parlez-en si nécessaire.",
-                "boutons de fièvre": "👄 Herpès labial ? Évitez le contact, appliquez une crème spécifique dès les premiers signes.",
-                "lombalgie": "🧍‍♂️ Douleur en bas du dos ? Évitez les charges lourdes, dormez sur une surface ferme.",
-                "périarthrite": "🦴 Inflammation autour d’une articulation. Froid local, repos, et anti-inflammatoires si besoin.",
-                "hallux valgus": "👣 Déformation du gros orteil ? Port de chaussures larges, semelles spéciales ou chirurgie selon le cas.",
-                "bradycardie": "💓 Fréquence cardiaque anormalement basse. Peut être normale chez les sportifs, mais à surveiller si accompagnée de fatigue ou vertiges.",
-                "tachycardie": "💓 Accélération du rythme cardiaque. Peut être liée à l’anxiété, la fièvre ou un problème cardiaque. Consultez si cela se répète.",
-                "psoriasis": "🩹 Maladie de peau chronique provoquant des plaques rouges et squameuses. Hydratation et traitements locaux peuvent apaiser.",
-                "fibromyalgie": "😖 Douleurs diffuses, fatigue, troubles du sommeil. La relaxation, la marche douce et la gestion du stress peuvent aider.",
-                "thyroïde": "🦋 Une thyroïde déréglée peut causer fatigue, nervosité, prise ou perte de poids. Un bilan sanguin peut éclairer la situation.",
-                "cystite": "🚽 Inflammation de la vessie, fréquente chez les femmes. Boire beaucoup d’eau et consulter si symptômes persistants.",
-                "glaucome": "👁️ Maladie oculaire causée par une pression intraoculaire élevée. Risque de perte de vision. Bilan ophtalmo conseillé.",
-                "bruxisme": "😬 Grincement des dents, souvent nocturne. Stress ou tension en cause. Une gouttière peut protéger les dents.",
-                "arthrose": "🦴 Usure des articulations avec l'âge. Douleurs, raideurs. Le mouvement doux est bénéfique.",
-                "hernie discale": "🧍‍♂️ Douleur dans le dos irradiant vers les jambes. Une IRM peut confirmer. Repos, kiné, parfois chirurgie.",
-                "spasmophilie": "🫁 Crises de tremblements, oppression, liées à l’hyperventilation ou au stress. Respiration calme et magnésium peuvent aider.",
-                "urticaire": "🤯 Démangeaisons soudaines, plaques rouges. Souvent allergique. Antihistaminiques efficaces dans la plupart des cas.",
-                "coup de chaleur": "🔥 Survient par forte chaleur. Fatigue, nausée, température élevée. Refroidissement rapide nécessaire.",
-                "luxation": "🦴 Déplacement d’un os hors de son articulation. Douleur intense, immobilisation, urgence médicale.",
-                "anxiété": "🧠 Tension intérieure, nervosité. La relaxation, la respiration guidée ou un suivi thérapeutique peuvent aider.",
-                "torticolis": "💢 Douleur vive dans le cou, souvent due à une mauvaise position ou un faux mouvement. Chaleur et repos sont recommandés.",
-                "eczéma de contact": "🌿 Réaction cutanée suite à un contact avec une substance. Évitez le produit irritant et appliquez une crème apaisante.",
-                "hypoglycémie": "🩸 Baisse de sucre dans le sang : fatigue, sueurs, vertiges. Une boisson sucrée ou un fruit aident à rétablir rapidement.",
-                "apnée du sommeil": "😴 Arrêts respiratoires nocturnes. Somnolence, fatigue. Une consultation spécialisée est recommandée.",
-                "brûlure chimique": "🧪 Rincer abondamment à l’eau tiède (15-20 minutes) et consulter rapidement. Ne pas appliquer de produit sans avis médical.",
-                "eczéma atopique": "🧴 Forme chronique d’eczéma liée à des allergies. Utilisez des crèmes hydratantes et évitez les allergènes connus.",
-                "syndrome des jambes sans repos": "🦵 Sensations désagréables dans les jambes le soir, besoin de bouger. Une bonne hygiène de sommeil peut aider.",
-                "colique néphrétique": "🧊 Douleur intense dans le dos ou le côté, souvent due à un calcul rénal. Hydratation et consultation urgente recommandées.",
-                "hépatite": "🩸 Inflammation du foie, souvent virale. Fatigue, jaunisse, nausées. Nécessite un suivi médical.",
-                "pneumonie": "🫁 Infection pulmonaire sérieuse, accompagnée de fièvre, toux, et douleur thoracique. Consultez rapidement.",
-                "zona": "🔥 Éruption douloureuse sur une partie du corps. Cause : réactivation du virus de la varicelle. Consultez dès les premiers signes.",
-                "épilepsie": "⚡ Trouble neurologique provoquant des crises. Suivi médical strict indispensable.",
-                "coupure profonde": "🩹 Nettoyez, appliquez une pression pour arrêter le saignement et consultez si elle est profonde ou large.",
-                "hépatite C": "🧬 Infection virale du foie souvent silencieuse. Un dépistage est important pour un traitement efficace.",
-                "phlébite": "🦵 Caillot dans une veine, souvent au mollet. Douleur, rougeur, chaleur. Consultez en urgence.",
-                "gastro-entérite": "🤢 Diarrhée, vomissements, crampes. Repos, hydratation et alimentation légère sont essentiels.",
-                "blessure musculaire": "💪 Repos, glace et compression. Évitez de forcer. Étirement progressif après quelques jours.",
-                "tendinopathie": "🎾 Inflammation des tendons suite à un effort. Repos, glace et parfois kinésithérapie sont recommandés.",
-                "œil rouge": "👁️ Allergie, infection ou fatigue ? Si douleur ou vision floue, consultez rapidement.",
-                "perte d'odorat": "👃 Souvent liée à un virus comme la COVID-19. Hydratez-vous et surveillez les autres symptômes."
+         }
+         if pays_detecte and pays_detecte in capitales:
+            message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
+        else:
+            message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
 
-            }
-            for cle, rep in reponses_medic.items():
-                if cle in question_clean:
-                    message_bot = rep
-                    break
-            return message_bot
-
-        # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
-        elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
-            pays_detecte = None
-            match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", question_clean)
-            if match:
-                pays_detecte = match.group(1).strip().lower()
-            else:
-                tokens = question_clean.split()
-                if len(tokens) >= 2:
-                    pays_detecte = tokens[-1].strip(" ?!.,;").lower()
-            capitales = {
-                    "france"           : "Paris", 
-                    "espagne"          : "Madrid",
-                    "italie"           : "Rome",
-                    "allemagne"        : "Berlin",
-                    "japon"            : "Tokyo",
-                    "japonaise"        : "Tokyo",
-                    "chine"            : "Pékin",
-                    "brésil"           : "Brasilia",
-                    "mexique"          : "Mexico",
-                    "canada"           : "Ottawa",
-                    "états-unis"       : "Washington",
-                    "usa"              : "Washington",
-                    "united states"    : "Washington",
-                    "inde"             : "New Delhi",
-                    "portugal"         : "Lisbonne",
-                    "royaume-uni"      : "Londres",
-                    "angleterre"       : "Londres",
-                    "argentine"        : "Buenos Aires",
-                    "maroc"            : "Rabat",
-                    "algérie"          : "Alger",
-                    "tunisie"          : "Tunis",
-                    "turquie"          : "Ankara",
-                    "russie"           : "Moscou",
-                    "russe"            : "Moscou",
-                    "australie"        : "Canberra",
-                    "corée du sud"     : "Séoul",
-                    "corée"            : "Séoul",
-                    "corée du nord"    : "Pyongyang",
-                    "vietnam"          : "Hanoï",
-                    "thailande"        : "Bangkok",
-                    "indonésie"        : "Jakarta",
-                    "malaisie"         : "Kuala Lumpur",
-                    "singapour"        : "Singapour",
-                    "philippines"      : "Manille",
-                    "pakistan"         : "Islamabad",
-                    "bangladesh"       : "Dacca",
-                    "sri lanka"        : "Colombo",
-                    "népal"            : "Katmandou",
-                    "iran"             : "Téhéran",
-                    "irak"             : "Bagdad",
-                    "syrie"            : "Damas",
-                    "liban"            : "Beyrouth",
-                    "jordanie"         : "Amman",
-                    "israël"           : "Jérusalem",
-                    "palestine"        : "Ramallah",
-                    "qatar"            : "Doha",
-                    "oman"             : "Mascate",
-                    "yémen"            : "Sanaa",
-                    "afghanistan"      : "Kaboul",
-                    "émirats arabes unis" : "Abou Dabi",
-                    "sénégal"          : "Dakar",
-                    "côte d'ivoire"    : "Yamoussoukro",
-                    "mali"             : "Bamako",
-                    "niger"            : "Niamey",
-                    "tchad"            : "N'Djaména",
-                    "burkina faso"     : "Ouagadougou",
-                    "congo"            : "Brazzaville",
-                    "rd congo"         : "Kinshasa",
-                    "kenya"            : "Nairobi",
-                    "éthiopie"         : "Addis-Abeba",
-                    "ghana"            : "Accra",
-                    "zambie"           : "Lusaka",
-                    "zimbabwe"         : "Harare",
-                    "soudan"           : "Khartoum",
-                    "botswana"         : "Gaborone",
-                    "namibie"          : "Windhoek",
-                    "madagascar"       : "Antananarivo",
-                    "mozambique"       : "Maputo",
-                    "angola"           : "Luanda",
-                    "libye"            : "Tripoli",
-                    "egypte"           : "Le Caire",
-                    "grèce"            : "Athènes",
-                    "pologne"          : "Varsovie",
-                    "ukraine"          : "Kyiv",
-                    "roumanie"         : "Bucarest",
-                    "bulgarie"         : "Sofia",
-                    "serbie"           : "Belgrade",
-                    "croatie"          : "Zagreb",
-                    "slovénie"         : "Ljubljana",
-                    "hongrie"          : "Budapest",
-                    "tchéquie"         : "Prague",
-                    "slovaquie"        : "Bratislava",
-                    "suède"            : "Stockholm",
-                    "norvège"          : "Oslo",
-                    "finlande"         : "Helsinki",
-                    "islande"          : "Reykjavik",
-                    "belgique"         : "Bruxelles",
-                    "pays-bas"         : "Amsterdam",
-                    "irlande"          : "Dublin",
-                    "suisse"           : "Berne",
-                    "colombie"         : "Bogota",
-                    "pérou"            : "Lima",
-                    "chili"            : "Santiago",
-                    "équateur"         : "Quito",
-                    "uruguay"          : "Montevideo",
-                    "paraguay"         : "Asuncion",
-                    "bolivie"          : "Sucre",
-                    "venezuela"        : "Caracas",
-                    "cuba"             : "La Havane",
-                    "haïti"            : "Port-au-Prince",
-                    "république dominicaine" : "Saint-Domingue",
-                    "nicaragua"        : "Managua",
-                    "honduras"         : "Tegucigalpa",
-                    "guatemala"        : "Guatemala",
-                    "salvador"         : "San Salvador",
-                    "panama"           : "Panama",
-                    "costarica"        : "San José",
-                    "jamaïque"         : "Kingston",
-                    "bahamas"          : "Nassau",
-                    "barbade"          : "Bridgetown",
-                    "trinité-et-tobago": "Port of Spain",
-                    "kazakhstan"       : "Noursoultan",
-                    "ouzbekistan"      : "Tachkent",
-                    "turkménistan"     : "Achgabat",
-                    "kirghizistan"     : "Bichkek",
-                    "mongolie"         : "Oulan-Bator",
-                    "géorgie"          : "Tbilissi",
-                    "arménie"          : "Erevan",
-                    "azerbaïdjan"      : "Bakou",
-                    "nouvelles-zélande": "Wellington",
-                    "fidji"            : "Suva",
-                    "palaos"           : "Ngerulmud",
-                    "papouasie-nouvelle-guinée" : "Port Moresby",
-                    "samoa"            : "Apia",
-                    "tonga"            : "Nukuʻalofa",
-                    "vanuatu"          : "Port-Vila",
-                    "micronésie"       : "Palikir",
-                    "marshall"         : "Majuro",
-                    "tuvalu"           : "Funafuti",
-                    "bhoutan"          : "Thimphou",
-                    "maldives"         : "Malé",
-                    "laos"             : "Vientiane",
-                    "cambodge"         : "Phnom Penh",
-                    "brunei"           : "Bandar Seri Begawan",
-                    "timor oriental"   : "Dili",
-                    "somalie"           : "Mogadiscio",
-                    "tanzanie"          : "Dodoma",
-                    "ouganda"           : "Kampala",
-                    "rwanda"            : "Kigali",
-                    "burundi"           : "Bujumbura",
-                    "malawi"            : "Lilongwe",
-                    "sierra leone"      : "Freetown",
-                    "libéria"           : "Monrovia",
-                    "guinée"            : "Conakry",
-                    "guinée-bissau"     : "Bissau",
-                    "guinée équatoriale": "Malabo",
-                    "gambie"            : "Banjul",
-                    "cap-vert"          : "Praia",
-                    "swaziland"         : "Mbabane",
-                    "lesotho"           : "Maseru",
-                    "bénin"             : "Porto-Novo",
-                    "togo"              : "Lomé",
-                    "gabon"             : "Libreville",
-                    "république centrafricaine": "Bangui",
-                    "eswatini"          : "Mbabane",  # anciennement Swaziland
-                    "suriname"          : "Paramaribo",
-                    "guyana"            : "Georgetown",
-                    "dominique"         : "Roseau",
-                    "sainte-lucie"      : "Castries",
-                    "saint-vincent-et-les-grenadines": "Kingstown",
-                    "saint-christophe-et-niévès"    : "Basseterre",
-                    "saint-marin"       : "Saint-Marin",
-                    "liechtenstein"     : "Vaduz",
-                    "andorre"           : "Andorre-la-Vieille",
-                    "vatican"           : "Vatican",
-                    "luxembourg"        : "Luxembourg",
-                    "monténégro"        : "Podgorica",
-                    "macédoine du nord" : "Skopje",
-                    "bosnie-herzégovine": "Sarajevo"
-
-            }
-            if pays_detecte and pays_detecte in capitales:
-                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
-            else:
-                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
-
-            return message_bot  # Ce return doit être au même niveau que l'if-else
+        return message_bot  # Ce return doit être au même niveau que l'if-else
 
 
 
-        # --- Bloc Punchlines motivationnelles ---
-        if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
-            punchlines = [
-                "🚀 *N’attends pas les opportunités. Crée-les.*",
-                "🔥 *Chaque bougie japonaise est une chance de rebondir.*",
-                "⚡ *La discipline bat la chance sur le long terme.*",
-                "🌟 *Tu ne trades pas juste des actifs, tu construis ton avenir.*",
-                "💪 *Même dans un marché baissier, ta volonté peut monter en flèche.*",
-                "🏁 *Les gagnants n’abandonnent jamais, les perdants n’essaient même pas.*",
-                "🎯 *Rêve grand, agis fort, ajuste vite.*",
-                "⏳ *Le temps est ton meilleur allié… ou ton pire ennemi.*",
-                "🧠 *Ce n’est pas le marché qui te limite. C’est ta vision.*",
-                "🦾 *Chaque difficulté est une opportunité camouflée.*",
-                "📈 *Ta plus belle courbe, c’est celle de ta progression.*",
-                "💼 *Travaille en silence, laisse tes gains faire le bruit.*",
-                "🔮 *Prédis l’avenir ? Non. Prépare-toi à l’écrire.*",
-                "🌌 *Le doute tue plus de rêves que l’échec.*",
-                "🛠️ *Construis-toi un mindset solide avant de construire ton portefeuille.*",
-                "🧭 *Quand tu sais où tu vas, même les tempêtes deviennent utiles.*"
-            ]
-            message_bot = random.choice(punchlines)
-            return message_bot
+    # --- Bloc Punchlines motivationnelles ---
+    if not message_bot and any(kw in question_clean for kw in ["motivation", "punchline", "booster", "remotive", "inspire-moi"]):
+        punchlines = [
+            "🚀 *N’attends pas les opportunités. Crée-les.*",
+            "🔥 *Chaque bougie japonaise est une chance de rebondir.*",
+            "⚡ *La discipline bat la chance sur le long terme.*",
+            "🌟 *Tu ne trades pas juste des actifs, tu construis ton avenir.*",
+            "💪 *Même dans un marché baissier, ta volonté peut monter en flèche.*",
+            "🏁 *Les gagnants n’abandonnent jamais, les perdants n’essaient même pas.*",
+            "🎯 *Rêve grand, agis fort, ajuste vite.*",
+            "⏳ *Le temps est ton meilleur allié… ou ton pire ennemi.*",
+            "🧠 *Ce n’est pas le marché qui te limite. C’est ta vision.*",
+            "🦾 *Chaque difficulté est une opportunité camouflée.*",
+            "📈 *Ta plus belle courbe, c’est celle de ta progression.*",
+            "💼 *Travaille en silence, laisse tes gains faire le bruit.*",
+            "🔮 *Prédis l’avenir ? Non. Prépare-toi à l’écrire.*",
+            "🌌 *Le doute tue plus de rêves que l’échec.*",
+            "🛠️ *Construis-toi un mindset solide avant de construire ton portefeuille.*",
+            "🧭 *Quand tu sais où tu vas, même les tempêtes deviennent utiles.*"
+         ]
+        message_bot = random.choice(punchlines)
+        return message_bot
 
-        # --- Bloc Culture Générale (questions simples) ---
-        if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
-            base_connaissances = {
-                    "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
-                    "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de **Tesla**.",
-                    "combien y a-t-il de pays dans le monde": "🌍 Il y a actuellement **195 pays reconnus** dans le monde.",
-                    "quelle est la capitale de la france": "📍 La capitale de la France est **Paris**.",
-                    "quel est le plus grand océan": "🌊 L'océan Pacifique est le plus grand au monde.",
-                    "quelle est la distance entre la terre et la lune": "🌕 En moyenne, la distance est de **384 400 km** entre la Terre et la Lune.",
-                    "quel est l’élément chimique o": "🧪 L'élément chimique 'O' est **l'oxygène**.",
-                    "qui a écrit roméo et juliette": "🎭 C'est **William Shakespeare** qui a écrit *Roméo et Juliette*.",
-                    "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
-                    "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-                    "qui a marché sur la lune en premier": "👨‍🚀 **Neil Armstrong** a été le premier homme à marcher sur la Lune en 1969.",
-                    "quelle est la plus haute montagne du monde": "🏔️ L’**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
-                    "combien y a-t-il d’os dans le corps humain": "🦴 Le corps humain adulte compte **206 os**.",
-                    "qui a peint la joconde": "🖼️ C’est **Léonard de Vinci** qui a peint *La Joconde*.",
-                    "quelle est la capitale du japon": "🏙️ La capitale du Japon est **Tokyo**.",
-                    "quelle planète est la plus proche du soleil": "☀️ **Mercure** est la planète la plus proche du Soleil.",
-                    "qui a inventé l’électricité": "⚡ L'électricité n’a pas été inventée, mais **Benjamin Franklin** et **Thomas Edison** ont été des figures clés dans sa compréhension et son exploitation.",
-                    "qu’est-ce que l’adn": "🧬 L’**ADN** est le support de l’information génétique chez tous les êtres vivants.",
-                    "quelle est la plus grande forêt du monde": "🌳 L’**Amazonie** est la plus grande forêt tropicale du monde.",
-                    "quel est l’animal terrestre le plus rapide": "🐆 Le **guépard** peut atteindre jusqu’à 110 km/h en vitesse de pointe.",
-                    "qui a écrit harry potter": "📚 C’est **J.K. Rowling** qui a écrit la saga *Harry Potter*.",
-                    "quelle est la température de l’eau qui bout": "💧 L’eau bout à **100°C** à pression atmosphérique normale.",
-                    "quel est le pays le plus peuplé": "👥 **La Chine** est actuellement le pays le plus peuplé du monde.",
-                    "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-                    "qui a découvert l’amérique": "🗺️ C’est **Christophe Colomb** qui a découvert l’Amérique en 1492, du moins pour l’Europe.",
-                    "quelle est la planète la plus grosse": "🪐 **Jupiter** est la plus grosse planète du système solaire.",
-                    "quelle est la vitesse de la lumière": "⚡ La lumière voyage à environ **299 792 km/s** dans le vide.",
-                    "combien de jours dans une année bissextile": "📅 Une année bissextile dure **366 jours**.",
-                    "quelle est la capitale de l’italie": "🇮🇹 La capitale de l’Italie est **Rome**.",
-                    "qui a écrit les misérables": "📖 C’est **Victor Hugo** qui a écrit *Les Misérables*.",
-                    "quelle est la capitale de l’allemagne": "🇩🇪 La capitale de l’Allemagne est **Berlin**.",
-                    "qui est le président de la france": "🇫🇷 Le président actuel de la France est **Emmanuel Macron** (en 2025).",
-                    "quelle est la profondeur de la fosse des mariannes": "🌊 La fosse des Mariannes atteint environ **11 000 mètres** de profondeur.",
-                    "qui a inventé le téléphone": "📞 **Alexander Graham Bell** est l’inventeur du téléphone.",
-                    "quelle est la langue officielle du brésil": "🇧🇷 La langue officielle du Brésil est **le portugais**.",
-                    "combien de muscles dans le corps humain": "💪 Le corps humain compte environ **650 muscles**.",
-                    "quelle est la capitale de la russie": "🇷🇺 La capitale de la Russie est **Moscou**.",
-                    "quand a eu lieu la révolution française": "⚔️ La Révolution française a commencé en **1789**.",
-                    "qui est le créateur de facebook": "🌐 **Mark Zuckerberg** a cofondé Facebook en 2004.",
-                    "quelle est la capitale de la chine": "🇨🇳 La capitale de la Chine est **Pékin**."
-            }
-            for question_cle, reponse in base_connaissances.items():
-                if question_cle in question_clean:
-                    message_bot = reponse
-                    break
+    # --- Bloc Culture Générale (questions simples) ---
+    if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
+        base_connaissances = {
+                "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
+                "qui est le fondateur de tesla": "⚡ Elon Musk est l'un des cofondateurs et l'actuel PDG de **Tesla**.",
+                "combien y a-t-il de pays dans le monde": "🌍 Il y a actuellement **195 pays reconnus** dans le monde.",
+                "quelle est la capitale de la france": "📍 La capitale de la France est **Paris**.",
+                "quel est le plus grand océan": "🌊 L'océan Pacifique est le plus grand au monde.",
+                "quelle est la distance entre la terre et la lune": "🌕 En moyenne, la distance est de **384 400 km** entre la Terre et la Lune.",
+                "quel est l’élément chimique o": "🧪 L'élément chimique 'O' est **l'oxygène**.",
+                "qui a écrit roméo et juliette": "🎭 C'est **William Shakespeare** qui a écrit *Roméo et Juliette*.",
+                "quelle est la langue la plus parlée au monde": "🗣️ Le **mandarin** est la langue la plus parlée au monde en nombre de locuteurs natifs.",
+                "combien de continents existe-t-il": "🌎 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+                "qui a marché sur la lune en premier": "👨‍🚀 **Neil Armstrong** a été le premier homme à marcher sur la Lune en 1969.",
+                "quelle est la plus haute montagne du monde": "🏔️ L’**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
+                "combien y a-t-il d’os dans le corps humain": "🦴 Le corps humain adulte compte **206 os**.",
+                "qui a peint la joconde": "🖼️ C’est **Léonard de Vinci** qui a peint *La Joconde*.",
+                "quelle est la capitale du japon": "🏙️ La capitale du Japon est **Tokyo**.",
+                "quelle planète est la plus proche du soleil": "☀️ **Mercure** est la planète la plus proche du Soleil.",
+                "qui a inventé l’électricité": "⚡ L'électricité n’a pas été inventée, mais **Benjamin Franklin** et **Thomas Edison** ont été des figures clés dans sa compréhension et son exploitation.",
+                "qu’est-ce que l’adn": "🧬 L’**ADN** est le support de l’information génétique chez tous les êtres vivants.",
+                "quelle est la plus grande forêt du monde": "🌳 L’**Amazonie** est la plus grande forêt tropicale du monde.",
+                "quel est l’animal terrestre le plus rapide": "🐆 Le **guépard** peut atteindre jusqu’à 110 km/h en vitesse de pointe.",
+                "qui a écrit harry potter": "📚 C’est **J.K. Rowling** qui a écrit la saga *Harry Potter*.",
+                "quelle est la température de l’eau qui bout": "💧 L’eau bout à **100°C** à pression atmosphérique normale.",
+                "quel est le pays le plus peuplé": "👥 **La Chine** est actuellement le pays le plus peuplé du monde.",
+                "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+                "qui a découvert l’amérique": "🗺️ C’est **Christophe Colomb** qui a découvert l’Amérique en 1492, du moins pour l’Europe.",
+                "quelle est la planète la plus grosse": "🪐 **Jupiter** est la plus grosse planète du système solaire.",
+                "quelle est la vitesse de la lumière": "⚡ La lumière voyage à environ **299 792 km/s** dans le vide.",
+                "combien de jours dans une année bissextile": "📅 Une année bissextile dure **366 jours**.",
+                "quelle est la capitale de l’italie": "🇮🇹 La capitale de l’Italie est **Rome**.",
+                "qui a écrit les misérables": "📖 C’est **Victor Hugo** qui a écrit *Les Misérables*.",
+                "quelle est la capitale de l’allemagne": "🇩🇪 La capitale de l’Allemagne est **Berlin**.",
+                "qui est le président de la france": "🇫🇷 Le président actuel de la France est **Emmanuel Macron** (en 2025).",
+                "quelle est la profondeur de la fosse des mariannes": "🌊 La fosse des Mariannes atteint environ **11 000 mètres** de profondeur.",
+                "qui a inventé le téléphone": "📞 **Alexander Graham Bell** est l’inventeur du téléphone.",
+                "quelle est la langue officielle du brésil": "🇧🇷 La langue officielle du Brésil est **le portugais**.",
+                "combien de muscles dans le corps humain": "💪 Le corps humain compte environ **650 muscles**.",
+                "quelle est la capitale de la russie": "🇷🇺 La capitale de la Russie est **Moscou**.",
+                "quand a eu lieu la révolution française": "⚔️ La Révolution française a commencé en **1789**.",
+                "qui est le créateur de facebook": "🌐 **Mark Zuckerberg** a cofondé Facebook en 2004.",
+                "quelle est la capitale de la chine": "🇨🇳 La capitale de la Chine est **Pékin**."
+        }
+        for question_cle, reponse in base_connaissances.items():
+            if question_cle in question_clean:
+                message_bot = reponse
+                break
 
-        if message_bot:
-            return message_bot
+    if message_bot:
+        return message_bot
 
-        # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
-        if not message_bot and question_clean.startswith("analyse "):
-            nom_simple = question_clean.replace("analyse", "").strip()
-            nom_simple_norm = remove_accents(nom_simple)  # Normalisation sans accents
-            correspondances = {
-                "btc": "btc-usd", "bitcoin": "btc-usd",
-                "eth": "eth-usd", "ethereum": "eth-usd",
-                "aapl": "aapl", "apple": "aapl",
-                "tsla": "tsla", "tesla": "tsla",
-                "googl": "googl", "google": "googl",
-                "msft": "msft", "microsoft": "msft",
-                "amzn": "amzn", "amazon": "amzn",
-                "nvda": "nvda", "nvidia": "nvda",
-                "doge": "doge-usd", "dogecoin": "doge-usd",
-                "ada": "ada-usd", "cardano": "ada-usd",
-                "sol": "sol-usd", "solana": "sol-usd",
-                "gold": "gc=F", "or": "gc=F",
-                "sp500": "^gspc", "s&p": "^gspc",
-                "cac": "^fchi", "cac40": "^fchi",
-                "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F", "cl=f": "cl=F",
-                "si": "si=F", "argent": "si=F",
-                "xrp": "xrp-usd", "ripple": "xrp-usd",
-                "bnb": "bnb-usd",
-                "matic": "matic-usd", "polygon": "matic-usd",
-                "uni": "uni-usd", "uniswap": "uni-usd",
-                "ndx": "^ndx", "nasdaq": "^ndx", "nasdaq100": "^ndx"
-            }
-            nom_ticker = correspondances.get(nom_simple_norm)
-            if nom_ticker:
-                data_path = f"data/donnees_{nom_ticker}.csv"
-                if os.path.exists(data_path):
-                    df = pd.read_csv(data_path)
-                    df.columns = [col.capitalize() for col in df.columns]
-                    df = ajouter_indicateurs_techniques(df)
-                    analyse, suggestion = analyser_signaux_techniques(df)
-                    
-                    def generer_resume_signal(signaux):
-                        texte = ""
-                        signaux_str = " ".join(signaux).lower()
-                        if "survente" in signaux_str:
-                            texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
-                        if "surachat" in signaux_str:
-                            texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
-                        if "haussier" in signaux_str:
-                            texte += "📈 **Tendance haussière détectée.**\n"
-                        if "baissier" in signaux_str:
-                            texte += "📉 **Tendance baissière détectée.**\n"
-                        if "faible" in signaux_str:
-                            texte += "😴 **Tendance faible.** Le marché semble indécis.\n"
-                        return texte if texte else "ℹ️ Aucun signal fort détecté."
-                    
-                    signaux = analyse.split("\n") if analyse else []
-                    resume = generer_resume_signal(signaux)
-                    
-                    message_bot = (
-                        f"📊 **Analyse pour {nom_simple.upper()}**\n\n"
-                        f"{analyse}\n\n"
-                        f"💬 **Résumé d'AVA :**\n{resume}\n\n"
-                        f"🤖 *Intuition d'AVA :* {suggestion}"
-                    )
-                else:
-                    message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
-            else:
-                message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
+    # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
+    if not message_bot and question_clean.startswith("analyse "):
+        nom_simple = question_clean.replace("analyse", "").strip()
+        nom_simple_norm = remove_accents(nom_simple)  # Normalisation sans accents
+        correspondances = {
+            "btc": "btc-usd", "bitcoin": "btc-usd",
+            "eth": "eth-usd", "ethereum": "eth-usd",
+            "aapl": "aapl", "apple": "aapl",
+            "tsla": "tsla", "tesla": "tsla",
+            "googl": "googl", "google": "googl",
+            "msft": "msft", "microsoft": "msft",
+            "amzn": "amzn", "amazon": "amzn",
+            "nvda": "nvda", "nvidia": "nvda",
+            "doge": "doge-usd", "dogecoin": "doge-usd",
+            "ada": "ada-usd", "cardano": "ada-usd",
+            "sol": "sol-usd", "solana": "sol-usd",
+            "gold": "gc=F", "or": "gc=F",
+            "sp500": "^gspc", "s&p": "^gspc",
+            "cac": "^fchi", "cac40": "^fchi",
+            "cl": "cl=F", "pétrole": "cl=F", "petrole": "cl=F", "cl=f": "cl=F",
+            "si": "si=F", "argent": "si=F",
+            "xrp": "xrp-usd", "ripple": "xrp-usd",
+            "bnb": "bnb-usd",
+            "matic": "matic-usd", "polygon": "matic-usd",
+            "uni": "uni-usd", "uniswap": "uni-usd",
+            "ndx": "^ndx", "nasdaq": "^ndx", "nasdaq100": "^ndx"
+        }
+        nom_ticker = correspondances.get(nom_simple_norm)
+        if nom_ticker:
+            data_path = f"data/donnees_{nom_ticker}.csv"
+            if os.path.exists(data_path):
+                df = pd.read_csv(data_path)
+                df.columns = [col.capitalize() for col in df.columns]
+                df = ajouter_indicateurs_techniques(df)
+                analyse, suggestion = analyser_signaux_techniques(df)
+                
+                def generer_resume_signal(signaux):
+                     texte = ""
+                     signaux_str = " ".join(signaux).lower()
+                     if "survente" in signaux_str:
+                         texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
+                     if "surachat" in signaux_str:
+                         texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
+                     if "haussier" in signaux_str:
+                         texte += "📈 **Tendance haussière détectée.**\n"
+                     if "baissier" in signaux_str:
+                         texte += "📉 **Tendance baissière détectée.**\n"
+                     if "faible" in signaux_str:
+                         texte += "😴 **Tendance faible.** Le marché semble indécis.\n"
+                     return texte if texte else "ℹ️ Aucun signal fort détecté."
+                 
+                 signaux = analyse.split("\n") if analyse else []
+                 resume = generer_resume_signal(signaux)
+                 
+                 message_bot = (
+                     f"📊 **Analyse pour {nom_simple.upper()}**\n\n"
+                     f"{analyse}\n\n"
+                     f"💬 **Résumé d'AVA :**\n{resume}\n\n"
+                     f"🤖 *Intuition d'AVA :* {suggestion}"
+                 )
+             else:
+                 message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
+         else:
+             message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
 
-        if message_bot:
-            return message_bot
+    if message_bot:
+        return message_bot
 
-        # --- Bloc Calcul (simple expression mathématique ou phrase) ---
-        if not message_bot:
-            question_calc = question_clean.replace(",", ".")
-            question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
-            try:
-                if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
-                    try:
-                        result = eval(question_calc)
-                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-                    except Exception:
-                        pass
-                if not message_bot:
-                    match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
-                    if match:
-                        expression = match.group(1).strip()
-                        result = eval(expression)
-                        message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
-            except:
-                pass
-
-        if message_bot:
-            return message_bot
-
-        # --- Bloc Convertisseur intelligent ---
-        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
-            try:
-                phrase = question_clean.replace(",", ".")
-                match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
+    # --- Bloc Calcul (simple expression mathématique ou phrase) ---
+    if not message_bot:
+        question_calc = question_clean.replace(",", ".")
+        question_calc = re.sub(r"^calcul(?:e)?\s*", "", question_calc)
+        try:
+            if any(op in question_calc for op in ["+", "-", "*", "/", "%", "**"]):
+                try:
+                    result = eval(question_calc)
+                    message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+                except Exception:
+                    pass
+            if not message_bot:
+                match = re.search(r"(?:combien font|combien|calcul(?:e)?|résultat de)\s*(.*)", question_calc)
                 if match:
-                    montant = float(match.group(1))
-                    from_cur = match.group(3).upper()
-                    to_cur = match.group(5).upper()
-                    url = f"https://v6.exchangerate-api.com/v6/dab2bba4f43a99445158d9ae/latest/{from_cur}"
-                    response = requests.get(url, timeout=10)
-                    data = response.json()
-                    if data.get("result") == "success":
-                        taux = data["conversion_rates"].get(to_cur)
-                        if taux:
-                            result = montant * taux
-                            message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {to_cur}"
-                        else:
-                            message_bot = "❌ Taux de conversion non disponible pour la devise demandée."
-                    else:
-                        message_bot = "⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème avec l’API. Veuillez réessayer plus tard."
-                elif "km en miles" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*km", phrase)
-                    if match:
-                        km = float(match.group(1))
-                        miles = km * 0.621371
-                        message_bot = f"📏 {km} km = {round(miles, 2)} miles"
-                elif "miles en km" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*miles?", phrase)
-                    if match:
-                        mi = float(match.group(1))
-                        km = mi / 0.621371
-                        message_bot = f"📏 {mi} miles = {round(km, 2)} km"
-                elif "celsius en fahrenheit" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*c", phrase)
-                    if match:
-                        celsius = float(match.group(1))
-                        fahrenheit = (celsius * 9/5) + 32
-                        message_bot = f"🌡️ {celsius}°C = {round(fahrenheit, 2)}°F"
-                elif "fahrenheit en celsius" in phrase:
-                    match = re.search(r"(\d+(\.\d+)?)\s*f", phrase)
-                    if match:
-                        f_temp = float(match.group(1))
-                        c_temp = (f_temp - 32) * 5/9
-                        message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
-            except Exception as e:
-                message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
-            
+                    expression = match.group(1).strip()
+                    result = eval(expression)
+                    message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
+        except:
+            pass
+
         if message_bot:
-            return message_bot
+        return message_bot
 
-        # === Bloc Reconnaissance des tickers (exemple) ===
-        if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
-            nom_ticker = question_clean.replace(" ", "").replace("-", "")
-            if "btc" in nom_ticker or "bitcoin" in nom_ticker:
-                nom_ticker = "btc-usd"
-            elif "eth" in nom_ticker:
-                nom_ticker = "eth-usd"
-            elif "aapl" in nom_ticker:
-                nom_ticker = "aapl"
-            elif "tsla" in nom_ticker:
-                nom_ticker = "tsla"
-            elif "googl" in nom_ticker:
-                nom_ticker = "googl"
-            elif "fchi" in nom_ticker or "cac" in nom_ticker:
-                nom_ticker = "^fchi"
-            elif "msft" in nom_ticker:
-                nom_ticker = "msft"
-            elif "amzn" in nom_ticker:
-                nom_ticker = "amzn"
-            elif "nvda" in nom_ticker:
-                nom_ticker = "nvda"
-            elif "sp500" in nom_ticker or "s&p" in nom_ticker:
-                nom_ticker = "^gspc"
-            elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
-                nom_ticker = "doge-usd"
-            elif "ada" in nom_ticker or "cardano" in nom_ticker:
-                nom_ticker = "ada-usd"
-            elif "sol" in nom_ticker or "solana" in nom_ticker:
-                nom_ticker = "sol-usd"
-            elif "gold" in nom_ticker or "or" in nom_ticker:
-                nom_ticker = "gc=F"
-            elif "xrp" in nom_ticker or "ripple" in nom_ticker:
-                nom_ticker = "xrp-usd"
-            elif "bnb" in nom_ticker:
-                nom_ticker = "bnb-usd"
-            elif "cl" in nom_ticker or "petrole" in nom_ticker or "pétrole" in nom_ticker:
-                nom_ticker = "cl=F"
-            elif "si" in nom_ticker or "argent" in nom_ticker:
-                nom_ticker = "si=F"
-            elif "matic" in nom_ticker or "polygon" in nom_ticker:
-                nom_ticker = "matic-usd"
-            elif "uni" in nom_ticker or "uniswap" in nom_ticker:
-                nom_ticker = "uni-usd"
-            elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
-                nom_ticker = "^ndx"
+    # --- Bloc Convertisseur intelligent ---
+        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
+        try:
+            phrase = question_clean.replace(",", ".")
+            match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
+            if match:
+                montant = float(match.group(1))
+                from_cur = match.group(3).upper()
+                to_cur = match.group(5).upper()
+                url = f"https://v6.exchangerate-api.com/v6/dab2bba4f43a99445158d9ae/latest/{from_cur}"
+                response = requests.get(url, timeout=10)
+                data = response.json()
+                if data.get("result") == "success":
+                    taux = data["conversion_rates"].get(to_cur)
+                    if taux:
+                        result = montant * taux
+                        message_bot = f"💱 {montant} {from_cur} = {round(result, 2)} {to_cur}"
+                    else:
+                        message_bot = "❌ Taux de conversion non disponible pour la devise demandée."
+                else:
+                    message_bot = "⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème avec l’API. Veuillez réessayer plus tard."
+            elif "km en miles" in phrase:
+                match = re.search(r"(\d+(\.\d+)?)\s*km", phrase)
+                if match:
+                    km = float(match.group(1))
+                    miles = km * 0.621371
+                    message_bot = f"📏 {km} km = {round(miles, 2)} miles"
+            elif "miles en km" in phrase:
+                match = re.search(r"(\d+(\.\d+)?)\s*miles?", phrase)
+                if match:
+                    mi = float(match.group(1))
+                    km = mi / 0.621371
+                    message_bot = f"📏 {mi} miles = {round(km, 2)} km"
+            elif "celsius en fahrenheit" in phrase:
+                match = re.search(r"(\d+(\.\d+)?)\s*c", phrase)
+                if match:
+                    celsius = float(match.group(1))
+                    fahrenheit = (celsius * 9/5) + 32
+                    message_bot = f"🌡️ {celsius}°C = {round(fahrenheit, 2)}°F"
+            elif "fahrenheit en celsius" in phrase:
+                match = re.search(r"(\d+(\.\d+)?)\s*f", phrase)
+                if match:
+                    f_temp = float(match.group(1))
+                    c_temp = (f_temp - 32) * 5/9
+                    message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
+        except Exception as e:
+            message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
+        
+        if essage_bot:
+        return message_bot
 
-            message_bot = f"🔍 Vous souhaitez en savoir plus sur **{nom_ticker.upper()}** ? Tapez `analyse {nom_ticker}` pour une analyse complète 📊"
-            return message_bot    
+    # === Bloc Reconnaissance des tickers (exemple) ===
+    if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
+        nom_ticker = question_clean.replace(" ", "").replace("-", "")
+        if "btc" in nom_ticker or "bitcoin" in nom_ticker:
+            nom_ticker = "btc-usd"
+        elif "eth" in nom_ticker:
+            nom_ticker = "eth-usd"
+        elif "aapl" in nom_ticker:
+            nom_ticker = "aapl"
+        elif "tsla" in nom_ticker:
+            nom_ticker = "tsla"
+        elif "googl" in nom_ticker:
+            nom_ticker = "googl"
+        elif "fchi" in nom_ticker or "cac" in nom_ticker:
+            nom_ticker = "^fchi"
+        elif "msft" in nom_ticker:
+            nom_ticker = "msft"
+        elif "amzn" in nom_ticker:
+            nom_ticker = "amzn"
+        elif "nvda" in nom_ticker:
+            nom_ticker = "nvda"
+        elif "sp500" in nom_ticker or "s&p" in nom_ticker:
+            nom_ticker = "^gspc"
+        elif "doge" in nom_ticker or "dogecoin" in nom_ticker:
+            nom_ticker = "doge-usd"
+        elif "ada" in nom_ticker or "cardano" in nom_ticker:
+            nom_ticker = "ada-usd"
+        elif "sol" in nom_ticker or "solana" in nom_ticker:
+            nom_ticker = "sol-usd"
+        elif "gold" in nom_ticker or "or" in nom_ticker:
+            nom_ticker = "gc=F"
+        elif "xrp" in nom_ticker or "ripple" in nom_ticker:
+            nom_ticker = "xrp-usd"
+        elif "bnb" in nom_ticker:
+            nom_ticker = "bnb-usd"
+        elif "cl" in nom_ticker or "petrole" in nom_ticker or "pétrole" in nom_ticker:
+            nom_ticker = "cl=F"
+        elif "si" in nom_ticker or "argent" in nom_ticker:
+            nom_ticker = "si=F"
+        elif "matic" in nom_ticker or "polygon" in nom_ticker:
+            nom_ticker = "matic-usd"
+        elif "uni" in nom_ticker or "uniswap" in nom_ticker:
+            nom_ticker = "uni-usd"
+        elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
+            nom_ticker = "^ndx"
+
+        message_bot = f"🔍 Vous souhaitez en savoir plus sur **{nom_ticker.upper()}** ? Tapez `analyse {nom_ticker}` pour une analyse complète 📊"
+        return message_bot    
         
 
         
