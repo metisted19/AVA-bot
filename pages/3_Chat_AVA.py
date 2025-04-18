@@ -200,31 +200,31 @@ if question:
                 try:
                     url = "https://kayoo123.github.io/astroo-api/jour.json"
                     response = requests.get(url)
-                    if response.status_code == 200:
-                        data = response.json()
-                        if "signes" in data:
-                            horoscope_dict = data.get("signes", {})
-                        else:
-                            horoscope_dict = data
-                        signe_data = next((v for k, v in horoscope_dict.items() if k.lower() == signe_detecte), None)
-                        if signe_data is None:
-                            message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
-                        else:
-                            if isinstance(signe_data, dict):
-                                horoscope = signe_data.get("horoscope")
-                            else:
-                                horoscope = signe_data
-                            if horoscope:
-                                message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
-                            else:
-                                message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
-                        horoscope_repondu = True
+            if response.status_code == 200:
+                data = response.json()
+                if "signes" in data:
+                    horoscope_dict = data.get("signes", {})
+                else:
+                    horoscope_dict = data
+                signe_data = next((v for k, v in horoscope_dict.items() if k.lower() == signe_detecte), None)
+                if signe_data is None:
+                    message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                else:
+                    if isinstance(signe_data, dict):
+                        horoscope = signe_data.get("horoscope")
                     else:
-                        message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
-                        horoscope_repondu = True
-                except Exception as e:
-                    message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
-                    horoscope_repondu = True
+                        horoscope = signe_data
+                    if horoscope:
+                        message_bot += f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                    else:
+                        message_bot += f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                horoscope_repondu = True
+            else:
+                message_bot += "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
+                horoscope_repondu = True
+        except Exception as e:
+            message_bot += "⚠️ Une erreur est survenue lors de la récupération de l'horoscope.\n\n"
+            horoscope_repondu = True
 
         # --- Analyse complète / technique ---
         if not horoscope_repondu and any(phrase in qc for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
