@@ -183,13 +183,13 @@ if question:
 
         if question_raw:
             qc = question_raw.lower()  # Nettoyage de la question en minuscule
-            print(f"Question nettoyée : {qc}")  # Pour déboguer et vérifier qc
 
-            # Vérification si qc est une chaîne non vide
-            if isinstance(qc, str) and qc.strip():  # Vérifie que qc est une chaîne non vide
+            # Vérifie que qc est une chaîne de caractères et non vide
+            if isinstance(qc, str) and qc.strip():
                 message_bot = trouver_reponse(qc)
             else:
                 message_bot = "⚠️ Il semble y avoir un problème avec la question. Essayez de reformuler."
+
 
 
         if isinstance(qc, str) and qc:  # Vérifie que qc est bien une chaîne non vide
