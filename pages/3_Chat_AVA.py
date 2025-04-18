@@ -158,7 +158,9 @@ def nettoyer_texte(txt):
     txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
     txt = re.sub(r"\s+", " ", txt)
     return txt
-
+# 3. 🔍 Initialisation du chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 # Input utilisateur en fin de page (à la racine)
 question = st.chat_input("Posez votre question ici")
 
