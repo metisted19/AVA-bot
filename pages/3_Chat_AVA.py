@@ -148,9 +148,7 @@ for message in st.session_state.messages:
     else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-
-# Récupération de la question utilisateur
-question = st.chat_input("Que souhaitez-vous demander à AVA ?")
+            
 
 # 🔒 Sécurité : détection d'entrée dangereuse
 if question and re.search(r"[<>;{}]", question):
