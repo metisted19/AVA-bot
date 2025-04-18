@@ -713,8 +713,8 @@ def gerer_modules_speciaux(question_clean):
                 "macédoine du nord" : "Skopje",
                 "bosnie-herzégovine": "Sarajevo"
 
-         }
-         if pays_detecte and pays_detecte in capitales:
+        }
+        if pays_detecte and pays_detecte in capitales:
             message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
         else:
             message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
@@ -835,33 +835,33 @@ def gerer_modules_speciaux(question_clean):
                 analyse, suggestion = analyser_signaux_techniques(df)
                 
                 def generer_resume_signal(signaux):
-                     texte = ""
-                     signaux_str = " ".join(signaux).lower()
-                     if "survente" in signaux_str:
-                         texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
-                     if "surachat" in signaux_str:
-                         texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
-                     if "haussier" in signaux_str:
-                         texte += "📈 **Tendance haussière détectée.**\n"
-                     if "baissier" in signaux_str:
+                    texte = ""
+                    signaux_str = " ".join(signaux).lower()
+                    if "survente" in signaux_str:
+                        texte += "🔻 **Zone de survente détectée.** L'actif pourrait être sous-évalué.\n"
+                    if "surachat" in signaux_str:
+                        texte += "🔺 **Zone de surachat détectée.** Attention à une possible correction.\n"
+                    if "haussier" in signaux_str:
+                        texte += "📈 **Tendance haussière détectée.**\n"
+                    if "baissier" in signaux_str:
                          texte += "📉 **Tendance baissière détectée.**\n"
-                     if "faible" in signaux_str:
-                         texte += "😴 **Tendance faible.** Le marché semble indécis.\n"
-                     return texte if texte else "ℹ️ Aucun signal fort détecté."
+                    if "faible" in signaux_str:
+                        texte += "😴 **Tendance faible.** Le marché semble indécis.\n"
+                    return texte if texte else "ℹ️ Aucun signal fort détecté."
                  
-                 signaux = analyse.split("\n") if analyse else []
-                 resume = generer_resume_signal(signaux)
+                signaux = analyse.split("\n") if analyse else []
+                resume = generer_resume_signal(signaux)
                  
-                 message_bot = (
-                     f"📊 **Analyse pour {nom_simple.upper()}**\n\n"
-                     f"{analyse}\n\n"
-                     f"💬 **Résumé d'AVA :**\n{resume}\n\n"
-                     f"🤖 *Intuition d'AVA :* {suggestion}"
-                 )
-             else:
-                 message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
-         else:
-             message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
+                message_bot = (
+                    f"📊 **Analyse pour {nom_simple.upper()}**\n\n"
+                    f"{analyse}\n\n"
+                    f"💬 **Résumé d'AVA :**\n{resume}\n\n"
+                    f"🤖 *Intuition d'AVA :* {suggestion}"
+                )
+            else:
+                message_bot = f"⚠️ Je ne trouve pas les données pour {nom_simple.upper()}. Lancez le script d'entraînement."
+        else:
+            message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
 
     if message_bot:
         return message_bot
@@ -887,10 +887,10 @@ def gerer_modules_speciaux(question_clean):
             pass
 
         if message_bot:
-        return message_bot
+            return message_bot
 
     # --- Bloc Convertisseur intelligent ---
-        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
+    if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
         try:
             phrase = question_clean.replace(",", ".")
             match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
@@ -938,7 +938,7 @@ def gerer_modules_speciaux(question_clean):
             message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
         
         if essage_bot:
-        return message_bot
+            return message_bot
 
     # === Bloc Reconnaissance des tickers (exemple) ===
     if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
