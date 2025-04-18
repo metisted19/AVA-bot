@@ -205,9 +205,6 @@ if question:
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue lors de la récupération de l'horoscope : {e}\n\n"
 
-        # Envoi de la réponse de l'IA
-        with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-            st.markdown(message_bot)
 
         # Ajout du message dans l'historique
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
