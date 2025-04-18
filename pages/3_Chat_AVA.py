@@ -1518,10 +1518,9 @@ def gerer_modules_speciaux(question_clean):
 
 
     # ✅ Bloc final de retour (à garder tout à la fin de trouver_reponse)
-    if not message_bot:
-        message_bot = "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"
-    return message_bot
-    return None 
+    if message_bot:
+        return message_bot
+    return None
         
 
 # Récupération de la question utilisateur
