@@ -181,15 +181,20 @@ if question:
 
         question_raw = st.chat_input("Posez votre question ici :")
 
-        # Vérification détaillée de qc avant de le tester
-        print(f"Type de qc: {type(qc)}")
-        print(f"Valeur de qc: '{qc}'")  # Affiche qc avec des quotes pour mieux voir les espaces éventuels
+        # On définit qc à partir de la question de l'utilisateur
+        question_clean = question.lower().strip()
+        qc = question_clean  # Définit qc ici
 
-        # Ajout de strip() pour enlever les espaces inutiles
-        if isinstance(qc, str) and qc.strip():  # Vérifie que qc est bien une chaîne non vide
+       # Vérification détaillée de qc avant de l'utiliser
+       print(f"Type de qc: {type(qc)}")
+       print(f"Valeur de qc: '{qc}'")  # Affiche qc avec des quotes pour mieux voir les espaces éventuels
+
+       # Ajout de strip() pour enlever les espaces inutiles
+       if isinstance(qc, str) and qc.strip():  # Vérifie que qc est bien une chaîne non vide
             message_bot = trouver_reponse(qc)
         else:
             message_bot = "⚠️ Il semble y avoir un problème avec la question. Essayez de reformuler."
+
 
 
 
