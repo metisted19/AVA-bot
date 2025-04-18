@@ -437,7 +437,26 @@ if question:
                 nom_ticker = "uni-usd"
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
-        
+        if question:
+            # Ajouter la question de l'utilisateur dans les messages de session
+            st.session_state.messages.append({"role": "user", "content": question})
+
+            # Afficher la question de l'utilisateur
+            with st.chat_message("user"):
+                st.markdown(question)
+
+            # Nettoyer la question avant de la traiter
+            question_clean = question.lower().strip()
+
+            # Obtenir la réponse de l'IA
+            message_bot = obtenir_reponse_ava(question_clean)
+
+            # Afficher la réponse de l'IA
+               st.markdown(message_bot)
+
+            # Ajouter la réponse de l'IA dans les messages de session
+            st.session_state.messages.append({"role": "assistant", "content": message_bot})
+
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
         # 4.a) Hard‑codées
         reponses_courantes = {
