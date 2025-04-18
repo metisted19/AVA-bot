@@ -10,7 +10,6 @@ from langdetect import detect
 from newsapi import NewsApiClient
 from forex_python.converter import CurrencyRates, CurrencyCodes
 from analyse_technique import ajouter_indicateurs_techniques, analyser_signaux_techniques
-from fonctions_chat import obtenir_reponse_ava
 from fonctions_meteo import obtenir_meteo, get_meteo_ville  
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity 
