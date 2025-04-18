@@ -199,11 +199,23 @@ def trouver_reponse(question):
 # --- Modules personnalisés (à enrichir) ---
 def gerer_modules_speciaux(question_clean):
     """
-    Gère tous les modules spéciaux : analyse BTC, horoscope, météo, actualités,
-    analyse complète, symptômes/solutions naturelles, punchlines motivation,
-    culture générale, calculs, conversions, reconnaissance tickers, quiz,
-    faits insolites, recettes.
-    Retourne la réponse du module ou None s'il n'y a pas de correspondance.
+    Gère tous les modules spéciaux :
+      1. Analyse complète du marché (CSV + indicateurs techniques)
+      2. Analyse simple d'un actif
+      3. Analyse BTC spécifique
+      4. Horoscope
+      5. Météo
+      6. Actualités
+      7. Symptômes courants
+      8. Remèdes naturels
+      9. Punchlines motivationnelles
+     10. Culture générale statique
+     11. Calcul et conversion
+     12. Reconnaissance de tickers
+     13. Quiz de culture générale
+     14. Faits insolites
+     15. Recettes rapides
+    Retourne la réponse ou None si aucun module ne match.
     """
     # Initialisation
     message_bot       = ""
