@@ -450,15 +450,6 @@ if question:
 
         question = st.chat_input("Posez votre question ici")
 
-        if question:
-            st.session_state.messages.append({"role": "user", "content": question})
-            with st.chat_message("user"):
-                st.markdown(question)
-
-            with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-                message_bot = traiter_question(question)
-                st.markdown(message_bot)
-                st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
