@@ -978,7 +978,7 @@ def gerer_modules_speciaux(question_clean):
         except Exception as e:
             message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
         
-        if essage_bot:
+        if message_bot:
             return message_bot
 
     # === Bloc Reconnaissance des tickers (exemple) ===
