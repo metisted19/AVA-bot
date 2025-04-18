@@ -18,22 +18,7 @@ import difflib
 import urllib.parse
 from fonctions_chat import obtenir_reponse_ava
 
-# --- CONFIG ---
-st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# --- Modèle sémantique (cache) ---
-@st.cache_resource
-def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
-model_semantic = load_model()
-
-# --- Nettoyage du texte ---
-def nettoyer_texte(txt):
-    txt = unicodedata.normalize("NFKC", txt)
-    txt = txt.lower().strip()
-    txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
-    txt = re.sub(r"\s+", " ", txt)
-    return txt
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -157,7 +142,22 @@ with col2:
 
 st.markdown(f"<p style='font-style: italic;'>{humeur_du_jour()}</p>", unsafe_allow_html=True)
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
+# --- CONFIG ---
+st.set_page_config(page_title="Chat AVA", layout="centered")
 
+# --- Modèle sémantique (cache) ---
+@st.cache_resource
+def load_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+model_semantic = load_model()
+
+# --- Nettoyage du texte ---
+def nettoyer_texte(txt):
+    txt = unicodedata.normalize("NFKC", txt)
+    txt = txt.lower().strip()
+    txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
+    txt = re.sub(r"\s+", " ", txt)
+    return txt
 
 # Input utilisateur en fin de page (à la racine)
 question = st.chat_input("Posez votre question ici")
@@ -530,9 +530,8 @@ if question:
         base_complet = {**base_savoir, **reponses_courantes}
 
         # --- Moteur central de réponse AVA ---
-        def trouver_reponse(question):
+        def traiter_question(question: str) -> str:
             question_clean = nettoyer_texte(question)
-            st.write("🧼 Texte nettoyé :", question_clean)  # Debug temporaire
 
             # 1. Direct
             if question_clean in base_complet:
