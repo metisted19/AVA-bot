@@ -180,28 +180,28 @@ if question:
 
         question_raw = st.chat_input("Posez votre question ici :")
 
-        # --- Récupération de la question utilisateur ---
+        
         if question:
             st.session_state.messages.append({"role": "user", "content": question})
             with st.chat_message("user"):
                 st.markdown(question)
+
+            # Traitement de la question en minuscule et nettoyage
+            question_clean = question.lower().strip()
+    
+            # Appel à la fonction de réponse en utilisant la question nettoyée
+            message_bot = obtenir_reponse_ava(question_clean)
+
+            # Envoi de la réponse de l'IA
             with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-                # Traitement de la question en minuscule et nettoyage
-                question_clean = question.lower().strip()
-        
-                # Appel à la fonction de réponse en utilisant la question nettoyée
-                message_bot = obtenir_reponse_ava(question_clean)
-
                 st.markdown(message_bot)
-                st.session_state.messages.append({"role": "assistant", "content": message_bot})
+        
+            # Ajout du message dans l'historique
+            st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
-
-
-
-
-        if isinstance(question_clean, str) and question_clean:  
+        # --- Vérification de la question pour l'horoscope ---
+        if isinstance(question_clean, str) and question_clean:  # Vérifie que question_clean est bien une chaîne non vide
             if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
-                # Ton code ici pour l'horoscope
                 signes_disponibles = [
                     "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
                     "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
@@ -227,30 +227,12 @@ if question:
                     except Exception as e:
                         message_bot = f"⚠️ Une erreur est survenue lors de la récupération de l'horoscope : {e}\n\n"
 
+        # Envoi de la réponse de l'IA
+        with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+            st.markdown(message_bot)
 
-
-        # --- Analyse complète / technique ---
-        if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
-            try:
-                resultats = []
-                fichiers = glob.glob("data/donnees_*.csv")
-                for fichier in fichiers:
-                    df = pd.read_csv(fichier)
-                    df.columns = [col.capitalize() for col in df.columns]
-                    df = ajouter_indicateurs_techniques(df)  # ← Important !
-                    analyse, suggestion = analyser_signaux_techniques(df)
-                    try:
-                        analyse, suggestion = analyser_signaux_techniques(df)
-                        nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
-                        resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
-                        resultats.append(resume)
-                    except:
-                        continue
-                if resultats:
-                    message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats) + "\n\n"
-                    analyse_complete = True
-            except Exception as e:
-                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
+        # Ajout du message dans l'historique
+        st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
         # --- Bloc météo intelligent (villages inclus) ---
         if not horoscope_repondu and not analyse_complete \
