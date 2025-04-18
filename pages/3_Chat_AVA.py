@@ -424,19 +424,21 @@ def gerer_modules_speciaux(question_clean):
         return message_bot
 
         # --- Bloc Réponses médicales explicites ---
-        elif not message_bot and any(mot in question_clean for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
-            "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie", "vertige", "brûlures", "reflux", "nausée", "dépression",
-            "allergie", "palpitations", "otite", "sinusite", "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée",
-            "ballonnements", "brûlures d’estomac", "brûlure d'estomac", "saignement de nez", "mal de dos", "entorse", "tendinite",
-            "ampoule", "piqûre d’insecte", "bruit dans l'oreille", "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus",
-            "hallucinations", "trouble du sommeil", "inflammation", "baisse de tension", "fièvre nocturne","bradycardie", "tachycardie", "psoriasis", "fibromyalgie", "thyroïde", "cystite", "glaucome", "bruxisme",
-            "arthrose", "hernie discale", "spasmophilie", "urticaire", "coup de chaleur", "luxation", "anxiété",
-            "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil", "brûlure chimique","eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite", "pneumonie",
-            "zona", "épilepsie", "coupure profonde", "hépatite C", "phlébite",
-            "gastro-entérite", "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
+        if not message_bot and any(phrase in question_clean for phrase in [
+            "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur",
+            "asthme", "bronchite", "eczéma", "diabète", "cholestérol", "acné", "ulcère", "anémie", "insomnie",
+            "vertige", "brûlures", "reflux", "nausée", "dépression", "allergie", "palpitations", "otite", "sinusite",
+            "crampes", "infections urinaires", "fatigue", "constipation", "diarrhée", "ballonnements", "brûlures d'estomac",
+            "saignement de nez", "mal de dos", "entorse", "tendinite", "ampoule", "piqûre d’insecte", "bruit dans l'oreille",
+            "angoisse", "boutons de fièvre", "lombalgie", "périarthrite", "hallux valgus", "hallucinations", "trouble du sommeil",
+            "inflammation", "baisse de tension", "fièvre nocturne", "bradycardie", "tachycardie", "psoriasis", "fibromyalgie",
+            "thyroïde", "cystite", "glaucome", "bruxisme", "arthrose", "hernie discale", "spasmophilie", "urticaire",
+            "coup de chaleur", "luxation", "anxiété", "torticolis", "eczéma de contact", "hypoglycémie", "apnée du sommeil",
+            "brûlure chimique", "eczéma atopique", "syndrome des jambes sans repos", "colique néphrétique", "hépatite",
+            "pneumonie", "zona", "épilepsie", "coupure profonde", "hépatite c", "phlébite", "gastro-entérite",
+            "blessure musculaire", "tendinopathie", "œil rouge", "perte d'odorat"
+        ]):
 
-
-            ]):
             reponses_medic = {
                 "grippe": "🤒 Les symptômes de la grippe incluent : fièvre élevée, frissons, fatigue intense, toux sèche, douleurs musculaires.",
                 "rhume": "🤧 Le rhume provoque généralement une congestion nasale, des éternuements, une légère fatigue et parfois un peu de fièvre.",
