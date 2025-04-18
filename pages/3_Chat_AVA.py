@@ -155,16 +155,7 @@ with col2:
 st.markdown(f"<p style='font-style: italic;'>{humeur_du_jour()}</p>", unsafe_allow_html=True)
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
-for message in st.session_state.messages:
-    if message["role"] == "assistant":
-        with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-            st.markdown(message["content"])
-    else:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
 # Input utilisateur en fin de page (à la racine)
 question = st.chat_input("Posez votre question ici")
 
@@ -454,7 +445,7 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
 
-        
+        question = st.chat_input("Posez votre question ici")
 
         if question:
             # Affichage du message utilisateur
