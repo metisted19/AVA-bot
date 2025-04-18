@@ -203,7 +203,6 @@ if question:
             st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
         # --- Vérification de la question pour l'horoscope ---
-        if not message_bot:
         if isinstance(question_clean, str) and question_clean:  # Vérifie que question_clean est bien une chaîne non vide
             if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
                 signes_disponibles = [
