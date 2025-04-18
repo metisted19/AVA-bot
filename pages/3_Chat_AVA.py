@@ -158,11 +158,7 @@ def nettoyer_texte(txt):
     txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
     txt = re.sub(r"\s+", " ", txt)
     return txt
-# 3. 🔍 Initialisation du chat
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-# Input utilisateur en fin de page (à la racine)
-question = st.chat_input("Posez votre question ici")
+
 
 # 🔒 Sécurité : détection d'entrée dangereuse
 if question and re.search(r"[<>;{}]", question):
@@ -450,9 +446,12 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
 
-
-
-
+        # 3. 🔍 Initialisation du chat
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        # Input utilisateur en fin de page (à la racine)
+        question = st.chat_input("Posez votre question ici")
+        
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
         # 4.a) Hard‑codées
         reponses_courantes = {
