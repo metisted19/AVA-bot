@@ -1129,7 +1129,7 @@ if question:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
             message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
-    # --- Bloc « encore un » pour faits insolites ---
+        # --- Bloc « encore un » pour faits insolites ---
         if not message_bot and any(
             mot in qc for mot in ["encore un", "un autre", "encore"]
         ):
