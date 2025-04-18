@@ -1129,141 +1129,6 @@ def gerer_modules_speciaux(question_clean):
             st.session_state['derniere_fait'] = random.choice(faits_insolites)
         message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
-
-    # Gestion de la demande "encore un" ou "plus" pour les faits insolites
-    if any(mot in question_clean for mot in ["encore un", "un autre","encore"]):
-        if 'derniere_fait' in st.session_state:
-            message_bot = f"✨ Voici une autre anecdote :\n\n{random.choice(faits_insolites)}"
-        else:
-            message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
-
-    if any(mot in question_clean for mot in ["encore une", "une autre"]):
-        if 'derniere_fait' in st.session_state:
-            message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
-        else:
-            message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
-
-    if message_bot:
-        return message_bot
-        
-    # --- Bloc Recettes rapides 
-    recettes = [
-        "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
-        "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
-        "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
-        "🥗 **Salade express** : tomates cerises, mozzarella, roquette, huile d’olive, vinaigre balsamique.",
-        "🌯 **Wrap poulet-crudités** : galette + restes de poulet + salade + sauce yaourt.",
-        "🥔 **Pommes de terre sautées** : en cubes, à la poêle avec ail et persil. Parfait avec des œufs !",
-        "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes.",
-        "🍞 **Croque-monsieur rapide** : pain de mie, jambon, fromage, 5 min au grill ou à la poêle.",
-        "🥒 **Tartines fraîcheur** : pain grillé, fromage frais, concombre, citron et herbes.",
-        "🍚 **Riz sauté aux légumes** : reste de riz + légumes + œuf + sauce soja. Un wok express !",
-        "🍗 **Poulet minute au curry** : dés de poulet + crème + curry + oignon, à la poêle en 10 min.",
-        "🍳 **Œufs brouillés crémeux** : œufs + beurre + sel + poivre, cuisson douce pour onctuosité.",
-        "🧄 **Pâtes ail-persil** : ail doré à la poêle, persil frais, huile d’olive, et hop sur les pâtes !",
-        "🥑 **Toast avocat-œuf** : pain grillé + avocat écrasé + œuf au plat ou mollet.",
-        "🌮 **Tacos express** : galette + steak haché ou haricots + tomate + salade + sauce.",
-        "🥔 **Gratin express au micro-ondes** : pommes de terre en tranches fines + crème + fromage.",
-        "🍅 **Tomates mozzarella** : tranches de tomates + mozzarella + basilic + huile d’olive. Simple et frais.",
-        "🧀 **Quesadilla express** : deux tortillas + fromage + restes au choix + poêle 5 min chaque côté.",
-        "🍳 **Mini shakshuka rapide** : tomates en dés + œufs + cumin dans une petite poêle. Un délice !",
-        "🥣 **Bowl sucré express** : fromage blanc + fruits + flocons d’avoine + miel. Parfait au petit dej.",
-        "🥕 **Bâtonnets carottes-concombre** : trempés dans du houmous ou une sauce yaourt. Frais et sain.",
-        "🍞 **Pain perdu rapide** : tranches de pain + œuf + lait + sucre, à la poêle jusqu’à dorure.",
-        "🍠 **Patate douce micro-ondes** : piquée à la fourchette, 7 min puissance max, à garnir à volonté.",
-        "🥒 **Taboulé express** : semoule, tomate, menthe, citron, huile d’olive. Hydratation 5 min à l’eau chaude.",
-        "🍌 **Banana pancakes** : 1 banane + 2 œufs, mélangés et cuits en petites galettes. Sans farine !",
-        "🧈 **Wrap beurre de cacahuète-banane** : rapide, énergétique, parfait en collation !",
-        "🍽️ **Assiette anti-gaspi** : reste de pâtes, légumes et un œuf, mélangés et poêlés façon wok !",
-        "🍜 **Nouilles instant maison** : nouilles + bouillon + œuf + légumes râpés. Prêt en 7 minutes top chrono !",
-        "🥓 **Œuf cocotte express** : œuf + crème + fromage dans un ramequin, 1 min au micro-ondes.",
-        "🌽 **Galette de maïs rapide** : maïs + œuf + farine + épices, cuit à la poêle façon pancake salé.",
-        "🍕 **Mini pizzas pain de mie** : pain de mie, sauce tomate, fromage, garniture au choix, 10 min au four.",
-        "🍄 **Poêlée champignons ail-persil** : champignons frais, ail, persil, et huile d’olive. Simple & savoureux.",
-        "🌯 **Wrap sucré pomme-cannelle** : pomme râpée, cannelle, un filet de miel, le tout roulé dans une galette.",
-        "🍳 **Tortilla minute** : œufs battus + restes de légumes + fromage, à la poêle comme une omelette épaisse.",
-        "🧀 **Boulettes express** : steak haché + chapelure + épices, façonnées et dorées en 5 min à la poêle.",
-        "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
-        "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
-    ]
-    # Gestion de la demande "recette"
-    if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
-        if 'derniere_recette' not in st.session_state:
-            st.session_state['derniere_recette'] = random.choice(recettes)
-        message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
-
-    # Gestion de la demande "encore un" ou "plus" pour les recettes
-    if any(mot in question_clean for mot in ["encore une", "une autre"]):
-        if 'derniere_recette' in st.session_state:
-            message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
-        else:
-            message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
-    if message_bot:
-        return message_bot
-
-    # ─── 4) Bases de réponses ───────────────────────────────────────────────────
-    # 4.a) Hard‑codées
-    reponses_courantes = {
-        "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
-        "ça va": "Je vais bien, merci de demander ! Et vous ?",
-        "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-        "hello": "Hello! How can I assist you today?",
-        "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-        "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-        "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-        "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-        "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-        "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-        "tu m'entends": "Je vous entends fort et clair 🎧",
-        "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-        "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-        "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-        "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
-        "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-        "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
-        "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-        "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
-        "re": "Re bienvenue à bord ! On continue notre mission ?",
-        "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-        "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-        "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-        "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
-        "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
-        "salut çava": "Salut ! Je vais très bien, merci 😊 Et vous ?",
-    }   
-    base_savoir = {
-        # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
-        "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
-        "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
-        "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
-        "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
-        "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
-        "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-        "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
-        "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
-        "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
-        "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
-        "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
-        "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",        "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
-        "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
-        "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
-        "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
-        "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-        "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
-        "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
-        "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
-        "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
-        "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
-        "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
-        "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
-        "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
-        "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
-        "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
-    }
-    # Fusionner les deux dans une base complète
-    base_complet = {**base_savoir, **reponses_courantes}
-    
-
     # --- Bloc Mini base générale (culture quotidienne) ---
     if not message_bot:
 
@@ -1500,7 +1365,143 @@ def gerer_modules_speciaux(question_clean):
 
     if message_bot:
         return message_bot
+
+    # Gestion de la demande "encore un" ou "plus" pour les faits insolites
+    if not message_bot and any(m in question_clean for m in [
+        "fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"
+    ]):
+        if 'derniere_fait' not in st.session_state:
+            st.session_state['derniere_fait'] = random.choice(faits_insolites)
+        message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
+        return message_bot
+
+    if not message_bot and any(m in question_clean for m in ["encore un", "un autre", "encore", "une autre"]):
+        if 'derniere_fait' in st.session_state:
+            message_bot = f"✨ Encore un :\n\n{random.choice(faits_insolites)}"
+        else:
+            message_bot = "⚠️ Je n'ai pas encore de fait insolite. Demandez d'abord un fait !"
+        return message_bot
+
+        
+    # --- Bloc Recettes rapides 
+    recettes = [
+        "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
+        "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
+        "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
+        "🥗 **Salade express** : tomates cerises, mozzarella, roquette, huile d’olive, vinaigre balsamique.",
+        "🌯 **Wrap poulet-crudités** : galette + restes de poulet + salade + sauce yaourt.",
+        "🥔 **Pommes de terre sautées** : en cubes, à la poêle avec ail et persil. Parfait avec des œufs !",
+        "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes.",
+        "🍞 **Croque-monsieur rapide** : pain de mie, jambon, fromage, 5 min au grill ou à la poêle.",
+        "🥒 **Tartines fraîcheur** : pain grillé, fromage frais, concombre, citron et herbes.",
+        "🍚 **Riz sauté aux légumes** : reste de riz + légumes + œuf + sauce soja. Un wok express !",
+        "🍗 **Poulet minute au curry** : dés de poulet + crème + curry + oignon, à la poêle en 10 min.",
+        "🍳 **Œufs brouillés crémeux** : œufs + beurre + sel + poivre, cuisson douce pour onctuosité.",
+        "🧄 **Pâtes ail-persil** : ail doré à la poêle, persil frais, huile d’olive, et hop sur les pâtes !",
+        "🥑 **Toast avocat-œuf** : pain grillé + avocat écrasé + œuf au plat ou mollet.",
+        "🌮 **Tacos express** : galette + steak haché ou haricots + tomate + salade + sauce.",
+        "🥔 **Gratin express au micro-ondes** : pommes de terre en tranches fines + crème + fromage.",
+        "🍅 **Tomates mozzarella** : tranches de tomates + mozzarella + basilic + huile d’olive. Simple et frais.",
+        "🧀 **Quesadilla express** : deux tortillas + fromage + restes au choix + poêle 5 min chaque côté.",
+        "🍳 **Mini shakshuka rapide** : tomates en dés + œufs + cumin dans une petite poêle. Un délice !",
+        "🥣 **Bowl sucré express** : fromage blanc + fruits + flocons d’avoine + miel. Parfait au petit dej.",
+        "🥕 **Bâtonnets carottes-concombre** : trempés dans du houmous ou une sauce yaourt. Frais et sain.",
+        "🍞 **Pain perdu rapide** : tranches de pain + œuf + lait + sucre, à la poêle jusqu’à dorure.",
+        "🍠 **Patate douce micro-ondes** : piquée à la fourchette, 7 min puissance max, à garnir à volonté.",
+        "🥒 **Taboulé express** : semoule, tomate, menthe, citron, huile d’olive. Hydratation 5 min à l’eau chaude.",
+        "🍌 **Banana pancakes** : 1 banane + 2 œufs, mélangés et cuits en petites galettes. Sans farine !",
+        "🧈 **Wrap beurre de cacahuète-banane** : rapide, énergétique, parfait en collation !",
+        "🍽️ **Assiette anti-gaspi** : reste de pâtes, légumes et un œuf, mélangés et poêlés façon wok !",
+        "🍜 **Nouilles instant maison** : nouilles + bouillon + œuf + légumes râpés. Prêt en 7 minutes top chrono !",
+        "🥓 **Œuf cocotte express** : œuf + crème + fromage dans un ramequin, 1 min au micro-ondes.",
+        "🌽 **Galette de maïs rapide** : maïs + œuf + farine + épices, cuit à la poêle façon pancake salé.",
+        "🍕 **Mini pizzas pain de mie** : pain de mie, sauce tomate, fromage, garniture au choix, 10 min au four.",
+        "🍄 **Poêlée champignons ail-persil** : champignons frais, ail, persil, et huile d’olive. Simple & savoureux.",
+        "🌯 **Wrap sucré pomme-cannelle** : pomme râpée, cannelle, un filet de miel, le tout roulé dans une galette.",
+        "🍳 **Tortilla minute** : œufs battus + restes de légumes + fromage, à la poêle comme une omelette épaisse.",
+        "🧀 **Boulettes express** : steak haché + chapelure + épices, façonnées et dorées en 5 min à la poêle.",
+        "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
+        "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
+    ]
+    # Gestion de la demande "recette"
+    if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+        if 'derniere_recette' not in st.session_state:
+            st.session_state['derniere_recette'] = random.choice(recettes)
+        message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
+
+    # Gestion de la demande "encore un" ou "plus" pour les recettes
+    if any(mot in question_clean for mot in ["encore une", "une autre"]):
+        if 'derniere_recette' in st.session_state:
+            message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
+        else:
+            message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
+    if message_bot:
+        return message_bot
+
+    # ─── 4) Bases de réponses ───────────────────────────────────────────────────
+    # 4.a) Hard‑codées
+    reponses_courantes = {
+        "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+        "ça va": "Je vais bien, merci de demander ! Et vous ?",
+        "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+        "hello": "Hello! How can I assist you today?",
+        "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+        "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+        "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+        "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+        "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+        "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+        "tu m'entends": "Je vous entends fort et clair 🎧",
+        "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+        "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+        "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+        "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+        "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+        "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+        "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+        "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+        "re": "Re bienvenue à bord ! On continue notre mission ?",
+        "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+        "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+        "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+        "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+        "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
+        "salut çava": "Salut ! Je vais très bien, merci 😊 Et vous ?",
+    }   
+    base_savoir = {
+        # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
+        "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
+        "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
+        "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
+        "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
+        "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
+        "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+        "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
+        "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
+        "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
+        "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
+        "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
+        "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",        "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
+        "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
+        "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
+        "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
+        "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+        "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
+        "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
+        "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
+        "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
+        "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
+        "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
+        "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
+        "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
+        "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
+        "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
+    }
+    # Fusionner les deux dans une base complète
+    base_complet = {**base_savoir, **reponses_courantes}
     
+
+        
 
         
     # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
