@@ -274,7 +274,6 @@ if question:
 
 
         # --- Actualités améliorées ---
-        if not message_bot:
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
             actus = get_general_news()
             if isinstance(actus, str):
