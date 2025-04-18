@@ -452,8 +452,8 @@ if question:
             # Obtenir la réponse de l'IA
             message_bot = obtenir_reponse_ava(question_clean)
 
-           # Afficher la réponse de l'IA
-           with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+            # Afficher la réponse de l'IA
+            with st.chat_message("assistant", avatar="assets/ava_logo.png"):
                 st.markdown(message_bot)
 
             # Ajouter la réponse de l'IA dans les messages de session
