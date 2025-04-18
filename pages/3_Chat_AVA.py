@@ -108,6 +108,23 @@ def get_general_news():
     except Exception as e:
         return f"❌ Error fetching news via NewsApiClient: {e}"
 
+# --- Fonction modules personnalisés (à placer en toute fin avant l'interface) ---
+def gerer_modules_speciaux(question_clean):
+    if "analyse" in question_clean and "btc" in question_clean:
+        return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
+    if "horoscope" in question_clean:
+        return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+    if "météo" in question_clean and "paris" in question_clean:
+        return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+    if "blague" in question_clean:
+        blagues = [
+            "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
+            "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
+            "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
+        ]
+        return random.choice(blagues)
+    return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
+
 # Fonction de traduction via l’API gratuite MyMemory
 def traduire_texte(texte, langue_dest):
     try:
@@ -1430,22 +1447,6 @@ if question:
                 if question_base in question_clean:
                     message_bot = reponse_base
                     break
-        # --- Fonction modules personnalisés (à placer en toute fin avant l'interface) ---
-        def gerer_modules_speciaux(question_clean):
-            if "analyse" in question_clean and "btc" in question_clean:
-                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-            if "horoscope" in question_clean:
-                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-            if "météo" in question_clean and "paris" in question_clean:
-                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-            if "blague" in question_clean:
-                blagues = [
-                    "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
-                    "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
-                    "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
-                ]
-                return random.choice(blagues)
-            return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
             
             with st.chat_message("user"):
                 st.markdown(question_raw)
