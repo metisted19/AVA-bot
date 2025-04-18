@@ -148,7 +148,8 @@ for message in st.session_state.messages:
     else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-            
+# Input utilisateur en fin de page (à la racine)
+question = st.chat_input("Posez votre question ici")
 
 # 🔒 Sécurité : détection d'entrée dangereuse
 if question and re.search(r"[<>;{}]", question):
@@ -436,8 +437,7 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
 
-        # Input utilisateur en fin de page (à la racine)
-        question = st.chat_input("Posez votre question ici")
+        
 
         if question:
             # Affichage du message utilisateur
