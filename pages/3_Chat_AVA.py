@@ -199,10 +199,13 @@ def trouver_reponse(question):
 # --- Modules personnalisés (à enrichir) ---
 def gerer_modules_speciaux(question_clean):
     """
-    Gère les modules spéciaux : analyse BTC, horoscope, météo, actualités.
+    Gère tous les modules spéciaux : analyse BTC, horoscope, météo, actualités,
+    analyse complète, symptômes/solutions naturelles, punchlines motivation,
+    culture générale, calculs, conversions, reconnaissance tickers, quiz,
+    faits insolites, recettes.
     Retourne la réponse du module ou None s'il n'y a pas de correspondance.
     """
-    # Initialisation des flags et message
+    # Initialisation
     message_bot       = ""
     horoscope_repondu = False
     meteo_repondu     = False
