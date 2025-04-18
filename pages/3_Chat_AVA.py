@@ -1069,14 +1069,14 @@ if question:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
             
-        # Liste des faits insolites (définie une seule fois)
-           # --- Bloc faits insolites (anecdotes) ---
-        if not message_bot and any(
-            mot in qc for mot in [
-                "fait insolite", "truc fou", "surprends-moi",
-                "anecdote", "incroyable mais vrai"
-            ]
-        ):
+    # Liste des faits insolites (définie une seule fois)
+    # --- Bloc faits insolites (anecdotes) ---
+    if not message_bot and any(
+        mot in qc for mot in [
+            "fait insolite", "truc fou", "surprends-moi",
+            "anecdote", "incroyable mais vrai"
+        ]
+    ):
         faits_insolites = [
             "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
             "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
@@ -1129,7 +1129,7 @@ if question:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
             message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
-        # --- Bloc « encore un » pour faits insolites ---
+    # --- Bloc « encore un » pour faits insolites ---
         if not message_bot and any(
             mot in qc for mot in ["encore un", "un autre", "encore"]
         ):
