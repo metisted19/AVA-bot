@@ -448,7 +448,7 @@ if question:
         question = st.chat_input("Posez votre question ici")
 
         if question:
-                    st.session_state.messages.append({"role": "user", "content": question})
+            st.session_state.messages.append({"role": "user", "content": question})
             with st.chat_message("user"):
                 st.markdown(question)
 
