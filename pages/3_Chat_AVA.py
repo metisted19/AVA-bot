@@ -93,7 +93,7 @@ def humeur_du_jour():
         return "🧘 Détendue mais toujours efficace. Prêt(e) pour une analyse zen ?"
     else:
         return "🌙 En mode nocturne, mais toujours connectée pour vous aider !"
-        
+
 # Nouvelle fonction get_general_news() avec la modification pour NewsAPI
 def get_general_news():
     try:
@@ -767,7 +767,13 @@ if question:
                 message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
 
         # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
-        elif any(kw in qc for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
+        if not message_bot and any(
+            kw in qc for kw in [
+                "capitale", "capitale de", "capitale du", "capitale d", "capitale des",
+                "où se trouve", "ville principale", "ville de"
+            ]
+        ):
+            # Détection du pays
             pays_detecte = None
             match = re.search(r"(?:de la|de l'|du|de|des)\s+([a-zàâçéèêëîïôûùüÿñæœ' -]+)", qc)
             if match:
