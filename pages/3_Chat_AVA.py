@@ -1457,9 +1457,7 @@ if question:
     if lang_question.lower() != "fr" and message_bot.strip():
         traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
         message_bot = traduction
-            
-        st.markdown(message_bot)
-        st.session_state.messages.append({"role": "assistant", "content": message_bot})
+
         st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
 
 
