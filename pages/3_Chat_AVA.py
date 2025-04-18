@@ -1069,14 +1069,13 @@ if question:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
             
-        # Liste des faits insolites (définie une seule fois)
-        # --- Bloc faits insolites (anecdotes) ---
-        if not message_bot and any(
-            mot in qc for mot in [
-                "fait insolite", "truc fou", "surprends-moi",
-                "anecdote", "incroyable mais vrai"
-            ]
-        ):
+    # --- Bloc faits insolites (anecdotes) ---
+    if not message_bot and any(
+        mot in qc for mot in [
+            "fait insolite", "truc fou", "surprends-moi",
+            "anecdote", "incroyable mais vrai"
+        ]
+    ):
         faits_insolites = [
             "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
             "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
@@ -1127,19 +1126,19 @@ if question:
         # Si c'est la toute première anecdote demandée
             if 'derniere_fait' not in st.session_state:
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
-            message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
+        message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
-        # --- Bloc « encore un » pour faits insolites ---
-        if not message_bot and any(
-            mot in qc for mot in ["encore un", "un autre", "encore"]
-        ):
-            if 'derniere_fait' in st.session_state:
-                message_bot = (
-                    "✨ Voici une autre anecdote :\n\n"
-                    f"{random.choice(faits_insolites)}"
-                )
-            else:
-                message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
+    # --- Bloc « encore un » pour faits insolites ---
+    if not message_bot and any(
+        mot in qc for mot in ["encore un", "un autre", "encore"]
+    ):
+        if 'derniere_fait' in st.session_state:
+            message_bot = (
+                "✨ Voici une autre anecdote :\n\n"
+                f"{random.choice(faits_insolites)}"
+            )
+        else:
+            message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
 
         # --- Bloc Recettes rapides
