@@ -1455,8 +1455,8 @@ if question:
     except Exception as e:
         lang_question = "fr"
     if lang_question.lower() != "fr" and reponse.strip():
-        traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
-        message_bot = traduction
+        traduction = traduire_deepl(reponse, langue_cible=lang_question.upper())
+        reponse = traduction
 
         st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
 
