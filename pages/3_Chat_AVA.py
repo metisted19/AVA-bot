@@ -147,6 +147,73 @@ for message in st.session_state.messages:
     else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+# --- Moteur central de réponse AVA ---
+def trouver_reponse(question):
+    qc = nettoyer_texte(question)
+    st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
+
+    # 1. Direct
+    if qc in base_complet:
+        st.write("✅ Match direct trouvé")
+        return base_complet[qc]
+
+    # 2. Fuzzy
+    proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
+    if proche:
+        st.write(f"🔎 Match fuzzy : {proche[0]}")
+        return base_complet[proche[0]]
+
+    # 3. Sémantique
+    keys = list(base_complet.keys())
+    vb = model_semantic.encode(keys)
+    vq = model_semantic.encode([qc])[0]
+    sims = cosine_similarity([vq], vb)[0]
+    best, score = max(zip(keys, sims), key=lambda x: x[1])
+    st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
+
+    if score > 0.7:
+        return base_complet[best]
+
+    # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
+    return gerer_modules_speciaux(qc)
+
+# --- Modules personnalisés (à enrichir) ---
+def gerer_modules_speciaux(qc):
+    if "analyse" in qc and "btc" in qc:
+        return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
+    if "horoscope" in qc:
+        return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+    if "météo" in qc and "paris" in qc:
+        return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+    # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
+def gerer_modules_speciaux(qc):
+    if "blague" in qc:
+        blagues = [
+            "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
+            "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
+            "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
+        ]
+        return random.choice(blagues)
+
+    # ... les autres modules (horoscope, météo, etc.)
+
+    return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
+        
+
+        # --- Interface utilisateur ---
+        st.title("💬 Chat AVA")
+
+        question_raw = st.chat_input("Posez votre question ici :")
+
+        if question_raw:
+            message_bot = trouver_reponse(question_raw)
+
+            with st.chat_message("user"):
+                st.markdown(question_raw)
+
+            with st.chat_message("assistant"):
+                st.markdown(message_bot)
+
 
 # Récupération de la question utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
@@ -1142,73 +1209,7 @@ if question:
         # Fusionner les deux dans une base complète
         base_complet = {**base_savoir, **reponses_courantes}
 
-        # --- Moteur central de réponse AVA ---
-        def trouver_reponse(question):
-            qc = nettoyer_texte(question)
-            st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
-
-            # 1. Direct
-            if qc in base_complet:
-                st.write("✅ Match direct trouvé")
-                return base_complet[qc]
-
-            # 2. Fuzzy
-            proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
-            if proche:
-                st.write(f"🔎 Match fuzzy : {proche[0]}")
-                return base_complet[proche[0]]
-
-            # 3. Sémantique
-            keys = list(base_complet.keys())
-            vb = model_semantic.encode(keys)
-            vq = model_semantic.encode([qc])[0]
-            sims = cosine_similarity([vq], vb)[0]
-            best, score = max(zip(keys, sims), key=lambda x: x[1])
-            st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
-
-            if score > 0.7:
-                return base_complet[best]
-
-            # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
-            return gerer_modules_speciaux(qc)
-
-        # --- Modules personnalisés (à enrichir) ---
-        def gerer_modules_speciaux(qc):
-            if "analyse" in qc and "btc" in qc:
-                return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-            if "horoscope" in qc:
-                return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-            if "météo" in qc and "paris" in qc:
-                return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
-            # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
-        def gerer_modules_speciaux(qc):
-            if "blague" in qc:
-                blagues = [
-                    "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
-                    "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
-                    "Pourquoi le Bitcoin fait du yoga ? Pour rester stable... mais c'est pas gagné ! 🧘‍♂️"
-                ]
-                return random.choice(blagues)
-
-            # ... les autres modules (horoscope, météo, etc.)
-
-            return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
         
-
-        # --- Interface utilisateur ---
-        st.title("💬 Chat AVA")
-
-        question_raw = st.chat_input("Posez votre question ici :")
-
-        if question_raw:
-            message_bot = trouver_reponse(question_raw)
-
-            with st.chat_message("user"):
-                st.markdown(question_raw)
-
-            with st.chat_message("assistant"):
-                st.markdown(message_bot)
-
 
         # --- Bloc Mini base générale (culture quotidienne) ---
         if not message_bot:
