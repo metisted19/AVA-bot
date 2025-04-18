@@ -182,36 +182,41 @@ if question:
         question_raw = st.chat_input("Posez votre question ici :")
 
         if question_raw:
-            qc = question_raw.lower()  # Assure-toi que qc est une chaîne de caractères
-            print(f"Question nettoyée : {qc}")  # Affiche la question nettoyée pour déboguer
-            message_bot = trouver_reponse(qc)
-
-        # --- Partie Horoscope ---
-        if any(mot in qc for mot in ["horoscope", "signe", "astrologie"]):
-            signes_disponibles = [
-                "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
-                "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
-            ]
-            signe_detecte = next((s for s in signes_disponibles if s in qc), None)
-            if not signe_detecte:
-                message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+            qc = question_raw.lower()  # Nettoyage de la question
+            print(f"Question nettoyée : {qc}")  # Pour vérifier que qc est bien une chaîne
+            if isinstance(qc, str) and qc:  # Vérifie si qc est une chaîne non vide
+                message_bot = trouver_reponse(qc)
             else:
-                try:
-                    url = "https://kayoo123.github.io/astroo-api/jour.json"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        data = response.json()
-                        horoscope_dict = data.get("signes", {}) if "signes" in data else data
-                        signe_data = horoscope_dict.get(signe_detecte.lower(), None)
-                        if signe_data:
-                            horoscope = signe_data.get("horoscope", "Aucun horoscope disponible")
-                            message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                message_bot = "⚠️ Il semble y avoir un problème avec la question. Essayez de reformuler."
+
+        if isinstance(qc, str) and qc:  # Vérifie que qc est bien une chaîne non vide
+            if any(mot in qc for mot in ["horoscope", "signe", "astrologie"]):
+                # Ton code ici pour l'horoscope
+                signes_disponibles = [
+                    "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
+                    "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
+                ]
+                signe_detecte = next((s for s in signes_disponibles if s in qc), None)
+                if not signe_detecte:
+                    message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+                else:
+                    try:
+                        url = "https://kayoo123.github.io/astroo-api/jour.json"
+                        response = requests.get(url)
+                        if response.status_code == 200:
+                            data = response.json()
+                            horoscope_dict = data.get("signes", {}) if "signes" in data else data
+                            signe_data = horoscope_dict.get(signe_detecte.lower(), None)
+                            if signe_data:
+                                horoscope = signe_data.get("horoscope", "Aucun horoscope disponible")
+                                message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                            else:
+                                message_bot = f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
                         else:
-                            message_bot = f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
-                    else:
-                        message_bot = "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
-                except Exception as e:
-                    message_bot = f"⚠️ Une erreur est survenue lors de la récupération de l'horoscope : {e}\n\n"
+                            message_bot = "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
+                    except Exception as e:
+                        message_bot = f"⚠️ Une erreur est survenue lors de la récupération de l'horoscope : {e}\n\n"
+
 
 
         # --- Analyse complète / technique ---
