@@ -1447,9 +1447,7 @@ if question:
         st.markdown(reponse)
 
     st.session_state.messages.append({"role": "assistant", "content": reponse})
-    # Nettoyage et traitement de la question
-    question_clean = question.lower().strip()
-    message_bot = trouver_reponse(question_clean)
+
 
     # Détecter la langue de la question et loguer le résultat
     try:
