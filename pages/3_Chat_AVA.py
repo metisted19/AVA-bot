@@ -1406,7 +1406,9 @@ def gerer_modules_speciaux(question_clean):
                 if question_base in question_clean:
                     message_bot = reponse_base
                     break
-
+                
+            if message_bot:
+                return message_bot
 
 
         
