@@ -1454,7 +1454,7 @@ if question:
         lang_question = detect(question)
     except Exception as e:
         lang_question = "fr"
-    if lang_question.lower() != "fr" and message_bot.strip():
+    if lang_question.lower() != "fr" and reponse.strip():
         traduction = traduire_deepl(message_bot, langue_cible=lang_question.upper())
         message_bot = traduction
 
