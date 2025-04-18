@@ -991,497 +991,495 @@ def gerer_modules_speciaux(question_clean):
         
 
         
-        # --- Bloc Quiz de culture générale ---
-        if not message_bot and any(mot in question_clean for mot in [
-            "quiz", "quizz", "question", "culture générale", "pose-moi une question", "teste mes connaissances"
-        ]):
-            quizz_culture = [
-                {"question": "🌍 Quelle est la capitale de l'Australie ?", "réponse": "canberra"},
-                {"question": "🧪 Quel est l'élément chimique dont le symbole est O ?", "réponse": "oxygène"},
-                {"question": "🖼️ Qui a peint la Joconde ?", "réponse": "léonard de vinci"},
-                {"question": "📚 Combien y a-t-il de continents sur Terre ?", "réponse": "7"},
-                {"question": "🚀 Quelle planète est la plus proche du Soleil ?", "réponse": "mercure"},
-                {"question": "🇫🇷 Qui a écrit 'Les Misérables' ?", "réponse": "victor hugo"},
-                {"question": "🎬 Quel film a remporté l'Oscar du meilleur film en 1998 avec 'Titanic' ?", "réponse": "titanic"},
-                {"question": "🐘 Quel est le plus grand animal terrestre ?", "réponse": "éléphant"},
-                {"question": "🎼 Quel musicien est surnommé 'le Roi de la Pop' ?", "réponse": "michael jackson"},
-                {"question": "⚽ Quelle nation a remporté la Coupe du Monde 2018 ?", "réponse": "france"},
-                {"question": "🗼 En quelle année a été inaugurée la Tour Eiffel ?", "réponse": "1889"},
-                {"question": "🧬 Que signifie l'acronyme ADN ?", "réponse": "acide désoxyribonucléique"},
-                {"question": "🎨 Quel peintre est célèbre pour avoir coupé une partie de son oreille ?", "réponse": "vincent van gogh"},
-                {"question": "🇮🇹 Dans quel pays se trouve la ville de Venise ?", "réponse": "italie"},
-                {"question": "🎭 Qui a écrit la pièce 'Hamlet' ?", "réponse": "william shakespeare"},
-                {"question": "📐 Quel est le nom du triangle qui a deux côtés de même longueur ?", "réponse": "triangle isocèle"},
-                {"question": "🔬 Quel scientifique a formulé la théorie de la relativité ?", "réponse": "albert einstein"},
-                {"question": "🌋 Quel volcan italien est célèbre pour avoir détruit Pompéi ?", "réponse": "vesuve"},
-                {"question": "🎤 Qui chante la chanson 'Someone Like You' ?", "réponse": "adele"},
-                {"question": "🗳️ Quel est le régime politique de la France ?", "réponse": "république"}
-            ]
-            question_choisie = random.choice(quizz_culture)
-            st.session_state["quiz_attendu"] = question_choisie["réponse"].lower()
-            message_bot = f"🧠 **Quiz Culture G** :\n{question_choisie['question']}\n\nRépondez directement !"
-
-        # --- Vérification de la réponse au quiz ---
-        elif "quiz_attendu" in st.session_state and st.session_state["quiz_attendu"]:
-            reponse_attendue = st.session_state["quiz_attendu"]
-            if question_clean.lower() == reponse_attendue:
-                message_bot = "✅ Bonne réponse ! Vous avez l’esprit affûté 🧠💪"
-            else:
-                message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
-            st.session_state["quiz_attendu"] = ""
-
-        if message_bot:
-            return message_bot
-
-        # --- Bloc Faits Insolites ---
-        # Liste des faits insolites (définie une seule fois)
-        faits_insolites = [
-            "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
-            "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
-            "🐌 Un escargot peut dormir pendant trois ans d’affilée.",
-            "🌋 Il y a plus de volcans sous l’eau que sur la terre ferme.",
-            "📦 Amazon a été fondée dans un garage... et maintenant, ils livrent même des frigos !",
-            "🧠 Le cerveau humain génère assez d’électricité pour allumer une petite ampoule.",
-            "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
-            "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
-            "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
-            "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !",
-            "🧊 Les manchots proposent parfois des galets comme cadeau de séduction.",
-            "🚀 Les astronautes peuvent grandir de quelques centimètres dans l’espace à cause de la microgravité.",
-            "🥶 L’eau chaude peut geler plus vite que l’eau froide. C’est l’effet Mpemba.",
-            "🐥 Les canetons s’attachent à la première chose qu’ils voient — c’est l’empreinte.",
-            "🍕 En Italie, il existe une pizza avec 111 sortes de fromages dessus !",
-            "🎵 Les abeilles peuvent reconnaître des visages humains… et elles adorent les sons aigus.",
-            "🌍 Il y a plus d’arbres sur Terre que d’étoiles dans la Voie lactée.",
-            "👅 La langue est aussi unique qu’une empreinte digitale.",
-            "🚿 En moyenne, une personne passe **6 mois de sa vie sous la douche**.",
-            "🎈 Une banane est techniquement une baie. Mais pas la fraise !",
-            "🦙 Les alpagas peuvent cracher… mais seulement s’ils sont vraiment énervés.",
-            "⏳ Les crocodiles peuvent vivre plus de 100 ans… et certains ne meurent que de vieillesse.",
-            "🐓 Les poules peuvent se souvenir de plus de 100 visages humains ou animaux.",
-            "🦇 Les chauves-souris tournent toujours à gauche en sortant d’une grotte.",
-            "🛸 Il existe un endroit sur Terre où la gravité semble inversée : la Mystery Spot en Californie.",
-            "🎮 Un gamer japonais détient le record mondial du plus long temps passé à jouer sans pause : 35 heures !",
-            "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
-            "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
-            "🐠 Certains poissons changent de sexe au cours de leur vie.",
-            "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie.",
-            "🦷 Les requins ont une infinité de dents : dès qu’une tombe, une autre pousse instantanément.",
-            "🌌 On connaît mieux la surface de Mars que les fonds marins de la Terre.",
-            "🥦 Le brocoli contient plus de protéines que certains morceaux de bœuf… oui, vraiment.",
-            "🛏️ On passe environ un tiers de notre vie à dormir, soit environ 25 ans !",
-            "📚 La bibliothèque du Vatican contient des textes qui n’ont pas été lus depuis des siècles.",
-            "🦵 Les autruches peuvent courir plus vite qu’un cheval… et changer de direction net sans freiner.",
-            "🪐 Sur Vénus, un jour dure plus longtemps qu’une année complète !",
-            "🦜 Certains perroquets peuvent apprendre plus de 100 mots humains… et les utiliser à bon escient.",
-            "🥚 En moyenne, une poule pond environ 300 œufs par an.",
-            "🌻 Les tournesols suivent réellement le soleil dans le ciel quand ils grandissent. C’est l’héliotropisme.",
-            "📏 Si tu pouvais plier une feuille de papier 42 fois, elle atteindrait la Lune.",
-            "🥶 Le sang d’un poisson antarctique peut rester liquide même en dessous de 0°C grâce à une protéine antigel.",
-            "🧃 Le Coca-Cola serait vert sans colorant.",
-            "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
-            "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
+    # --- Bloc Quiz de culture générale ---
+    if not message_bot and any(mot in question_clean for mot in [
+        "quiz", "quizz", "question", "culture générale", "pose-moi une question", "teste mes connaissances"
+    ]):
+        quizz_culture = [
+            {"question": "🌍 Quelle est la capitale de l'Australie ?", "réponse": "canberra"},
+            {"question": "🧪 Quel est l'élément chimique dont le symbole est O ?", "réponse": "oxygène"},
+            {"question": "🖼️ Qui a peint la Joconde ?", "réponse": "léonard de vinci"},
+            {"question": "📚 Combien y a-t-il de continents sur Terre ?", "réponse": "7"},
+            {"question": "🚀 Quelle planète est la plus proche du Soleil ?", "réponse": "mercure"},
+            {"question": "🇫🇷 Qui a écrit 'Les Misérables' ?", "réponse": "victor hugo"},
+            {"question": "🎬 Quel film a remporté l'Oscar du meilleur film en 1998 avec 'Titanic' ?", "réponse": "titanic"},
+            {"question": "🐘 Quel est le plus grand animal terrestre ?", "réponse": "éléphant"},
+            {"question": "🎼 Quel musicien est surnommé 'le Roi de la Pop' ?", "réponse": "michael jackson"},
+            {"question": "⚽ Quelle nation a remporté la Coupe du Monde 2018 ?", "réponse": "france"},
+            {"question": "🗼 En quelle année a été inaugurée la Tour Eiffel ?", "réponse": "1889"},
+            {"question": "🧬 Que signifie l'acronyme ADN ?", "réponse": "acide désoxyribonucléique"},
+            {"question": "🎨 Quel peintre est célèbre pour avoir coupé une partie de son oreille ?", "réponse": "vincent van gogh"},
+            {"question": "🇮🇹 Dans quel pays se trouve la ville de Venise ?", "réponse": "italie"},
+            {"question": "🎭 Qui a écrit la pièce 'Hamlet' ?", "réponse": "william shakespeare"},
+            {"question": "📐 Quel est le nom du triangle qui a deux côtés de même longueur ?", "réponse": "triangle isocèle"},
+            {"question": "🔬 Quel scientifique a formulé la théorie de la relativité ?", "réponse": "albert einstein"},
+            {"question": "🌋 Quel volcan italien est célèbre pour avoir détruit Pompéi ?", "réponse": "vesuve"},
+            {"question": "🎤 Qui chante la chanson 'Someone Like You' ?", "réponse": "adele"},
+            {"question": "🗳️ Quel est le régime politique de la France ?", "réponse": "république"}
         ]
-        # Gestion de la demande "fait insolite"
-        if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
-            if 'derniere_fait' not in st.session_state:
-                st.session_state['derniere_fait'] = random.choice(faits_insolites)
-            message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
+        question_choisie = random.choice(quizz_culture)
+        st.session_state["quiz_attendu"] = question_choisie["réponse"].lower()
+        message_bot = f"🧠 **Quiz Culture G** :\n{question_choisie['question']}\n\nRépondez directement !"
 
+    # --- Vérification de la réponse au quiz ---
+    elif "quiz_attendu" in st.session_state and st.session_state["quiz_attendu"]:
+        reponse_attendue = st.session_state["quiz_attendu"]
+        if question_clean.lower() == reponse_attendue:
+            message_bot = "✅ Bonne réponse ! Vous avez l’esprit affûté 🧠💪"
+        else:
+            message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
+        st.session_state["quiz_attendu"] = ""
 
-        # Gestion de la demande "encore un" ou "plus" pour les faits insolites
-        if any(mot in question_clean for mot in ["encore un", "un autre","encore"]):
-            if 'derniere_fait' in st.session_state:
-                message_bot = f"✨ Voici une autre anecdote :\n\n{random.choice(faits_insolites)}"
-            else:
-                message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
-
-        if any(mot in question_clean for mot in ["encore une", "une autre"]):
-            if 'derniere_fait' in st.session_state:
-                message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
-            else:
-                message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
-
-        if message_bot:
-            return message_bot
-        
-        # --- Bloc Recettes rapides 
-        recettes = [
-            "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
-            "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
-            "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
-            "🥗 **Salade express** : tomates cerises, mozzarella, roquette, huile d’olive, vinaigre balsamique.",
-            "🌯 **Wrap poulet-crudités** : galette + restes de poulet + salade + sauce yaourt.",
-            "🥔 **Pommes de terre sautées** : en cubes, à la poêle avec ail et persil. Parfait avec des œufs !",
-            "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes.",
-            "🍞 **Croque-monsieur rapide** : pain de mie, jambon, fromage, 5 min au grill ou à la poêle.",
-            "🥒 **Tartines fraîcheur** : pain grillé, fromage frais, concombre, citron et herbes.",
-            "🍚 **Riz sauté aux légumes** : reste de riz + légumes + œuf + sauce soja. Un wok express !",
-            "🍗 **Poulet minute au curry** : dés de poulet + crème + curry + oignon, à la poêle en 10 min.",
-            "🍳 **Œufs brouillés crémeux** : œufs + beurre + sel + poivre, cuisson douce pour onctuosité.",
-            "🧄 **Pâtes ail-persil** : ail doré à la poêle, persil frais, huile d’olive, et hop sur les pâtes !",
-            "🥑 **Toast avocat-œuf** : pain grillé + avocat écrasé + œuf au plat ou mollet.",
-            "🌮 **Tacos express** : galette + steak haché ou haricots + tomate + salade + sauce.",
-            "🥔 **Gratin express au micro-ondes** : pommes de terre en tranches fines + crème + fromage.",
-            "🍅 **Tomates mozzarella** : tranches de tomates + mozzarella + basilic + huile d’olive. Simple et frais.",
-            "🧀 **Quesadilla express** : deux tortillas + fromage + restes au choix + poêle 5 min chaque côté.",
-            "🍳 **Mini shakshuka rapide** : tomates en dés + œufs + cumin dans une petite poêle. Un délice !",
-            "🥣 **Bowl sucré express** : fromage blanc + fruits + flocons d’avoine + miel. Parfait au petit dej.",
-            "🥕 **Bâtonnets carottes-concombre** : trempés dans du houmous ou une sauce yaourt. Frais et sain.",
-            "🍞 **Pain perdu rapide** : tranches de pain + œuf + lait + sucre, à la poêle jusqu’à dorure.",
-            "🍠 **Patate douce micro-ondes** : piquée à la fourchette, 7 min puissance max, à garnir à volonté.",
-            "🥒 **Taboulé express** : semoule, tomate, menthe, citron, huile d’olive. Hydratation 5 min à l’eau chaude.",
-            "🍌 **Banana pancakes** : 1 banane + 2 œufs, mélangés et cuits en petites galettes. Sans farine !",
-            "🧈 **Wrap beurre de cacahuète-banane** : rapide, énergétique, parfait en collation !",
-            "🍽️ **Assiette anti-gaspi** : reste de pâtes, légumes et un œuf, mélangés et poêlés façon wok !",
-            "🍜 **Nouilles instant maison** : nouilles + bouillon + œuf + légumes râpés. Prêt en 7 minutes top chrono !",
-            "🥓 **Œuf cocotte express** : œuf + crème + fromage dans un ramequin, 1 min au micro-ondes.",
-            "🌽 **Galette de maïs rapide** : maïs + œuf + farine + épices, cuit à la poêle façon pancake salé.",
-            "🍕 **Mini pizzas pain de mie** : pain de mie, sauce tomate, fromage, garniture au choix, 10 min au four.",
-            "🍄 **Poêlée champignons ail-persil** : champignons frais, ail, persil, et huile d’olive. Simple & savoureux.",
-            "🌯 **Wrap sucré pomme-cannelle** : pomme râpée, cannelle, un filet de miel, le tout roulé dans une galette.",
-            "🍳 **Tortilla minute** : œufs battus + restes de légumes + fromage, à la poêle comme une omelette épaisse.",
-            "🧀 **Boulettes express** : steak haché + chapelure + épices, façonnées et dorées en 5 min à la poêle.",
-            "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
-            "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
-        ]
-        # Gestion de la demande "recette"
-        if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
-            if 'derniere_recette' not in st.session_state:
-                st.session_state['derniere_recette'] = random.choice(recettes)
-            message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
-    
-        # Gestion de la demande "encore un" ou "plus" pour les recettes
-        if any(mot in question_clean for mot in ["encore une", "une autre"]):
-            if 'derniere_recette' in st.session_state:
-                message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
-            else:
-                message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
-        if message_bot:
-            return message_bot
-
-        # ─── 4) Bases de réponses ───────────────────────────────────────────────────
-        # 4.a) Hard‑codées
-        reponses_courantes = {
-            "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
-            "ça va": "Je vais bien, merci de demander ! Et vous ?",
-            "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-            "hello": "Hello! How can I assist you today?",
-            "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-            "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-            "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-            "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-            "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-            "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-            "tu m'entends": "Je vous entends fort et clair 🎧",
-            "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-            "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-            "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
-            "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
-            "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-            "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
-            "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-            "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
-            "re": "Re bienvenue à bord ! On continue notre mission ?",
-            "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-            "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-            "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-            "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
-            "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
-            "salut çava": "Salut ! Je vais très bien, merci 😊 Et vous ?",
-        }   
-        base_savoir = {
-            # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
-            "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
-            "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
-            "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
-            "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
-            "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
-            "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
-            "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
-            "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
-            "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
-            "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
-            "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
-            "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",
-            "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
-            "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
-            "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
-            "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
-            "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
-            "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
-            "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
-            "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
-            "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
-            "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
-            "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
-            "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
-            "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
-            "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
-            "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
-        }
-        # Fusionner les deux dans une base complète
-        base_complet = {**base_savoir, **reponses_courantes}
-
-        
-
-        # --- Bloc Mini base générale (culture quotidienne) ---
-        if not message_bot:
-
-            base_generale = {
-                # 🌍 Météo & nature
-                "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
-                "qu'est-ce qu'un ouragan": "🌀 Un ouragan est une tempête tropicale très puissante, formée au-dessus des océans chauds.",
-                "comment se forme un arc-en-ciel": "🌈 Un arc-en-ciel se forme par la réfraction, la réflexion et la dispersion de la lumière dans les gouttelettes d'eau.",
-                "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
-                "qu'est-ce qu'un ouragan": "🌀 Un ouragan est une tempête tropicale très puissante, formée au-dessus des océans chauds.",
-                "comment se forme un arc-en-ciel": "🌈 Un arc-en-ciel se forme par la réfraction, la réflexion et la dispersion de la lumière dans les gouttelettes d'eau.",
-                "qu'est-ce qu'une tornade": "🌪️ Une tornade est une colonne d'air en rotation rapide qui touche le sol, souvent destructrice.",
-                "quelle est la température la plus basse jamais enregistrée": "❄️ La température la plus basse a été enregistrée en Antarctique : -89,2°C à la station Vostok.",
-                "pourquoi le ciel est bleu": "☀️ La lumière du Soleil se diffuse dans l’atmosphère. Le bleu est plus dispersé, d'où la couleur du ciel.",
-                "pourquoi les feuilles tombent en automne": "🍂 Les arbres perdent leurs feuilles pour économiser de l’eau et de l’énergie pendant l’hiver.",
-                "comment naît un orage": "⚡ Un orage naît d’un choc thermique entre de l’air chaud et humide et de l’air froid en altitude.",
-                "qu'est-ce que le changement climatique": "🌍 C’est l'évolution à long terme du climat de la Terre, causée en partie par les activités humaines.",
-                "comment se forme la neige": "❄️ La neige se forme quand les gouttelettes d’eau dans les nuages gèlent et tombent sous forme de cristaux.",
-                "qu'est-ce qu'un tsunami": "🌊 Un tsunami est une vague géante causée par un séisme ou une éruption sous-marine.",
-                "qu'est-ce qu'un séisme": "🌍 Un séisme est un tremblement de terre provoqué par des mouvements de plaques tectoniques.",
-                "pourquoi y a-t-il des saisons": "🌦️ Les saisons existent à cause de l’inclinaison de la Terre sur son axe et de sa révolution autour du Soleil.",
-                "c'est quoi une marée": "🌊 Une marée est le mouvement périodique de montée et de descente du niveau de la mer, influencé par la Lune.",
-                "comment se forment les nuages": "☁️ Les nuages se forment lorsque la vapeur d’eau se condense autour de particules fines dans l’air.",
-                "qu'est-ce que le réchauffement climatique": "🔥 Le réchauffement climatique est l’augmentation progressive de la température moyenne de la Terre, principalement due aux gaz à effet de serre.",
-                "qu'est-ce qu'une éruption volcanique": "🌋 C’est l’expulsion de lave, cendres et gaz par un volcan en activité.",
-                "quelle est la température moyenne sur Terre": "🌍 La température moyenne sur Terre est d’environ 15°C, mais elle varie selon les régions et les saisons.",
-                "quels sont les gaz à effet de serre": "💨 Dioxyde de carbone, méthane, vapeur d’eau, ozone… ce sont les principaux gaz responsables du réchauffement climatique.",
-    
-                # 🐾 Animaux
-                "combien de cœurs a une pieuvre": "🐙 Une pieuvre a **trois cœurs** ! Deux pour les branchies et un pour le corps.",
-                "quel est l’animal le plus rapide du monde": "🐆 Le guépard est l’animal terrestre le plus rapide, avec une pointe à 112 km/h.",
-                "quel animal pond des œufs mais allaite": "🦘 L’ornithorynque ! Un mammifère unique qui pond des œufs et allaite ses petits.",
-                "quel est l’animal le plus grand du monde": "🐋 La **baleine bleue** est l’animal le plus grand, pouvant dépasser 30 mètres de long.",
-                "quel est l’animal le plus petit": "🦠 Le **colibri d’Hélène** est l’un des plus petits oiseaux, pesant moins de 2 grammes.",
-                "quel animal vit le plus longtemps": "🐢 La **tortue géante** peut vivre plus de 150 ans !",
-                "quel est l’oiseau qui ne vole pas": "🐧 Le **manchot** est un oiseau qui ne vole pas mais excelle dans l’eau.",
-                "quel animal change de couleur": "🦎 Le **caméléon** peut changer de couleur pour se camoufler ou communiquer.",
-                "quels animaux hibernent": "🐻 L’ours, la marmotte ou encore le hérisson **hibernent** pendant l’hiver.",
-                "quel animal a la meilleure vue": "🦅 L’**aigle** a une vue perçante, capable de repérer une proie à des kilomètres.",
-                "quel est le plus gros félin": "🐅 Le **tigre de Sibérie** est le plus gros des félins sauvages.",
-                "quel animal pond le plus d'œufs": "🐔 La **poule** peut pondre jusqu’à 300 œufs par an, mais certains poissons comme le cabillaud pondent des millions d'œufs !",
-                "quel animal vit dans les abysses": "🌌 Le **poisson-lanterne** est l’un des habitants étranges des abysses marins.",
-                "quels animaux vivent en meute": "🐺 Les **loups**, les **chiens sauvages** ou encore les **hyènes** vivent en meute pour chasser.",
-                "quel animal a la langue la plus longue": "👅 Le **caméléon** peut projeter sa langue jusqu’à deux fois la longueur de son corps.",
-                "quel animal a le venin le plus mortel": "☠️ Le **cône géographique**, un petit escargot marin, possède un venin redoutable.",
-                "quel est l’animal le plus rapide dans l’eau": "🐬 Le **voilier de l’Indo-Pacifique** peut nager à près de 110 km/h !",
-                "quel est le cri du renard": "🦊 Le renard pousse un cri strident, souvent assimilé à un hurlement ou un aboiement sec.",
-                "quel animal peut survivre dans l’espace": "🛰️ Le **tardigrade**, aussi appelé ourson d’eau, est capable de survivre au vide spatial.",
-                "quels animaux sont nocturnes": "🌙 Les **chauves-souris**, **hiboux** ou encore **félins** sont actifs principalement la nuit.",
-                "quel est l’animal le plus bruyant": "📣 Le **cachalot** émet les sons les plus puissants du règne animal, jusqu'à 230 décibels !",
-                "quel animal a le plus grand nombre de dents": "🦈 Le **requin** peut avoir jusqu’à **3000 dents**, renouvelées en permanence.",
-                "quel est l’animal le plus intelligent": "🧠 Le **dauphin** est l’un des animaux les plus intelligents, capable d’utiliser des outils et de communiquer de manière complexe.",
-                "quel animal dort le moins": "🌙 La **girafe** dort moins de 2 heures par jour en moyenne.",
-                "quel animal a le plus de pattes": "🪱 Le **mille-pattes Illacme plenipes** peut avoir jusqu’à **750 pattes** !",
-                "quel animal peut marcher sur l’eau": "🦎 Le **basilic** est surnommé 'lézard Jésus-Christ' car il peut courir sur l’eau.",
-                "quel animal est immortel": "♾️ La **méduse Turritopsis dohrnii** peut retourner à son stade juvénile, ce qui la rend théoriquement immortelle.",
-                "quel animal a la meilleure ouïe": "👂 Le **grand duc** et la **chauve-souris** sont champions de l’audition, capables d’entendre des ultrasons imperceptibles pour nous.",
-                "quel est l’animal le plus toxique": "☠️ La **grenouille dorée** d’Amérique du Sud produit une toxine mortelle, même en très faible dose.",
-                "quel est l’animal le plus ancien": "⏳ Le **trilobite**, aujourd’hui disparu, est l’un des premiers animaux complexes, apparu il y a plus de 500 millions d’années.",
-
-    
-                # 🔬 Science
-                "qu'est-ce que la gravité": "🌌 La gravité est une force qui attire deux masses l'une vers l'autre, comme la Terre attire les objets vers elle.",
-                "combien de planètes dans le système solaire": "🪐 Il y a 8 planètes : Mercure, Vénus, Terre, Mars, Jupiter, Saturne, Uranus, Neptune.",
-                "quelle est la plus petite particule": "⚛️ Le quark est l'une des plus petites particules connues dans la physique quantique.",
-                "qu'est-ce qu'un atome": "⚛️ Un **atome** est la plus petite unité de matière, composée d’électrons, de protons et de neutrons.",
-                "quelle est la différence entre masse et poids": "⚖️ La **masse** est constante, le **poids** dépend de la gravité. On pèse moins sur la Lune que sur Terre !",
-                "qu'est-ce que l'effet de serre": "🌍 L’**effet de serre** est un phénomène naturel qui retient la chaleur dans l’atmosphère grâce à certains gaz.",
-                "qu'est-ce qu'un trou noir": "🕳️ Un **trou noir** est une région de l’espace où la gravité est si forte que même la lumière ne peut s’en échapper.",
-                "quelle est la vitesse de la lumière": "💡 Environ **299 792 km/s**. C’est la vitesse maximale dans l’univers selon la physique actuelle.",
-                "qu'est-ce que l'ADN": "🧬 L’**ADN** est la molécule qui contient toutes les instructions génétiques d’un être vivant.",
-                "comment fonctionne un aimant": "🧲 Un **aimant** attire certains métaux grâce à un champ magnétique généré par ses électrons.",
-                "qu'est-ce que l'électricité": "⚡ C’est un flux de particules appelées **électrons** circulant dans un conducteur.",
-                "qu'est-ce que le big bang": "🌌 Le **Big Bang** est la théorie selon laquelle l’univers a commencé par une énorme explosion il y a 13,8 milliards d’années.",
-                "comment se forme une étoile": "⭐ Une **étoile** naît dans un nuage de gaz et de poussière qui s’effondre sous sa propre gravité.",
-                "qu'est-ce que l’ADN": "🧬 L’ADN est une molécule porteuse d'informations génétiques, présente dans chaque cellule.",
-                "qu'est-ce que la photosynthèse": "🌱 C’est le processus par lequel les plantes transforment la lumière du soleil en énergie.",
-                "qu'est-ce qu'une éclipse": "🌑 Une **éclipse** se produit quand la Lune ou la Terre se place entre le Soleil et l’autre corps, bloquant partiellement la lumière.",
-                "quelle est la température du soleil": "☀️ La surface du Soleil atteint environ **5 500°C**, mais son noyau dépasse les **15 millions de degrés** !",
-                "qu'est-ce qu'un vaccin": "💉 Un **vaccin** stimule le système immunitaire pour qu’il apprenne à se défendre contre un virus ou une bactérie.",
-                "c’est quoi un neutron": "🧪 Un **neutron** est une particule subatomique présente dans le noyau des atomes, sans charge électrique.",
-                "qu'est-ce que la matière noire": "🌌 La **matière noire** est une substance invisible qui compose une grande partie de l’univers, détectée uniquement par ses effets gravitationnels.",
-                "qu'est-ce qu'une cellule souche": "🧫 Une **cellule souche** peut se transformer en différents types de cellules spécialisées. Elle est essentielle en médecine régénérative.",
-                "quelle est la différence entre virus et bactérie": "🦠 Les **bactéries** sont des organismes vivants autonomes, les **virus** ont besoin d'une cellule pour se reproduire.",
-                "comment fonctionne un laser": "🔴 Un **laser** produit un faisceau lumineux très concentré en amplifiant la lumière dans une seule direction.",
-                "comment vole un avion": "✈️ Grâce à la **portance** générée par les ailes. L’air circule plus vite au-dessus qu’en dessous, ce qui crée une force vers le haut.",
-                "qu'est-ce que l’intelligence artificielle": "🤖 L’**IA** est un ensemble de technologies qui permettent à des machines d’imiter certaines fonctions humaines comme apprendre ou résoudre des problèmes.",
-                "qu'est-ce que l’ARN": "🧬 L’**ARN** est une molécule qui transmet les instructions génétiques de l’ADN pour produire des protéines.",
-                "comment naît un arc électrique": "⚡ Un **arc électrique** se forme quand un courant saute dans l’air entre deux conducteurs, comme dans un éclair ou un poste haute tension.",
-                "qu'est-ce qu’un proton": "🧪 Un **proton** est une particule subatomique à charge positive, présente dans le noyau des atomes.",
-                "comment fonctionne une fusée": "🚀 Une **fusée** avance en projetant des gaz à grande vitesse vers l’arrière, selon le principe d’action-réaction de Newton.",
-    
-                # 📚 Histoire
-                "qui était napoléon": "👑 Napoléon Bonaparte était un empereur français du XIXe siècle, célèbre pour ses conquêtes militaires.",
-                "en quelle année la tour eiffel a été construite": "🗼 Elle a été achevée en **1889** pour l'Exposition universelle de Paris.",
-                "quelle guerre a eu lieu en 1914": "⚔️ La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918.","qui a découvert l'amérique": "🌎 **Christophe Colomb** a découvert l’Amérique en 1492, même si des peuples y vivaient déjà.",
-                "quand a eu lieu la révolution française": "⚔️ La **Révolution française** a commencé en **1789** et a profondément changé la société française.",
-                "qui était cléopâtre": "👑 **Cléopâtre** était la dernière reine d'Égypte, célèbre pour son intelligence et son alliance avec Jules César.",
-                "quand a eu lieu la seconde guerre mondiale": "🌍 La **Seconde Guerre mondiale** a duré de **1939 à 1945** et impliqué de nombreux pays du globe.",
-                "qui était charlemagne": "🛡️ **Charlemagne** était un empereur franc du Moyen Âge, considéré comme le père de l’Europe.",
-                "qui a construit les pyramides": "🔺 Les **anciens Égyptiens** ont construit les pyramides il y a plus de 4 500 ans comme tombes pour les pharaons.",
-                "quand l’homme a-t-il marché sur la lune": "🌕 **Neil Armstrong** a posé le pied sur la Lune le **20 juillet 1969** lors de la mission Apollo 11.",
-                "qui était hitler": "⚠️ **Adolf Hitler** était le dictateur de l’Allemagne nazie, responsable de la Seconde Guerre mondiale et de la Shoah.",
-                "qu’est-ce que la guerre froide": "🧊 La **guerre froide** fut une période de tension entre les États-Unis et l’URSS entre 1947 et 1991, sans affrontement direct.",
-                "qui a inventé l’imprimerie": "🖨️ **Gutenberg** a inventé l’imprimerie moderne au 15e siècle, révolutionnant la diffusion du savoir.",
-                "qui était louis xiv": "👑 **Louis XIV**, aussi appelé le Roi Soleil, a régné sur la France pendant 72 ans, de 1643 à 1715.",
-                "quelle est la plus ancienne civilisation connue": "🏺 La **civilisation sumérienne** en Mésopotamie est l’une des plus anciennes connues, datant de -3000 av. J.-C.",
-                "quand a été signée la déclaration des droits de l’homme": "📝 En **1789**, pendant la Révolution française.",
-                "qu’est-ce que la renaissance": "🎨 Une période de renouveau artistique et scientifique en Europe, entre le 14e et le 17e siècle.",
-                "qui a aboli l’esclavage en france": "✊ **Victor Schoelcher** a joué un rôle clé dans l’abolition de l’esclavage en 1848 en France.",
-                "qui était jules césar": "🏛️ **Jules César** était un général et homme politique romain, célèbre pour avoir transformé la République romaine en Empire.",
-                "quand a eu lieu la chute de l’empire romain": "🏰 Elle a eu lieu en **476 après J.-C.**, marquant la fin de l’Antiquité en Europe occidentale.",
-                "quand a été fondée la république française": "🇫🇷 La **Première République française** a été proclamée en **1792**, après la chute de la monarchie.",
-                "qu’est-ce que la révolution industrielle": "⚙️ Une période de profonds changements économiques et technologiques entre le 18e et le 19e siècle.",
-                "qui a déclenché la première guerre mondiale": "🔫 L’assassinat de **l’archiduc François-Ferdinand** d’Autriche en 1914 a été l’élément déclencheur.",
-                "qu’est-ce que le mur de berlin": "🧱 Le **mur de Berlin** séparait l’Allemagne de l’Est et de l’Ouest de 1961 à 1989, symbole de la guerre froide.",
-                "qui était marie-antoinette": "👑 **Marie-Antoinette** était la reine de France épouse de Louis XVI, exécutée pendant la Révolution française.",
-                "quand a été signé le traité de versailles": "📜 Le **traité de Versailles** a été signé en **1919** pour mettre fin à la Première Guerre mondiale.",
-                "quand a commencé l’antiquité": "🏺 L’**Antiquité** commence vers **-3000 av. J.-C.** avec l’invention de l’écriture.",
-    
-                # 🧠 Connaissances générales
-                "quelle est la langue officielle du brésil": "🇧🇷 C’est le **portugais**.",
-                "combien de dents a un adulte": "🦷 Un adulte possède généralement **32 dents**.",
-                "qu'est-ce que le code morse": "📡 C’est un système de communication utilisant des points et des tirets.",
-                "quelle est la langue la plus parlée au monde": "🗣️ Le mandarin (chinois) est la langue la plus parlée au monde en nombre de locuteurs natifs.",
-                "quelle est la langue officielle du brésil": "🇧🇷 La langue officielle du Brésil est le **portugais**.",
-                "combien de dents a un adulte": "🦷 Un adulte possède généralement **32 dents**.",
-                "qu'est-ce que le code morse": "📡 C’est un système de communication utilisant des points et des tirets pour représenter des lettres.",
-                "qui a inventé l'imprimerie": "🖨️ **Johannes Gutenberg** a inventé l'imprimerie moderne vers 1450.",
-                "quel est l’aliment le plus consommé au monde": "🍚 Le **riz** est l’un des aliments les plus consommés sur la planète.",
-                "combien de litres d’eau faut-il pour faire un jean": "👖 Il faut environ **7 000 à 10 000 litres** d'eau pour fabriquer un seul jean.",
-                "quel est l'objet le plus utilisé au quotidien": "📱 Le **téléphone portable** est l’objet le plus utilisé au quotidien.",
-                "qu’est-ce que le pH": "🧪 Le pH mesure l’acidité ou l’alcalinité d’une solution, de 0 (acide) à 14 (alcalin).",
-                "combien de pays font partie de l’Union européenne": "🇪🇺 L’Union européenne regroupe **27 pays membres** (après le Brexit).",
-                "combien de lettres dans l’alphabet": "🔤 L’alphabet latin compte **26 lettres**.",
-                "quelle est la monnaie du japon": "💴 La monnaie du Japon est le **yen**.",
-                "quel est le sport le plus pratiqué dans le monde": "⚽ Le football est le sport le plus populaire et pratiqué dans le monde.",
-                "qu’est-ce qu’un QR code": "🔳 Un QR code est un code barre 2D qui peut contenir des liens, des infos ou des paiements.",
-                "qu’est-ce qu’un satellite": "🛰️ Un satellite est un objet placé en orbite autour d'une planète pour collecter ou transmettre des données.",
-                "que veut dire wifi": "📶 Wi-Fi signifie **Wireless Fidelity**, une technologie sans fil pour transmettre des données.",
-                "combien y a-t-il de côtés dans un hexagone": "🔺 Un hexagone a **6 côtés**.",
-                "qu’est-ce que l’ADN": "🧬 L’ADN (acide désoxyribonucléique) contient toutes les informations génétiques d’un être vivant.",
-                "quelle est la capitale de l’Espagne": "🇪🇸 La capitale de l’Espagne est **Madrid**.",
-                "quelle est la monnaie des États-Unis": "💵 La monnaie des États-Unis est le **dollar américain**.",
-                "qu’est-ce que la photosynthèse": "🌱 La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie.",
-                "combien de secondes dans une heure": "⏱️ Il y a **3 600 secondes** dans une heure.",
-                "qu’est-ce qu’un volcan": "🌋 C’est une ouverture de la croûte terrestre par laquelle s’échappent des gaz, des cendres et de la lave.",
-                "qu’est-ce qu’une éclipse solaire": "🌞🌑 C’est quand la Lune passe entre la Terre et le Soleil, cachant partiellement ou totalement la lumière du Soleil.",
-                "quelle est la mer la plus salée": "🧂 La **mer Morte** est la plus salée au monde, avec une salinité extrême.",
-                "qu’est-ce que l’énergie renouvelable": "♻️ C’est une énergie qui se régénère naturellement : soleil, vent, eau, géothermie ou biomasse.",
-                "qu’est-ce que la biodiversité": "🦋 La biodiversité désigne la variété des espèces vivantes sur Terre, essentielles à l’équilibre écologique.",
-                "quel est le plus grand désert du monde": "🏜️ Le plus grand désert est **l’Antarctique**. Oui, c’est un désert de glace !",
-                # 🧮 Maths & Logique
-                "quelle est la racine carrée de 64": "📐 La racine carrée de 64 est **8**.",
-                "combien font 7 fois 9": "🧠 7 multiplié par 9 égale **63**.",
-                "quel est le chiffre pi": "🔢 Le chiffre **pi (π)** est une constante mathématique d’environ **3,14159**.",
-                "combien y a-t-il de côtés dans un hexagone": "📏 Un **hexagone** possède **6 côtés**.",
-                "quel est le plus grand nombre premier connu": "💡 Le plus grand nombre premier connu est gigantesque, avec **plus de 24 millions de chiffres** !",
-                "qu'est-ce qu'un nombre pair": "⚖️ Un **nombre pair** est divisible par 2 sans reste, comme 2, 4, 6, etc.",
-                "qu’est-ce qu’un triangle isocèle": "🔺 Un **triangle isocèle** a deux côtés de même longueur.",
-                "qu’est-ce qu’un pourcentage": "📊 Un **pourcentage** représente une proportion sur 100.",
-                "quelle est la moitié de 250": "✂️ La moitié de 250 est **125**.",
-                "comment convertir des degrés en radians": "🧮 Multipliez les degrés par π et divisez par 180 pour obtenir des **radians**.",
-                "qu’est-ce qu’un multiple": "🔁 Un **multiple** d’un nombre est le résultat de sa multiplication par un entier.",
-                "qu’est-ce que le théorème de pythagore": "📐 Dans un triangle rectangle, **a² + b² = c²**, où c est l’hypoténuse.",
-                "quelle est la racine carrée de 144": "🧮 La racine carrée de 144 est **12**.",
-                "combien font 12 fois 8": "📊 12 multiplié par 8 égale **96**.",
-                "quels sont les angles d'un triangle équilatéral": "🔺 Dans un **triangle équilatéral**, tous les angles mesurent **60°**.",
-                "quel est le plus grand carré parfait": "📏 Le plus grand carré parfait connu est un nombre dont la racine est un nombre entier, comme **64** qui est 8².",
-                "qu'est-ce qu'un nombre premier": "🔢 Un **nombre premier** est un nombre qui n’a que deux diviseurs : 1 et lui-même.",
-                "qu'est-ce qu'un carré magique": "🔢 Un **carré magique** est une grille où la somme des nombres dans chaque ligne, chaque colonne et chaque diagonale est la même.",
-                "comment résoudre une équation du second degré": "🧠 Pour résoudre une équation du second degré, on utilise la formule **ax² + bx + c = 0**, et la discriminante **Δ = b² - 4ac**.",
-                "quels sont les angles d'un triangle rectangle": "📐 Un **triangle rectangle** possède un angle de **90°**, et les deux autres angles sont complémentaires.",
-                "combien d'heures dans une journée": "⏰ Il y a **24 heures** dans une journée.",
-                "quelle est la somme des angles d'un triangle": "📏 La somme des angles d’un triangle est toujours égale à **180°**.",
-                "qu'est-ce qu'un logarithme": "🧮 Un **logarithme** est l'inverse de l'exponentiation. Par exemple, **log₁₀(100)** = 2, car 10² = 100.",
-                "qu'est-ce qu'une série arithmétique": "🔢 Une **série arithmétique** est une suite de nombres où chaque terme est obtenu en ajoutant une constante à son prédécesseur.",
-                "qu'est-ce qu'une fonction affine": "🧮 Une **fonction affine** est une fonction de la forme **f(x) = ax + b**, où a est la pente et b l'ordonnée à l'origine.",
-    
-                # 🗺️ Géographie bonus
-                "quel est le plus long fleuve du monde": "🌊 Le Nil et l’Amazone se disputent le titre, mais l’Amazone est souvent considéré comme le plus long.",
-                "quel est le pays le plus peuplé": "👥 La Chine est le pays le plus peuplé, avec plus d’1,4 milliard d’habitants.",
-                "quel est le plus grand désert du monde": "🏜️ Le **désert de l’Antarctique** est le plus grand au monde, même s’il est froid !",
-                "quelle est la plus haute montagne du monde": "🗻 L’**Everest**, avec **8 848 mètres**, est la plus haute montagne du monde.",
-                "quel est le pays le plus petit du monde": "📏 Le **Vatican** est le plus petit pays, avec moins de 1 km².",
-                "quel est le pays le plus grand du monde": "🌍 La **Russie** est le plus vaste pays du monde.",
-                "quel est le fleuve le plus long d'europe": "🌊 Le **Volga** est le fleuve le plus long d’Europe.",
-                "quels pays traversent les alpes": "⛰️ Les Alpes traversent la **France, l’Italie, la Suisse, l’Allemagne, l’Autriche, la Slovénie et le Liechtenstein**.",
-                "où se trouve le mont kilimandjaro": "🌄 Le **Kilimandjaro** se trouve en **Tanzanie**.",
-                "quelle est la mer la plus salée": "🌊 La **mer Morte** est la plus salée au monde.",
-                "quelles sont les capitales des pays baltes": "🇪🇪 🇱🇻 🇱🇹 Les capitales sont **Tallinn** (Estonie), **Riga** (Lettonie) et **Vilnius** (Lituanie).",
-                "quelle est la capitale de l’australie": "🦘 La capitale de l’Australie est **Canberra**, pas Sydney !",
-                "quelle est l’île la plus grande du monde": "🏝️ **Le Groenland** est la plus grande île du monde (hors continent).",
-                "quel pays a le plus de fuseaux horaires": "🌐 La **France** (grâce à ses territoires) a le plus de fuseaux horaires : **12** !",
-                "quel est le plus haut volcan actif du monde": "🌋 Le **Mauna Loa** à Hawaï est le plus grand volcan actif du monde.",
-                "quel est l’océan le plus profond": "🌊 L’**océan Pacifique** est le plus profond, avec la fosse des Mariannes qui atteint 10 994 mètres.",
-                "quelle est la plus grande île de la Méditerranée": "🏝️ **La Sicile** est la plus grande île de la Méditerranée.",
-                "quel est le pays le plus jeune du monde": "🌍 **Le Soudan du Sud**, qui a proclamé son indépendance en 2011, est le pays le plus jeune du monde.",
-                "quels pays ont une frontière avec le Brésil": "🌍 Le **Brésil** partage une frontière avec **10 pays** : Argentine, Bolivie, Colombie, Guyane, Paraguay, Pérou, Suriname, Uruguay, Venezuela et le pays français de la Guyane.",
-                "quelle est la capitale de l’Islande": "❄️ La capitale de l’**Islande** est **Reykjavik**.",
-                "quelle est la mer la plus grande": "🌊 La **mer des Philippines** est la plus grande mer de la planète.",
-                "quelle est la plus grande ville du monde par superficie": "🌍 **Hulunbuir**, en **Chine**, est la plus grande ville du monde par superficie.",
-                "quels pays ont une frontière avec l’Allemagne": "🌍 **L'Allemagne** partage une frontière avec **9 pays** : Danemark, Pologne, République tchèque, Autriche, Suisse, France, Luxembourg, Belgique, et les Pays-Bas.",
-                "où se trouve la forêt amazonienne": "🌳 La **forêt amazonienne** s’étend sur plusieurs pays, principalement le **Brésil**, mais aussi le **Pérou**, la **Colombie**, et plusieurs autres pays d'Amérique du Sud.",
-    
-                # ⏰ Temps & Calendrier
-                "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
-                "quels sont les mois de l'été": "☀️ En France, l'été comprend **juin, juillet et août**.",
-                "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
-                "quels sont les mois de l'été": "☀️ En France, l'été comprend **juin, juillet et août**.",
-                "combien de mois dans une année": "📅 Une année contient **12 mois**.",
-                "quelle est la durée d'un jour sur Mars": "🪐 Un jour sur Mars, aussi appelé sol, dure **24 heures et 39 minutes**.",
-                "quels sont les mois de l'hiver": "❄️ En France, l'hiver comprend **décembre, janvier et février**.",
-                "combien de jours dans une semaine": "📅 Une semaine contient **7 jours** : lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
-                "quelle est la date de la fête nationale en France": "🇫🇷 La fête nationale française est célébrée le **14 juillet**, commémorant la prise de la Bastille en 1789.",
-                "quand a eu lieu le premier voyage sur la Lune": "🌕 Le premier voyage sur la Lune a eu lieu le **20 juillet 1969**, avec **Neil Armstrong** comme premier homme à marcher sur la Lune.",
-                "combien de semaines dans une année": "📅 Il y a **52 semaines** dans une année, soit 365 jours divisés par 7.",
-                "quel est le mois le plus court de l'année": "📅 **Février** est le mois le plus court de l'année, avec **28** jours, ou **29** lors des années bissextiles.",
-                "quel est le mois de la rentrée scolaire en France": "📚 La rentrée scolaire en France a lieu en **septembre**.",
-                "quand commence le printemps": "🌸 Le printemps commence autour du **20 mars** dans l'hémisphère nord.",
-                "quand commence l'automne": "🍁 L'automne commence généralement autour du **22 septembre** dans l'hémisphère nord.",
-                "combien d'heures dans une journée": "🕰️ Une journée complète compte **24 heures**.",
-                "quand a été lancé le premier calendrier grégorien": "📅 Le calendrier grégorien a été introduit le **15 octobre 1582** par le pape Grégoire XIII pour remplacer le calendrier julien.",
-                "combien de secondes dans une heure": "⏳ Il y a **3600 secondes** dans une heure.",
-                "quelle est la durée d'une année sur Vénus": "🪐 Une année sur Vénus dure **225 jours terrestres**, mais une journée sur Vénus est plus longue, environ **243 jours terrestres**.",
-                "quand se passe le solstice d'hiver": "❄️ Le solstice d'hiver a lieu vers le **21 décembre** dans l'hémisphère nord, marquant le début de l'hiver.",
-                "combien de jours dans un mois de février d'une année bissextile": "📅 En année bissextile, **février** compte **29 jours**."
-            }
-
-            for question_base, reponse_base in base_generale.items():
-                if question_base in question_clean:
-                    message_bot = reponse_base
-                    break
-
-        if message_bot:
-            return message_bot
-
-
-        
-        # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
-        if not message_bot:
-            if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
-                message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
-            else:
-                reponses_ava = [
-                    "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖",
-                    "Je n'ai pas bien compris. Pouvez-vous reformuler, s'il vous plaît ?",
-                    "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !",
-                    "Hmm... Ce n'est pas encore dans ma base de données. Essayez une autre formulation ou tapez 'analyse complète' pour un aperçu du marché 📊"
-                ]
-                message_bot = random.choice(reponses_ava)
-
-
-        # ✅ Bloc final de retour (à garder tout à la fin de trouver_reponse)
-        if not message_bot:
-            message_bot = "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"
+    if message_bot:
         return message_bot
+
+    # --- Bloc Faits Insolites ---
+    # Liste des faits insolites (définie une seule fois)
+    faits_insolites = [
+        "🐙 Un poulpe a trois cœurs… et son sang est bleu !",
+        "🚽 Plus de gens possèdent un téléphone portable qu’une brosse à dents.",
+        "🐌 Un escargot peut dormir pendant trois ans d’affilée.",
+        "🌋 Il y a plus de volcans sous l’eau que sur la terre ferme.",
+        "📦 Amazon a été fondée dans un garage... et maintenant, ils livrent même des frigos !",
+        "🧠 Le cerveau humain génère assez d’électricité pour allumer une petite ampoule.",
+        "🌕 On a découvert de la glace sur la Lune, et même des poches d’eau sur Mars !",
+        "🔋 Un éclair contient assez d'énergie pour faire griller 100 000 toasts.",
+        "🕷️ Certaines araignées peuvent planer dans les airs à l’aide de fils de soie… c’est le *ballooning* !",
+        "🦑 Le calmar géant a les plus grands yeux du règne animal, aussi gros qu’un ballon de foot !",
+        "🧊 Les manchots proposent parfois des galets comme cadeau de séduction.",
+        "🚀 Les astronautes peuvent grandir de quelques centimètres dans l’espace à cause de la microgravité.",
+        "🥶 L’eau chaude peut geler plus vite que l’eau froide. C’est l’effet Mpemba.",
+        "🐥 Les canetons s’attachent à la première chose qu’ils voient — c’est l’empreinte.",
+        "🍕 En Italie, il existe une pizza avec 111 sortes de fromages dessus !",
+        "🎵 Les abeilles peuvent reconnaître des visages humains… et elles adorent les sons aigus.",
+        "🌍 Il y a plus d’arbres sur Terre que d’étoiles dans la Voie lactée.",
+        "👅 La langue est aussi unique qu’une empreinte digitale.",
+        "🚿 En moyenne, une personne passe **6 mois de sa vie sous la douche**.",
+        "🎈 Une banane est techniquement une baie. Mais pas la fraise !",
+        "🦙 Les alpagas peuvent cracher… mais seulement s’ils sont vraiment énervés.",
+        "⏳ Les crocodiles peuvent vivre plus de 100 ans… et certains ne meurent que de vieillesse.",
+        "🐓 Les poules peuvent se souvenir de plus de 100 visages humains ou animaux.",
+        "🦇 Les chauves-souris tournent toujours à gauche en sortant d’une grotte.",
+        "🛸 Il existe un endroit sur Terre où la gravité semble inversée : la Mystery Spot en Californie.",
+        "🎮 Un gamer japonais détient le record mondial du plus long temps passé à jouer sans pause : 35 heures !",
+        "🧀 Le plus grand fromage jamais fabriqué pesait 57 tonnes… il fallait une grue pour le déplacer.",
+        "🌲 Un arbre peut communiquer avec un autre à plusieurs kilomètres via des signaux chimiques.",
+        "🐠 Certains poissons changent de sexe au cours de leur vie.",
+        "🌞 Si le Soleil était de la taille d’une porte, la Terre serait une pièce de monnaie.",
+        "🦷 Les requins ont une infinité de dents : dès qu’une tombe, une autre pousse instantanément.",
+        "🌌 On connaît mieux la surface de Mars que les fonds marins de la Terre.",
+        "🥦 Le brocoli contient plus de protéines que certains morceaux de bœuf… oui, vraiment.",
+        "🛏️ On passe environ un tiers de notre vie à dormir, soit environ 25 ans !",
+        "📚 La bibliothèque du Vatican contient des textes qui n’ont pas été lus depuis des siècles.",
+        "🦵 Les autruches peuvent courir plus vite qu’un cheval… et changer de direction net sans freiner.",
+        "🪐 Sur Vénus, un jour dure plus longtemps qu’une année complète !",
+        "🦜 Certains perroquets peuvent apprendre plus de 100 mots humains… et les utiliser à bon escient.",
+        "🥚 En moyenne, une poule pond environ 300 œufs par an.",
+        "🌻 Les tournesols suivent réellement le soleil dans le ciel quand ils grandissent. C’est l’héliotropisme.",
+        "📏 Si tu pouvais plier une feuille de papier 42 fois, elle atteindrait la Lune.",
+        "🥶 Le sang d’un poisson antarctique peut rester liquide même en dessous de 0°C grâce à une protéine antigel.",
+        "🧃 Le Coca-Cola serait vert sans colorant.",
+        "💡 L’ampoule électrique la plus ancienne fonctionne depuis 1901, sans interruption.",
+        "🦴 Un os humain est plus résistant qu’une barre de béton à taille égale."
+    ]
+    # Gestion de la demande "fait insolite"
+    if any(mot in question_clean for mot in ["fait insolite", "truc fou", "surprends-moi", "anecdote", "incroyable mais vrai"]):
+        if 'derniere_fait' not in st.session_state:
+            st.session_state['derniere_fait'] = random.choice(faits_insolites)
+        message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
+
+
+    # Gestion de la demande "encore un" ou "plus" pour les faits insolites
+    if any(mot in question_clean for mot in ["encore un", "un autre","encore"]):
+        if 'derniere_fait' in st.session_state:
+            message_bot = f"✨ Voici une autre anecdote :\n\n{random.choice(faits_insolites)}"
+        else:
+            message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
+
+    if any(mot in question_clean for mot in ["encore une", "une autre"]):
+        if 'derniere_fait' in st.session_state:
+            message_bot = f"✨ Voici un autre fait insolite :\n\n{random.choice(faits_insolites)}"
+        else:
+            message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
+
+    if message_bot:
+        return message_bot
+        
+    # --- Bloc Recettes rapides 
+    recettes = [
+        "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
+        "🍝 **Pâtes à l’ail** : pâtes + ail émincé + huile d’olive + herbes. Simple, rapide, efficace.",
+        "🍳 **Omelette fromage** : œufs battus, sel, poivre, fromage râpé. 5 minutes à la poêle !",
+        "🥗 **Salade express** : tomates cerises, mozzarella, roquette, huile d’olive, vinaigre balsamique.",
+        "🌯 **Wrap poulet-crudités** : galette + restes de poulet + salade + sauce yaourt.",
+        "🥔 **Pommes de terre sautées** : en cubes, à la poêle avec ail et persil. Parfait avec des œufs !",
+        "🍲 **Soupe express** : légumes surgelés mixés + cube bouillon + crème légère. Prête en 10 minutes.",
+        "🍞 **Croque-monsieur rapide** : pain de mie, jambon, fromage, 5 min au grill ou à la poêle.",
+        "🥒 **Tartines fraîcheur** : pain grillé, fromage frais, concombre, citron et herbes.",
+        "🍚 **Riz sauté aux légumes** : reste de riz + légumes + œuf + sauce soja. Un wok express !",
+        "🍗 **Poulet minute au curry** : dés de poulet + crème + curry + oignon, à la poêle en 10 min.",
+        "🍳 **Œufs brouillés crémeux** : œufs + beurre + sel + poivre, cuisson douce pour onctuosité.",
+        "🧄 **Pâtes ail-persil** : ail doré à la poêle, persil frais, huile d’olive, et hop sur les pâtes !",
+        "🥑 **Toast avocat-œuf** : pain grillé + avocat écrasé + œuf au plat ou mollet.",
+        "🌮 **Tacos express** : galette + steak haché ou haricots + tomate + salade + sauce.",
+        "🥔 **Gratin express au micro-ondes** : pommes de terre en tranches fines + crème + fromage.",
+        "🍅 **Tomates mozzarella** : tranches de tomates + mozzarella + basilic + huile d’olive. Simple et frais.",
+        "🧀 **Quesadilla express** : deux tortillas + fromage + restes au choix + poêle 5 min chaque côté.",
+        "🍳 **Mini shakshuka rapide** : tomates en dés + œufs + cumin dans une petite poêle. Un délice !",
+        "🥣 **Bowl sucré express** : fromage blanc + fruits + flocons d’avoine + miel. Parfait au petit dej.",
+        "🥕 **Bâtonnets carottes-concombre** : trempés dans du houmous ou une sauce yaourt. Frais et sain.",
+        "🍞 **Pain perdu rapide** : tranches de pain + œuf + lait + sucre, à la poêle jusqu’à dorure.",
+        "🍠 **Patate douce micro-ondes** : piquée à la fourchette, 7 min puissance max, à garnir à volonté.",
+        "🥒 **Taboulé express** : semoule, tomate, menthe, citron, huile d’olive. Hydratation 5 min à l’eau chaude.",
+        "🍌 **Banana pancakes** : 1 banane + 2 œufs, mélangés et cuits en petites galettes. Sans farine !",
+        "🧈 **Wrap beurre de cacahuète-banane** : rapide, énergétique, parfait en collation !",
+        "🍽️ **Assiette anti-gaspi** : reste de pâtes, légumes et un œuf, mélangés et poêlés façon wok !",
+        "🍜 **Nouilles instant maison** : nouilles + bouillon + œuf + légumes râpés. Prêt en 7 minutes top chrono !",
+        "🥓 **Œuf cocotte express** : œuf + crème + fromage dans un ramequin, 1 min au micro-ondes.",
+        "🌽 **Galette de maïs rapide** : maïs + œuf + farine + épices, cuit à la poêle façon pancake salé.",
+        "🍕 **Mini pizzas pain de mie** : pain de mie, sauce tomate, fromage, garniture au choix, 10 min au four.",
+        "🍄 **Poêlée champignons ail-persil** : champignons frais, ail, persil, et huile d’olive. Simple & savoureux.",
+        "🌯 **Wrap sucré pomme-cannelle** : pomme râpée, cannelle, un filet de miel, le tout roulé dans une galette.",
+        "🍳 **Tortilla minute** : œufs battus + restes de légumes + fromage, à la poêle comme une omelette épaisse.",
+        "🧀 **Boulettes express** : steak haché + chapelure + épices, façonnées et dorées en 5 min à la poêle.",
+        "🍫 **Mug cake chocolat** : 4 ingrédients, 1 mug, 1 micro-ondes. Gâteau prêt en 1 minute !",
+        "🥔 **Chips maison micro-ondes** : pommes de terre très fines + sel + micro-ondes 5 à 6 min. Ultra croustillant !"
+    ]
+    # Gestion de la demande "recette"
+    if any(mot in question_clean for mot in ["recette", "cuisine", "plat rapide", "idée repas", "je mange quoi"]):
+        if 'derniere_recette' not in st.session_state:
+            st.session_state['derniere_recette'] = random.choice(recettes)
+        message_bot = f"🍽️ Voici une idée de recette :\n\n{st.session_state['derniere_recette']}"
+
+    # Gestion de la demande "encore un" ou "plus" pour les recettes
+    if any(mot in question_clean for mot in ["encore une", "une autre"]):
+        if 'derniere_recette' in st.session_state:
+            message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
+        else:
+            message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
+    if message_bot:
+        return message_bot
+
+    # ─── 4) Bases de réponses ───────────────────────────────────────────────────
+    # 4.a) Hard‑codées
+    reponses_courantes = {
+        "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
+        "ça va": "Je vais bien, merci de demander ! Et vous ?",
+        "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+        "hello": "Hello! How can I assist you today?",
+        "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
+        "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+        "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+        "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
+        "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
+        "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
+        "tu m'entends": "Je vous entends fort et clair 🎧",
+        "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
+        "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
+        "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+        "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
+        "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
+        "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+        "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
+        "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
+        "re": "Re bienvenue à bord ! On continue notre mission ?",
+        "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
+        "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
+        "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
+        "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+        "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
+        "salut çava": "Salut ! Je vais très bien, merci 😊 Et vous ?",
+    }   
+    base_savoir = {
+        # Mets ici toutes tes questions/réponses actuelles (animaux, science, météo, etc.)
+        "quel est le plus grand animal terrestre": "🐘 L’éléphant d’Afrique est le plus grand animal terrestre.",
+        "combien de dents possède un adulte": "🦷 Un adulte a généralement 32 dents, y compris les dents de sagesse.",
+        "comment se forme un arc-en-ciel": "🌈 Il se forme quand la lumière se réfracte et se réfléchit dans des gouttelettes d’eau.",
+        "quelle est la température normale du corps humain": "🌡️ Elle est d’environ 36,5 à 37°C.",
+        "quelle planète est la plus proche du soleil": "☀️ C’est **Mercure**, la plus proche du Soleil.",
+        "combien y a-t-il de continents": "🌍 Il y a **7 continents** : Afrique, Amérique du Nord, Amérique du Sud, Antarctique, Asie, Europe, Océanie.",
+        "quelle est la capitale du brésil": "🇧🇷 La capitale du Brésil est **Brasilia**.",
+        "quelle est la langue parlée au mexique": "🇲🇽 La langue officielle du Mexique est l’**espagnol**.",
+        "qu'est-ce qu'une éclipse lunaire": "🌕 C’est quand la Lune passe dans l’ombre de la Terre, elle peut apparaître rougeâtre.",
+        "quelle est la formule de l’eau": "💧 La formule chimique de l’eau est **H₂O**.",
+        "qu'est-ce que le code binaire": "🧮 Le code binaire est un langage informatique utilisant seulement des 0 et des 1.",
+        "quelle est la plus haute montagne du monde": "🏔️ L'**Everest** est la plus haute montagne du monde, culminant à 8 848 mètres.",        "qui a écrit 'Les Misérables'": "📚 **Victor Hugo** a écrit *Les Misérables*.",
+        "quelle est la langue officielle du japon": "🇯🇵 La langue officielle du Japon est le **japonais**.",
+        "quelle est la capitale de l'italie": "🇮🇹 La capitale de l'Italie est **Rome**.",
+        "combien y a-t-il de pays en Europe": "🌍 L’Europe compte **44 pays**, dont la Russie qui en fait partie partiellement.",
+        "quel est le plus long fleuve du monde": "🌊 Le **Nil** est souvent considéré comme le plus long fleuve du monde, bien que certains estiment que c’est l’Amazone.",
+        "quel est le plus grand océan du monde": "🌊 Le **Pacifique** est le plus grand océan, couvrant environ un tiers de la surface de la Terre.",
+        "combien de pays parlent espagnol": "🇪🇸 Il y a **21 pays** dans le monde où l'espagnol est la langue officielle.",
+        "qu'est-ce qu'un trou noir": "🌌 Un trou noir est une région de l’espace où la gravité est tellement forte que rien, même pas la lumière, ne peut s’en échapper.",
+        "qu'est-ce qu'une éclipse solaire": "🌞 Une éclipse solaire se produit lorsque la Lune passe entre la Terre et le Soleil, obscurcissant temporairement notre étoile.",
+        "qu'est-ce que le big bang": "💥 Le **Big Bang** est la théorie scientifique qui décrit l'origine de l'univers à partir d'un point extrêmement dense et chaud il y a environ 13,8 milliards d'années.",
+        "combien y a-t-il de dents de lait chez un enfant": "🦷 Un enfant a généralement **20 dents de lait**, qui commencent à tomber vers 6 ans.",
+        "quel est l'animal le plus rapide au monde": "🐆 Le **guépard** est l’animal terrestre le plus rapide, atteignant une vitesse de 112 km/h.",
+        "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
+        "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
+        "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines."
+    }
+    # Fusionner les deux dans une base complète
+    base_complet = {**base_savoir, **reponses_courantes}
+    
+
+    # --- Bloc Mini base générale (culture quotidienne) ---
+    if not message_bot:
+
+        base_generale = {
+            # 🌍 Météo & nature
+            "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
+            "qu'est-ce qu'un ouragan": "🌀 Un ouragan est une tempête tropicale très puissante, formée au-dessus des océans chauds.",
+            "comment se forme un arc-en-ciel": "🌈 Un arc-en-ciel se forme par la réfraction, la réflexion et la dispersion de la lumière dans les gouttelettes d'eau.",
+            "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
+            "qu'est-ce qu'un ouragan": "🌀 Un ouragan est une tempête tropicale très puissante, formée au-dessus des océans chauds.",
+            "comment se forme un arc-en-ciel": "🌈 Un arc-en-ciel se forme par la réfraction, la réflexion et la dispersion de la lumière dans les gouttelettes d'eau.",
+            "qu'est-ce qu'une tornade": "🌪️ Une tornade est une colonne d'air en rotation rapide qui touche le sol, souvent destructrice.",
+            "quelle est la température la plus basse jamais enregistrée": "❄️ La température la plus basse a été enregistrée en Antarctique : -89,2°C à la station Vostok.",
+            "pourquoi le ciel est bleu": "☀️ La lumière du Soleil se diffuse dans l’atmosphère. Le bleu est plus dispersé, d'où la couleur du ciel.",
+            "pourquoi les feuilles tombent en automne": "🍂 Les arbres perdent leurs feuilles pour économiser de l’eau et de l’énergie pendant l’hiver.",
+            "comment naît un orage": "⚡ Un orage naît d’un choc thermique entre de l’air chaud et humide et de l’air froid en altitude.",
+            "qu'est-ce que le changement climatique": "🌍 C’est l'évolution à long terme du climat de la Terre, causée en partie par les activités humaines.",
+            "comment se forme la neige": "❄️ La neige se forme quand les gouttelettes d’eau dans les nuages gèlent et tombent sous forme de cristaux.",
+            "qu'est-ce qu'un tsunami": "🌊 Un tsunami est une vague géante causée par un séisme ou une éruption sous-marine.",
+            "qu'est-ce qu'un séisme": "🌍 Un séisme est un tremblement de terre provoqué par des mouvements de plaques tectoniques.",
+            "pourquoi y a-t-il des saisons": "🌦️ Les saisons existent à cause de l’inclinaison de la Terre sur son axe et de sa révolution autour du Soleil.",
+            "c'est quoi une marée": "🌊 Une marée est le mouvement périodique de montée et de descente du niveau de la mer, influencé par la Lune.",
+            "comment se forment les nuages": "☁️ Les nuages se forment lorsque la vapeur d’eau se condense autour de particules fines dans l’air.",
+            "qu'est-ce que le réchauffement climatique": "🔥 Le réchauffement climatique est l’augmentation progressive de la température moyenne de la Terre, principalement due aux gaz à effet de serre.",
+            "qu'est-ce qu'une éruption volcanique": "🌋 C’est l’expulsion de lave, cendres et gaz par un volcan en activité.",
+            "quelle est la température moyenne sur Terre": "🌍 La température moyenne sur Terre est d’environ 15°C, mais elle varie selon les régions et les saisons.",
+            "quels sont les gaz à effet de serre": "💨 Dioxyde de carbone, méthane, vapeur d’eau, ozone… ce sont les principaux gaz responsables du réchauffement climatique.",
+    
+            # 🐾 Animaux
+            "combien de cœurs a une pieuvre": "🐙 Une pieuvre a **trois cœurs** ! Deux pour les branchies et un pour le corps.",
+            "quel est l’animal le plus rapide du monde": "🐆 Le guépard est l’animal terrestre le plus rapide, avec une pointe à 112 km/h.",
+            "quel animal pond des œufs mais allaite": "🦘 L’ornithorynque ! Un mammifère unique qui pond des œufs et allaite ses petits.",
+            "quel est l’animal le plus grand du monde": "🐋 La **baleine bleue** est l’animal le plus grand, pouvant dépasser 30 mètres de long.",
+            "quel est l’animal le plus petit": "🦠 Le **colibri d’Hélène** est l’un des plus petits oiseaux, pesant moins de 2 grammes.",
+            "quel animal vit le plus longtemps": "🐢 La **tortue géante** peut vivre plus de 150 ans !",
+            "quel est l’oiseau qui ne vole pas": "🐧 Le **manchot** est un oiseau qui ne vole pas mais excelle dans l’eau.",
+            "quel animal change de couleur": "🦎 Le **caméléon** peut changer de couleur pour se camoufler ou communiquer.",
+            "quels animaux hibernent": "🐻 L’ours, la marmotte ou encore le hérisson **hibernent** pendant l’hiver.",
+            "quel animal a la meilleure vue": "🦅 L’**aigle** a une vue perçante, capable de repérer une proie à des kilomètres.",
+            "quel est le plus gros félin": "🐅 Le **tigre de Sibérie** est le plus gros des félins sauvages.",
+            "quel animal pond le plus d'œufs": "🐔 La **poule** peut pondre jusqu’à 300 œufs par an, mais certains poissons comme le cabillaud pondent des millions d'œufs !",
+            "quel animal vit dans les abysses": "🌌 Le **poisson-lanterne** est l’un des habitants étranges des abysses marins.",
+            "quels animaux vivent en meute": "🐺 Les **loups**, les **chiens sauvages** ou encore les **hyènes** vivent en meute pour chasser.",
+            "quel animal a la langue la plus longue": "👅 Le **caméléon** peut projeter sa langue jusqu’à deux fois la longueur de son corps.",
+            "quel animal a le venin le plus mortel": "☠️ Le **cône géographique**, un petit escargot marin, possède un venin redoutable.",
+            "quel est l’animal le plus rapide dans l’eau": "🐬 Le **voilier de l’Indo-Pacifique** peut nager à près de 110 km/h !",
+            "quel est le cri du renard": "🦊 Le renard pousse un cri strident, souvent assimilé à un hurlement ou un aboiement sec.",
+            "quel animal peut survivre dans l’espace": "🛰️ Le **tardigrade**, aussi appelé ourson d’eau, est capable de survivre au vide spatial.",
+            "quels animaux sont nocturnes": "🌙 Les **chauves-souris**, **hiboux** ou encore **félins** sont actifs principalement la nuit.",
+            "quel est l’animal le plus bruyant": "📣 Le **cachalot** émet les sons les plus puissants du règne animal, jusqu'à 230 décibels !",
+            "quel animal a le plus grand nombre de dents": "🦈 Le **requin** peut avoir jusqu’à **3000 dents**, renouvelées en permanence.",
+            "quel est l’animal le plus intelligent": "🧠 Le **dauphin** est l’un des animaux les plus intelligents, capable d’utiliser des outils et de communiquer de manière complexe.",
+            "quel animal dort le moins": "🌙 La **girafe** dort moins de 2 heures par jour en moyenne.",
+            "quel animal a le plus de pattes": "🪱 Le **mille-pattes Illacme plenipes** peut avoir jusqu’à **750 pattes** !",
+            "quel animal peut marcher sur l’eau": "🦎 Le **basilic** est surnommé 'lézard Jésus-Christ' car il peut courir sur l’eau.",
+            "quel animal est immortel": "♾️ La **méduse Turritopsis dohrnii** peut retourner à son stade juvénile, ce qui la rend théoriquement immortelle.",
+            "quel animal a la meilleure ouïe": "👂 Le **grand duc** et la **chauve-souris** sont champions de l’audition, capables d’entendre des ultrasons imperceptibles pour nous.",
+            "quel est l’animal le plus toxique": "☠️ La **grenouille dorée** d’Amérique du Sud produit une toxine mortelle, même en très faible dose.",
+            "quel est l’animal le plus ancien": "⏳ Le **trilobite**, aujourd’hui disparu, est l’un des premiers animaux complexes, apparu il y a plus de 500 millions d’années.",
+
+    
+            # 🔬 Science
+            "qu'est-ce que la gravité": "🌌 La gravité est une force qui attire deux masses l'une vers l'autre, comme la Terre attire les objets vers elle.",
+            "combien de planètes dans le système solaire": "🪐 Il y a 8 planètes : Mercure, Vénus, Terre, Mars, Jupiter, Saturne, Uranus, Neptune.",
+            "quelle est la plus petite particule": "⚛️ Le quark est l'une des plus petites particules connues dans la physique quantique.",
+            "qu'est-ce qu'un atome": "⚛️ Un **atome** est la plus petite unité de matière, composée d’électrons, de protons et de neutrons.",
+            "quelle est la différence entre masse et poids": "⚖️ La **masse** est constante, le **poids** dépend de la gravité. On pèse moins sur la Lune que sur Terre !",
+            "qu'est-ce que l'effet de serre": "🌍 L’**effet de serre** est un phénomène naturel qui retient la chaleur dans l’atmosphère grâce à certains gaz.",
+            "qu'est-ce qu'un trou noir": "🕳️ Un **trou noir** est une région de l’espace où la gravité est si forte que même la lumière ne peut s’en échapper.",
+            "quelle est la vitesse de la lumière": "💡 Environ **299 792 km/s**. C’est la vitesse maximale dans l’univers selon la physique actuelle.",
+            "qu'est-ce que l'ADN": "🧬 L’**ADN** est la molécule qui contient toutes les instructions génétiques d’un être vivant.",
+            "comment fonctionne un aimant": "🧲 Un **aimant** attire certains métaux grâce à un champ magnétique généré par ses électrons.",
+            "qu'est-ce que l'électricité": "⚡ C’est un flux de particules appelées **électrons** circulant dans un conducteur.",
+            "qu'est-ce que le big bang": "🌌 Le **Big Bang** est la théorie selon laquelle l’univers a commencé par une énorme explosion il y a 13,8 milliards d’années.",
+            "comment se forme une étoile": "⭐ Une **étoile** naît dans un nuage de gaz et de poussière qui s’effondre sous sa propre gravité.",
+            "qu'est-ce que l’ADN": "🧬 L’ADN est une molécule porteuse d'informations génétiques, présente dans chaque cellule.",
+            "qu'est-ce que la photosynthèse": "🌱 C’est le processus par lequel les plantes transforment la lumière du soleil en énergie.",
+            "qu'est-ce qu'une éclipse": "🌑 Une **éclipse** se produit quand la Lune ou la Terre se place entre le Soleil et l’autre corps, bloquant partiellement la lumière.",
+            "quelle est la température du soleil": "☀️ La surface du Soleil atteint environ **5 500°C**, mais son noyau dépasse les **15 millions de degrés** !",
+            "qu'est-ce qu'un vaccin": "💉 Un **vaccin** stimule le système immunitaire pour qu’il apprenne à se défendre contre un virus ou une bactérie.",
+            "c’est quoi un neutron": "🧪 Un **neutron** est une particule subatomique présente dans le noyau des atomes, sans charge électrique.",
+            "qu'est-ce que la matière noire": "🌌 La **matière noire** est une substance invisible qui compose une grande partie de l’univers, détectée uniquement par ses effets gravitationnels.",
+            "qu'est-ce qu'une cellule souche": "🧫 Une **cellule souche** peut se transformer en différents types de cellules spécialisées. Elle est essentielle en médecine régénérative.",
+            "quelle est la différence entre virus et bactérie": "🦠 Les **bactéries** sont des organismes vivants autonomes, les **virus** ont besoin d'une cellule pour se reproduire.",
+            "comment fonctionne un laser": "🔴 Un **laser** produit un faisceau lumineux très concentré en amplifiant la lumière dans une seule direction.",
+            "comment vole un avion": "✈️ Grâce à la **portance** générée par les ailes. L’air circule plus vite au-dessus qu’en dessous, ce qui crée une force vers le haut.",
+            "qu'est-ce que l’intelligence artificielle": "🤖 L’**IA** est un ensemble de technologies qui permettent à des machines d’imiter certaines fonctions humaines comme apprendre ou résoudre des problèmes.",
+            "qu'est-ce que l’ARN": "🧬 L’**ARN** est une molécule qui transmet les instructions génétiques de l’ADN pour produire des protéines.",
+            "comment naît un arc électrique": "⚡ Un **arc électrique** se forme quand un courant saute dans l’air entre deux conducteurs, comme dans un éclair ou un poste haute tension.",
+            "qu'est-ce qu’un proton": "🧪 Un **proton** est une particule subatomique à charge positive, présente dans le noyau des atomes.",
+            "comment fonctionne une fusée": "🚀 Une **fusée** avance en projetant des gaz à grande vitesse vers l’arrière, selon le principe d’action-réaction de Newton.",
+    
+             # 📚 Histoire
+            "qui était napoléon": "👑 Napoléon Bonaparte était un empereur français du XIXe siècle, célèbre pour ses conquêtes militaires.",
+            "en quelle année la tour eiffel a été construite": "🗼 Elle a été achevée en **1889** pour l'Exposition universelle de Paris.",
+            "quelle guerre a eu lieu en 1914": "⚔️ La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918.","qui a découvert l'amérique": "🌎 **Christophe Colomb** a découvert l’Amérique en 1492, même si des peuples y vivaient déjà.",
+            "quand a eu lieu la révolution française": "⚔️ La **Révolution française** a commencé en **1789** et a profondément changé la société française.",
+            "qui était cléopâtre": "👑 **Cléopâtre** était la dernière reine d'Égypte, célèbre pour son intelligence et son alliance avec Jules César.",
+            "quand a eu lieu la seconde guerre mondiale": "🌍 La **Seconde Guerre mondiale** a duré de **1939 à 1945** et impliqué de nombreux pays du globe.",
+            "qui était charlemagne": "🛡️ **Charlemagne** était un empereur franc du Moyen Âge, considéré comme le père de l’Europe.",
+            "qui a construit les pyramides": "🔺 Les **anciens Égyptiens** ont construit les pyramides il y a plus de 4 500 ans comme tombes pour les pharaons.",
+            "quand l’homme a-t-il marché sur la lune": "🌕 **Neil Armstrong** a posé le pied sur la Lune le **20 juillet 1969** lors de la mission Apollo 11.",
+            "qui était hitler": "⚠️ **Adolf Hitler** était le dictateur de l’Allemagne nazie, responsable de la Seconde Guerre mondiale et de la Shoah.",
+            "qu’est-ce que la guerre froide": "🧊 La **guerre froide** fut une période de tension entre les États-Unis et l’URSS entre 1947 et 1991, sans affrontement direct.",
+            "qui a inventé l’imprimerie": "🖨️ **Gutenberg** a inventé l’imprimerie moderne au 15e siècle, révolutionnant la diffusion du savoir.",
+            "qui était louis xiv": "👑 **Louis XIV**, aussi appelé le Roi Soleil, a régné sur la France pendant 72 ans, de 1643 à 1715.",
+            "quelle est la plus ancienne civilisation connue": "🏺 La **civilisation sumérienne** en Mésopotamie est l’une des plus anciennes connues, datant de -3000 av. J.-C.",
+            "quand a été signée la déclaration des droits de l’homme": "📝 En **1789**, pendant la Révolution française.",
+            "qu’est-ce que la renaissance": "🎨 Une période de renouveau artistique et scientifique en Europe, entre le 14e et le 17e siècle.",
+            "qui a aboli l’esclavage en france": "✊ **Victor Schoelcher** a joué un rôle clé dans l’abolition de l’esclavage en 1848 en France.",
+            "qui était jules césar": "🏛️ **Jules César** était un général et homme politique romain, célèbre pour avoir transformé la République romaine en Empire.",
+            "quand a eu lieu la chute de l’empire romain": "🏰 Elle a eu lieu en **476 après J.-C.**, marquant la fin de l’Antiquité en Europe occidentale.",
+            "quand a été fondée la république française": "🇫🇷 La **Première République française** a été proclamée en **1792**, après la chute de la monarchie.",
+            "qu’est-ce que la révolution industrielle": "⚙️ Une période de profonds changements économiques et technologiques entre le 18e et le 19e siècle.",
+            "qui a déclenché la première guerre mondiale": "🔫 L’assassinat de **l’archiduc François-Ferdinand** d’Autriche en 1914 a été l’élément déclencheur.",
+            "qu’est-ce que le mur de berlin": "🧱 Le **mur de Berlin** séparait l’Allemagne de l’Est et de l’Ouest de 1961 à 1989, symbole de la guerre froide.",
+            "qui était marie-antoinette": "👑 **Marie-Antoinette** était la reine de France épouse de Louis XVI, exécutée pendant la Révolution française.",
+            "quand a été signé le traité de versailles": "📜 Le **traité de Versailles** a été signé en **1919** pour mettre fin à la Première Guerre mondiale.",
+            "quand a commencé l’antiquité": "🏺 L’**Antiquité** commence vers **-3000 av. J.-C.** avec l’invention de l’écriture.",
+    
+            # 🧠 Connaissances générales
+            "quelle est la langue officielle du brésil": "🇧🇷 C’est le **portugais**.",
+            "combien de dents a un adulte": "🦷 Un adulte possède généralement **32 dents**.",
+            "qu'est-ce que le code morse": "📡 C’est un système de communication utilisant des points et des tirets.",
+            "quelle est la langue la plus parlée au monde": "🗣️ Le mandarin (chinois) est la langue la plus parlée au monde en nombre de locuteurs natifs.",
+            "quelle est la langue officielle du brésil": "🇧🇷 La langue officielle du Brésil est le **portugais**.",
+            "combien de dents a un adulte": "🦷 Un adulte possède généralement **32 dents**.",
+            "qu'est-ce que le code morse": "📡 C’est un système de communication utilisant des points et des tirets pour représenter des lettres.",
+            "qui a inventé l'imprimerie": "🖨️ **Johannes Gutenberg** a inventé l'imprimerie moderne vers 1450.",
+            "quel est l’aliment le plus consommé au monde": "🍚 Le **riz** est l’un des aliments les plus consommés sur la planète.",
+            "combien de litres d’eau faut-il pour faire un jean": "👖 Il faut environ **7 000 à 10 000 litres** d'eau pour fabriquer un seul jean.",
+            "quel est l'objet le plus utilisé au quotidien": "📱 Le **téléphone portable** est l’objet le plus utilisé au quotidien.",
+            "qu’est-ce que le pH": "🧪 Le pH mesure l’acidité ou l’alcalinité d’une solution, de 0 (acide) à 14 (alcalin).",
+            "combien de pays font partie de l’Union européenne": "🇪🇺 L’Union européenne regroupe **27 pays membres** (après le Brexit).",
+            "combien de lettres dans l’alphabet": "🔤 L’alphabet latin compte **26 lettres**.",
+            "quelle est la monnaie du japon": "💴 La monnaie du Japon est le **yen**.",
+            "quel est le sport le plus pratiqué dans le monde": "⚽ Le football est le sport le plus populaire et pratiqué dans le monde.",
+            "qu’est-ce qu’un QR code": "🔳 Un QR code est un code barre 2D qui peut contenir des liens, des infos ou des paiements.",
+            "qu’est-ce qu’un satellite": "🛰️ Un satellite est un objet placé en orbite autour d'une planète pour collecter ou transmettre des données.",
+            "que veut dire wifi": "📶 Wi-Fi signifie **Wireless Fidelity**, une technologie sans fil pour transmettre des données.",
+            "combien y a-t-il de côtés dans un hexagone": "🔺 Un hexagone a **6 côtés**.",
+            "qu’est-ce que l’ADN": "🧬 L’ADN (acide désoxyribonucléique) contient toutes les informations génétiques d’un être vivant.",
+            "quelle est la capitale de l’Espagne": "🇪🇸 La capitale de l’Espagne est **Madrid**.",
+            "quelle est la monnaie des États-Unis": "💵 La monnaie des États-Unis est le **dollar américain**.",
+            "qu’est-ce que la photosynthèse": "🌱 La photosynthèse est le processus par lequel les plantes transforment la lumière du soleil en énergie.",
+            "combien de secondes dans une heure": "⏱️ Il y a **3 600 secondes** dans une heure.",
+            "qu’est-ce qu’un volcan": "🌋 C’est une ouverture de la croûte terrestre par laquelle s’échappent des gaz, des cendres et de la lave.",
+            "qu’est-ce qu’une éclipse solaire": "🌞🌑 C’est quand la Lune passe entre la Terre et le Soleil, cachant partiellement ou totalement la lumière du Soleil.",
+            "quelle est la mer la plus salée": "🧂 La **mer Morte** est la plus salée au monde, avec une salinité extrême.",
+            "qu’est-ce que l’énergie renouvelable": "♻️ C’est une énergie qui se régénère naturellement : soleil, vent, eau, géothermie ou biomasse.",
+            "qu’est-ce que la biodiversité": "🦋 La biodiversité désigne la variété des espèces vivantes sur Terre, essentielles à l’équilibre écologique.",
+            "quel est le plus grand désert du monde": "🏜️ Le plus grand désert est **l’Antarctique**. Oui, c’est un désert de glace !",
+            # 🧮 Maths & Logique
+            "quelle est la racine carrée de 64": "📐 La racine carrée de 64 est **8**.",
+            "combien font 7 fois 9": "🧠 7 multiplié par 9 égale **63**.",
+            "quel est le chiffre pi": "🔢 Le chiffre **pi (π)** est une constante mathématique d’environ **3,14159**.",
+            "combien y a-t-il de côtés dans un hexagone": "📏 Un **hexagone** possède **6 côtés**.",
+            "quel est le plus grand nombre premier connu": "💡 Le plus grand nombre premier connu est gigantesque, avec **plus de 24 millions de chiffres** !",
+            "qu'est-ce qu'un nombre pair": "⚖️ Un **nombre pair** est divisible par 2 sans reste, comme 2, 4, 6, etc.",
+            "qu’est-ce qu’un triangle isocèle": "🔺 Un **triangle isocèle** a deux côtés de même longueur.",
+            "qu’est-ce qu’un pourcentage": "📊 Un **pourcentage** représente une proportion sur 100.",
+            "quelle est la moitié de 250": "✂️ La moitié de 250 est **125**.",
+            "comment convertir des degrés en radians": "🧮 Multipliez les degrés par π et divisez par 180 pour obtenir des **radians**.",
+            "qu’est-ce qu’un multiple": "🔁 Un **multiple** d’un nombre est le résultat de sa multiplication par un entier.",
+            "qu’est-ce que le théorème de pythagore": "📐 Dans un triangle rectangle, **a² + b² = c²**, où c est l’hypoténuse.",
+            "quelle est la racine carrée de 144": "🧮 La racine carrée de 144 est **12**.",
+            "combien font 12 fois 8": "📊 12 multiplié par 8 égale **96**.",
+            "quels sont les angles d'un triangle équilatéral": "🔺 Dans un **triangle équilatéral**, tous les angles mesurent **60°**.",
+            "quel est le plus grand carré parfait": "📏 Le plus grand carré parfait connu est un nombre dont la racine est un nombre entier, comme **64** qui est 8².",
+            "qu'est-ce qu'un nombre premier": "🔢 Un **nombre premier** est un nombre qui n’a que deux diviseurs : 1 et lui-même.",
+            "qu'est-ce qu'un carré magique": "🔢 Un **carré magique** est une grille où la somme des nombres dans chaque ligne, chaque colonne et chaque diagonale est la même.",
+            "comment résoudre une équation du second degré": "🧠 Pour résoudre une équation du second degré, on utilise la formule **ax² + bx + c = 0**, et la discriminante **Δ = b² - 4ac**.",
+            "quels sont les angles d'un triangle rectangle": "📐 Un **triangle rectangle** possède un angle de **90°**, et les deux autres angles sont complémentaires.",
+            "combien d'heures dans une journée": "⏰ Il y a **24 heures** dans une journée.",
+            "quelle est la somme des angles d'un triangle": "📏 La somme des angles d’un triangle est toujours égale à **180°**.",
+            "qu'est-ce qu'un logarithme": "🧮 Un **logarithme** est l'inverse de l'exponentiation. Par exemple, **log₁₀(100)** = 2, car 10² = 100.",
+            "qu'est-ce qu'une série arithmétique": "🔢 Une **série arithmétique** est une suite de nombres où chaque terme est obtenu en ajoutant une constante à son prédécesseur.",
+            "qu'est-ce qu'une fonction affine": "🧮 Une **fonction affine** est une fonction de la forme **f(x) = ax + b**, où a est la pente et b l'ordonnée à l'origine.",
+    
+            # 🗺️ Géographie bonus
+            "quel est le plus long fleuve du monde": "🌊 Le Nil et l’Amazone se disputent le titre, mais l’Amazone est souvent considéré comme le plus long.",
+            "quel est le pays le plus peuplé": "👥 La Chine est le pays le plus peuplé, avec plus d’1,4 milliard d’habitants.",
+            "quel est le plus grand désert du monde": "🏜️ Le **désert de l’Antarctique** est le plus grand au monde, même s’il est froid !",
+            "quelle est la plus haute montagne du monde": "🗻 L’**Everest**, avec **8 848 mètres**, est la plus haute montagne du monde.",
+            "quel est le pays le plus petit du monde": "📏 Le **Vatican** est le plus petit pays, avec moins de 1 km².",
+            "quel est le pays le plus grand du monde": "🌍 La **Russie** est le plus vaste pays du monde.",
+            "quel est le fleuve le plus long d'europe": "🌊 Le **Volga** est le fleuve le plus long d’Europe.",
+            "quels pays traversent les alpes": "⛰️ Les Alpes traversent la **France, l’Italie, la Suisse, l’Allemagne, l’Autriche, la Slovénie et le Liechtenstein**.",
+            "où se trouve le mont kilimandjaro": "🌄 Le **Kilimandjaro** se trouve en **Tanzanie**.",
+            "quelle est la mer la plus salée": "🌊 La **mer Morte** est la plus salée au monde.",
+            "quelles sont les capitales des pays baltes": "🇪🇪 🇱🇻 🇱🇹 Les capitales sont **Tallinn** (Estonie), **Riga** (Lettonie) et **Vilnius** (Lituanie).",
+            "quelle est la capitale de l’australie": "🦘 La capitale de l’Australie est **Canberra**, pas Sydney !",
+            "quelle est l’île la plus grande du monde": "🏝️ **Le Groenland** est la plus grande île du monde (hors continent).",
+            "quel pays a le plus de fuseaux horaires": "🌐 La **France** (grâce à ses territoires) a le plus de fuseaux horaires : **12** !",
+            "quel est le plus haut volcan actif du monde": "🌋 Le **Mauna Loa** à Hawaï est le plus grand volcan actif du monde.",
+            "quel est l’océan le plus profond": "🌊 L’**océan Pacifique** est le plus profond, avec la fosse des Mariannes qui atteint 10 994 mètres.",
+            "quelle est la plus grande île de la Méditerranée": "🏝️ **La Sicile** est la plus grande île de la Méditerranée.",
+            "quel est le pays le plus jeune du monde": "🌍 **Le Soudan du Sud**, qui a proclamé son indépendance en 2011, est le pays le plus jeune du monde.",
+            "quels pays ont une frontière avec le Brésil": "🌍 Le **Brésil** partage une frontière avec **10 pays** : Argentine, Bolivie, Colombie, Guyane, Paraguay, Pérou, Suriname, Uruguay, Venezuela et le pays français de la Guyane.",
+            "quelle est la capitale de l’Islande": "❄️ La capitale de l’**Islande** est **Reykjavik**.",
+            "quelle est la mer la plus grande": "🌊 La **mer des Philippines** est la plus grande mer de la planète.",
+            "quelle est la plus grande ville du monde par superficie": "🌍 **Hulunbuir**, en **Chine**, est la plus grande ville du monde par superficie.",
+            "quels pays ont une frontière avec l’Allemagne": "🌍 **L'Allemagne** partage une frontière avec **9 pays** : Danemark, Pologne, République tchèque, Autriche, Suisse, France, Luxembourg, Belgique, et les Pays-Bas.",
+            "où se trouve la forêt amazonienne": "🌳 La **forêt amazonienne** s’étend sur plusieurs pays, principalement le **Brésil**, mais aussi le **Pérou**, la **Colombie**, et plusieurs autres pays d'Amérique du Sud.",
+    
+            # ⏰ Temps & Calendrier
+            "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
+            "quels sont les mois de l'été": "☀️ En France, l'été comprend **juin, juillet et août**.",
+            "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
+            "quels sont les mois de l'été": "☀️ En France, l'été comprend **juin, juillet et août**.",
+            "combien de mois dans une année": "📅 Une année contient **12 mois**.",
+            "quelle est la durée d'un jour sur Mars": "🪐 Un jour sur Mars, aussi appelé sol, dure **24 heures et 39 minutes**.",
+            "quels sont les mois de l'hiver": "❄️ En France, l'hiver comprend **décembre, janvier et février**.",
+            "combien de jours dans une semaine": "📅 Une semaine contient **7 jours** : lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+            "quelle est la date de la fête nationale en France": "🇫🇷 La fête nationale française est célébrée le **14 juillet**, commémorant la prise de la Bastille en 1789.",
+            "quand a eu lieu le premier voyage sur la Lune": "🌕 Le premier voyage sur la Lune a eu lieu le **20 juillet 1969**, avec **Neil Armstrong** comme premier homme à marcher sur la Lune.",
+            "combien de semaines dans une année": "📅 Il y a **52 semaines** dans une année, soit 365 jours divisés par 7.",
+            "quel est le mois le plus court de l'année": "📅 **Février** est le mois le plus court de l'année, avec **28** jours, ou **29** lors des années bissextiles.",
+            "quel est le mois de la rentrée scolaire en France": "📚 La rentrée scolaire en France a lieu en **septembre**.",
+            "quand commence le printemps": "🌸 Le printemps commence autour du **20 mars** dans l'hémisphère nord.",
+            "quand commence l'automne": "🍁 L'automne commence généralement autour du **22 septembre** dans l'hémisphère nord.",
+            "combien d'heures dans une journée": "🕰️ Une journée complète compte **24 heures**.",
+            "quand a été lancé le premier calendrier grégorien": "📅 Le calendrier grégorien a été introduit le **15 octobre 1582** par le pape Grégoire XIII pour remplacer le calendrier julien.",
+            "combien de secondes dans une heure": "⏳ Il y a **3600 secondes** dans une heure.",
+            "quelle est la durée d'une année sur Vénus": "🪐 Une année sur Vénus dure **225 jours terrestres**, mais une journée sur Vénus est plus longue, environ **243 jours terrestres**.",
+            "quand se passe le solstice d'hiver": "❄️ Le solstice d'hiver a lieu vers le **21 décembre** dans l'hémisphère nord, marquant le début de l'hiver.",
+            "combien de jours dans un mois de février d'une année bissextile": "📅 En année bissextile, **février** compte **29 jours**."
+        }
+
+        for question_base, reponse_base in base_generale.items():
+            if question_base in question_clean:
+                message_bot = reponse_base
+                break
+
+    if message_bot:
+        return message_bot
+
+
+        
+    # --- Bloc catch-all pour l'analyse technique ou réponse par défaut ---
+    if not message_bot:
+        if any(phrase in question_clean for phrase in ["hello", "hi", "good morning", "good afternoon", "good evening"]):
+            message_bot = "Bonjour ! Je suis là et prêt à vous aider. Comment puis-je vous assister aujourd'hui ?"
+        else:
+            reponses_ava = [
+                 "Je suis là pour vous aider, mais j'ai besoin d'un peu plus de détails 🤖",
+                "Je n'ai pas bien compris. Pouvez-vous reformuler, s'il vous plaît ?",
+                "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !",
+                "Hmm... Ce n'est pas encore dans ma base de données. Essayez une autre formulation ou tapez 'analyse complète' pour un aperçu du marché 📊"
+            ]
+            message_bot = random.choice(reponses_ava)
+
+
+    # ✅ Bloc final de retour (à garder tout à la fin de trouver_reponse)
+    if not message_bot:
+        message_bot = "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"
+    return message_bot
      
         
 
