@@ -1423,9 +1423,11 @@ def gerer_modules_speciaux(question_clean):
                 message_bot = random.choice(reponses_ava)
 
 
-    # ... les autres modules (horoscope, météo, etc.)
-
-    return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
+        # ✅ Bloc final de retour (à garder tout à la fin de trouver_reponse)
+        if not message_bot:
+            message_bot = "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"
+        return message_bot
+     
         
 
 # Récupération de la question utilisateur
