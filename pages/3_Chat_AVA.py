@@ -464,7 +464,7 @@ def gerer_modules_speciaux(question_clean):
         else:
             message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
         
-    return message_bot
+    
 
     # --- Bloc Réponses médicales explicites ---
     if not message_bot and any(phrase in question_clean for phrase in [
