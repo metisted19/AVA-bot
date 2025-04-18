@@ -175,37 +175,9 @@ if question:
         geographie_repondu = False
         sante_repondu = False
         perso_repondu = False
-        # --- Interface utilisateur ---
-        st.title("💬 Chat AVA")
-
-        question_raw = st.chat_input("Posez votre question ici :")
-
-        
-        if question:
-            # Ajouter la question de l'utilisateur dans les messages de session
-            st.session_state.messages.append({"role": "user", "content": question})
-
-            # Affichage de la question dans le chat (utilisateur)
-            with st.chat_message("user"):
-                st.markdown(question_raw)
-
-            # Traitement de la question en minuscule et nettoyage
-            question_clean = question.lower().strip()
-
-            # Appel à la fonction pour obtenir la réponse de l'IA
-            message_bot = obtenir_reponse_ava(question_clean)
-
-            # Affichage de la réponse de l'IA dans le chat (assistant)
-            with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-                 st.markdown(message_bot)
-
-            # Ajouter la réponse de l'IA dans les messages de session
-            st.session_state.messages.append({"role": "assistant", "content": message_bot})
-
- 
 
 
-        # --- Vérification de la question pour l'horoscope ---
+         # --- Vérification de la question pour l'horoscope ---
         if isinstance(question_clean, str) and question_clean:  # Vérifie que question_clean est bien une chaîne non vide
             if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
                 signes_disponibles = [
