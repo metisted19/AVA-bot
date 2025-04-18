@@ -182,12 +182,15 @@ if question:
         question_raw = st.chat_input("Posez votre question ici :")
 
         if question_raw:
-            qc = question_raw.lower()  # Nettoyage de la question
-            print(f"Question nettoyée : {qc}")  # Pour vérifier que qc est bien une chaîne
-            if isinstance(qc, str) and qc:  # Vérifie si qc est une chaîne non vide
+            qc = question_raw.lower()  # Nettoyage de la question en minuscule
+            print(f"Question nettoyée : {qc}")  # Pour déboguer et vérifier qc
+
+            # Vérification si qc est une chaîne non vide
+            if isinstance(qc, str) and qc.strip():  # Vérifie que qc est une chaîne non vide
                 message_bot = trouver_reponse(qc)
             else:
                 message_bot = "⚠️ Il semble y avoir un problème avec la question. Essayez de reformuler."
+
 
         if isinstance(qc, str) and qc:  # Vérifie que qc est bien une chaîne non vide
             if any(mot in qc for mot in ["horoscope", "signe", "astrologie"]):
