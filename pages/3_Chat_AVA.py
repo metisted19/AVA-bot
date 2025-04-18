@@ -160,11 +160,6 @@ def nettoyer_texte(txt):
     return txt
 
 
-# 🔒 Sécurité : détection d'entrée dangereuse
-if question and re.search(r"[<>;{}]", question):
-    st.warning("⛔ Entrée invalide détectée.")
-    st.stop()
-
 if question:
     st.session_state.messages.append({"role": "user", "content": question})
     with st.chat_message("user"):
@@ -451,7 +446,11 @@ if question:
             st.session_state.messages = []
         # Input utilisateur en fin de page (à la racine)
         question = st.chat_input("Posez votre question ici")
-        
+        # 🔒 Sécurité : détection d'entrée dangereuse
+        if question and re.search(r"[<>;{}]", question):
+            st.warning("⛔ Entrée invalide détectée.")
+            st.stop()
+            
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
         # 4.a) Hard‑codées
         reponses_courantes = {
