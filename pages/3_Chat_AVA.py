@@ -182,8 +182,8 @@ if question:
         question_raw = st.chat_input("Posez votre question ici :")
 
         if question_raw:
-            qc = question_raw.lower()  # Transforme la question en minuscules
-            print(f"Question nettoyée : {qc}")  # Pour déboguer et voir si qc est bien formée
+            qc = question_raw.lower()  # Assure-toi que qc est une chaîne de caractères
+            print(f"Question nettoyée : {qc}")  # Affiche la question nettoyée pour déboguer
             message_bot = trouver_reponse(qc)
 
         # --- Partie Horoscope ---
