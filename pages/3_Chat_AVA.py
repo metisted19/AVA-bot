@@ -182,8 +182,9 @@ if question:
         question_raw = st.chat_input("Posez votre question ici :")
 
         if question_raw:
-            qc = question_raw.lower()  # 🔑 Rend la question minuscule pour faciliter les détections
-            message_bot = trouver_reponse(qc)  # Optionnel si tu appelles une fonction externe
+            qc = question_raw.lower()  # Transforme la question en minuscules
+            print(f"Question nettoyée : {qc}")  # Pour déboguer et voir si qc est bien formée
+            message_bot = trouver_reponse(qc)
 
         # --- Partie Horoscope ---
         if any(mot in qc for mot in ["horoscope", "signe", "astrologie"]):
