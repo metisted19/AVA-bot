@@ -195,11 +195,11 @@ def trouver_reponse(question):
     # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
     return gerer_modules_speciaux(question_clean)
 
-# --- Modules personnalisés (à enrichir) ---
+
 # --- Modules personnalisés (à enrichir) ---
 def gerer_modules_speciaux(question_clean):
     """
-    Gère les modules spéciaux : analyse BTC, horoscope, météo, etc.
+    Gère les modules spéciaux : analyse BTC, horoscope, météo, actualités.
     Retourne la réponse du module ou None s'il n'y a pas de correspondance.
     """
     # Initialisation des flags et message
@@ -209,7 +209,7 @@ def gerer_modules_speciaux(question_clean):
     actus_repondu     = False
     analyse_complete  = False
 
-    # 1) Analyse BTC
+    # 1) Analyse technique BTC
     if "analyse" in question_clean and "btc" in question_clean:
         message_bot = (
             "📊 Analyse technique BTC : RSI en surachat, "
@@ -218,17 +218,50 @@ def gerer_modules_speciaux(question_clean):
         analyse_complete = True
 
     # 2) Horoscope
-    if not message_bot and "horoscope" in question_clean:
-        message_bot = "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+    if not message_bot and any(w in question_clean for w in ["horoscope", "signe", "astrologie"]):
+        # Exemples de signe détectables
+        signes = ["bélier","taureau","gémeaux","cancer","lion","vierge",
+                  "balance","scorpion","sagittaire","capricorne","verseau","poissons"]
+        signe = next((s for s in signes if s in question_clean), None)
+        if signe:
+            try:
+                url = "https://kayoo123.github.io/astroo-api/jour.json"
+                resp = requests.get(url, timeout=5)
+                data = resp.json().get("signes") or resp.json()
+                horoscope = data.get(signe.capitalize(), {}).get("horoscope")
+                message_bot = f"🔮 Horoscope pour **{signe.capitalize()}** :\n> {horoscope}\n" if horoscope else \
+                    f"🔍 Horoscope indisponible pour **{signe.capitalize()}**."
+            except Exception:
+                message_bot = "⚠️ Impossible d'obtenir l'horoscope pour le moment."
+        else:
+            message_bot = (
+                "🔮 Pour obtenir votre horoscope, indiquez votre signe (ex : Lion, Vierge...)."
+            )
         horoscope_repondu = True
 
-    # 3) Météo Paris
-    if not message_bot and "météo" in question_clean and "paris" in question_clean:
-        message_bot = "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+    # 3) Météo (générique)
+    if not message_bot and any(w in question_clean for w in ["météo", "meteo"]):
+        # extraction de la ville
+        match = re.search(r"(?:à|dans|en)\s+([A-Za-zÀ-ÿ' -]+)", question_clean)
+        ville = match.group(1).strip() if match else "Paris"
+        meteo = get_meteo_ville(ville)
+        message_bot = f"🌦️ Météo à {ville.title()} :\n{meteo}"
         meteo_repondu = True
+
+    # 4) Actualités générales
+    if not message_bot and any(w in question_clean for w in ["actualité", "news"]):
+        actus = get_general_news()
+        if isinstance(actus, str):
+            message_bot = actus
+        else:
+            message_bot = "📰 **Dernières actualités :**\n"
+            for titre, lien in actus[:5]:
+                message_bot += f"- [{titre}]({lien})\n"
+        actus_repondu = True
 
     # Retour final
     return message_bot if message_bot else None
+
 
 
 
