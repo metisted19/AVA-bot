@@ -18,7 +18,8 @@ import difflib
 import urllib.parse
 from fonctions_chat import obtenir_reponse_ava
 
-
+# --- CONFIG ---
+st.set_page_config(page_title="Chat AVA", layout="centered")
 
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
@@ -142,8 +143,7 @@ with col2:
 
 st.markdown(f"<p style='font-style: italic;'>{humeur_du_jour()}</p>", unsafe_allow_html=True)
 st.markdown("Posez-moi vos questions sur la bourse, la météo, les actualités... ou juste pour discuter !")
-# --- CONFIG ---
-st.set_page_config(page_title="Chat AVA", layout="centered")
+
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
