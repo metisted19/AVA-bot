@@ -187,7 +187,7 @@ if question:
 
             # Afficher la question de l'utilisateur dans le chat
             with st.chat_message("user"):
-                st.markdown(question)
+                st.markdown(question_raw)
 
             # Traitement de la question en minuscule et nettoyage
             question_clean = question.lower().strip()
@@ -201,6 +201,7 @@ if question:
 
             # Ajouter la réponse de l'IA dans les messages de session
             st.session_state.messages.append({"role": "assistant", "content": message_bot})
+ 
 
 
         # --- Vérification de la question pour l'horoscope ---
