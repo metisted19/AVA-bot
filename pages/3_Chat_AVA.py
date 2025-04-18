@@ -196,13 +196,39 @@ def trouver_reponse(question):
     return gerer_modules_speciaux(question_clean)
 
 # --- Modules personnalisés (à enrichir) ---
+# --- Modules personnalisés (à enrichir) ---
 def gerer_modules_speciaux(question_clean):
+    """
+    Gère les modules spéciaux : analyse BTC, horoscope, météo, etc.
+    Retourne la réponse du module ou None s'il n'y a pas de correspondance.
+    """
+    # Initialisation des flags et message
+    message_bot       = ""
+    horoscope_repondu = False
+    meteo_repondu     = False
+    actus_repondu     = False
+    analyse_complete  = False
+
+    # 1) Analyse BTC
     if "analyse" in question_clean and "btc" in question_clean:
-        return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-    if "horoscope" in question_clean:
-        return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-    if "météo" in question_clean and "paris" in question_clean:
-        return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+        message_bot = (
+            "📊 Analyse technique BTC : RSI en surachat, "
+            "attention à une possible correction."
+        )
+        analyse_complete = True
+
+    # 2) Horoscope
+    if not message_bot and "horoscope" in question_clean:
+        message_bot = "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
+        horoscope_repondu = True
+
+    # 3) Météo Paris
+    if not message_bot and "météo" in question_clean and "paris" in question_clean:
+        message_bot = "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
+        meteo_repondu = True
+
+    # Retour final
+    return message_bot if message_bot else None
 
 
 
