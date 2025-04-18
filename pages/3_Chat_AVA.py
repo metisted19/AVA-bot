@@ -448,25 +448,14 @@ if question:
         question = st.chat_input("Posez votre question ici")
 
         if question:
-            # Affichage du message utilisateur
+                    st.session_state.messages.append({"role": "user", "content": question})
             with st.chat_message("user"):
                 st.markdown(question)
 
-            # Stocker la question
-            st.session_state.messages.append({"role": "user", "content": question})
-
-            # Nettoyage pour traitement
-            question_clean = question.lower().strip()
-
-            # Obtenir réponse AVA (ta fonction personnalisée)
-            message_bot = obtenir_reponse_ava(question_clean)
-
-            # Affichage de la réponse AVA
             with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+                message_bot = traiter_question(question)
                 st.markdown(message_bot)
-
-            # Stocker la réponse AVA
-            st.session_state.messages.append({"role": "assistant", "content": message_bot})
+                st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
