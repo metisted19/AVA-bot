@@ -450,7 +450,6 @@ if question:
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
 
-        question = st.chat_input("Posez votre question ici")
 
 
 
