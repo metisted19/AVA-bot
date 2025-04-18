@@ -160,8 +160,65 @@ def nettoyer_texte(txt):
     return txt
 
 
+ 
+        
+
+        # 3. 🔍 Initialisation du chat
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        # Input utilisateur en fin de page (à la racine)
+        question = st.chat_input("Posez votre question ici")
+        # 🔒 Sécurité : détection d'entrée dangereuse
+        if question and re.search(r"[<>;{}]", question):
+            st.warning("⛔ Entrée invalide détectée.")
+            st.stop()
+        if question:
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.markdown(question)
+    with st.chat_message("assistant", avatar="assets/ava_logo.png"):
+        # Traitement de la question en minuscule
+        question_clean = question.lower().strip()
+        message_bot = ""
+        horoscope_repondu = False
+        meteo_repondu = False
+        actus_repondu = False
+        blague_repondu = False
+        analyse_complete = False
+
+        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
+        geographie_repondu = False
+        sante_repondu = False
+        perso_repondu = False
 
 
+        # --- Vérification de la question pour l'horoscope ---
+        if isinstance(question_clean, str) and question_clean:  # Vérifie que question_clean est bien une chaîne non vide
+            if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
+                signes_disponibles = [
+                    "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
+                    "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
+                ]
+                signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
+                if not signe_detecte:
+                    message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
+                else:
+                    try:
+                        url = "https://kayoo123.github.io/astroo-api/jour.json"
+                        response = requests.get(url)
+                        if response.status_code == 200:
+                            data = response.json()
+                            horoscope_dict = data.get("signes", {}) if "signes" in data else data
+                            signe_data = horoscope_dict.get(signe_detecte.lower(), None)
+                            if signe_data:
+                                horoscope = signe_data.get("horoscope", "Aucun horoscope disponible")
+                                message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
+                            else:
+                                message_bot = f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
+                        else:
+                            message_bot = "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
+                    except Exception as e:
+                        message_bot = f"⚠️ Une erreur est survenue lors de la récupération de l'horoscope : {e}\n\n"
         # Ajout du message dans l'historique
         st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
@@ -199,23 +256,7 @@ def nettoyer_texte(txt):
 
             meteo_repondu = True
 
-
-
-        # --- Actualités améliorées ---
-        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
-            actus = get_general_news()
-            if isinstance(actus, str):
-                message_bot += actus
-            elif actus and isinstance(actus, list):
-                message_bot += "📰 **Dernières actualités importantes :**\n\n"
-                for i, (titre, lien) in enumerate(actus[:5], 1):
-                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
-                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
-            else:
-                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
-            actus_repondu = True
- 
-        # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
+            # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
             nom_simple = question_clean.replace("analyse", "").strip()
             nom_simple_norm = remove_accents(nom_simple)  # Normalisation sans accents
@@ -393,63 +434,19 @@ def nettoyer_texte(txt):
                 nom_ticker = "uni-usd"
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
-
-        # 3. 🔍 Initialisation du chat
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-        # Input utilisateur en fin de page (à la racine)
-        question = st.chat_input("Posez votre question ici")
-        # 🔒 Sécurité : détection d'entrée dangereuse
-        if question and re.search(r"[<>;{}]", question):
-            st.warning("⛔ Entrée invalide détectée.")
-            st.stop()
-        if question:
-    st.session_state.messages.append({"role": "user", "content": question})
-    with st.chat_message("user"):
-        st.markdown(question)
-    with st.chat_message("assistant", avatar="assets/ava_logo.png"):
-        # Traitement de la question en minuscule
-        question_clean = question.lower().strip()
-        message_bot = ""
-        horoscope_repondu = False
-        meteo_repondu = False
-        actus_repondu = False
-        blague_repondu = False
-        analyse_complete = False
-
-        # Nouveaux flags pour la géographie, la médecine et les réponses personnalisées
-        geographie_repondu = False
-        sante_repondu = False
-        perso_repondu = False
-
-
-        # --- Vérification de la question pour l'horoscope ---
-        if isinstance(question_clean, str) and question_clean:  # Vérifie que question_clean est bien une chaîne non vide
-            if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
-                signes_disponibles = [
-                    "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
-                    "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
-                ]
-                signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
-                if not signe_detecte:
-                    message_bot = "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
-                else:
-                    try:
-                        url = "https://kayoo123.github.io/astroo-api/jour.json"
-                        response = requests.get(url)
-                        if response.status_code == 200:
-                            data = response.json()
-                            horoscope_dict = data.get("signes", {}) if "signes" in data else data
-                            signe_data = horoscope_dict.get(signe_detecte.lower(), None)
-                            if signe_data:
-                                horoscope = signe_data.get("horoscope", "Aucun horoscope disponible")
-                                message_bot = f"🔮 Horoscope pour **{signe_detecte.capitalize()}** :\n\n> {horoscope}\n\n"
-                            else:
-                                message_bot = f"🔍 Horoscope indisponible pour **{signe_detecte.capitalize()}**. Essayez plus tard.\n\n"
-                        else:
-                            message_bot = "❌ Impossible d'obtenir l'horoscope pour le moment.\n\n"
-                    except Exception as e:
-                        message_bot = f"⚠️ Une erreur est survenue lors de la récupération de l'horoscope : {e}\n\n"
+                # --- Actualités améliorées ---
+        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
+            actus = get_general_news()
+            if isinstance(actus, str):
+                message_bot += actus
+            elif actus and isinstance(actus, list):
+                message_bot += "📰 **Dernières actualités importantes :**\n\n"
+                for i, (titre, lien) in enumerate(actus[:5], 1):
+                    message_bot += f"{i}. 🔹 [{titre}]({lien})\n"
+                message_bot += "\n🧠 *Restez curieux, le savoir, c’est la puissance !*"
+            else:
+                message_bot += "⚠️ Je n’ai pas pu récupérer les actualités pour le moment.\n\n"
+            actus_repondu = True         
 
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
         # 4.a) Hard‑codées
