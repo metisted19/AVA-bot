@@ -78,7 +78,15 @@ def get_meteo_ville(city):
     hum  = data["main"].get("humidity", "N/A")
     vent = data["wind"].get("speed", "N/A")
     return f"{desc} avec {temp}°C, humidité : {hum}%, vent : {vent} m/s."
-
+# --- Bloc Traduction corrigé ---
+def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
+    url = "https://api-free.deepl.com/v2/translate"
+    params = {
+        "auth_key": api_key,
+        "text": texte,
+        "target_lang": langue_cible
+    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
 # Nouvelle fonction get_general_news() avec la modification pour NewsAPI
 def get_general_news():
@@ -149,8 +157,16 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 # --- Moteur central de réponse AVA ---
 def trouver_reponse(question):
-    question_clean = nettoyer_texte(question)
-    st.write("🧼 Texte nettoyé :", question_clean)  # Debug temporaire
+    question_clean = question.lower().strip()
+    reponse = gerer_modules_speciaux(question_clean)
+    if reponse:
+        return reponse
+    else:
+        # Réponse catch-all si aucun module n’a matché
+        return random.choice([
+            "Je n'ai pas compris, reformulez s'il vous plaît 🤖",
+            "Ce sujet est flou pour moi... mais je m'améliore chaque jour !"
+        ])
 
     # 1. Direct
     if question_clean in base_complet:
@@ -1458,15 +1474,7 @@ if question:
         perso_repondu = False
 
         
-    # --- Bloc Traduction corrigé ---
-        def traduire_deepl(texte, langue_cible="EN", api_key="0f57cbca-eac1-4c8a-b809-11403947afe4:fx"):
-            url = "https://api-free.deepl.com/v2/translate"
-            params = {
-                "auth_key": api_key,
-                "text": texte,
-                "target_lang": langue_cible
-            }
-            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    
             # Détecter la langue de la question et loguer le résultat
             try:
                 lang_question = detect(question)
