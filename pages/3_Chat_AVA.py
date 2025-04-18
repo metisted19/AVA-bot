@@ -149,11 +149,11 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 # --- Moteur central de réponse AVA ---
 def trouver_reponse(question):
-    qc = nettoyer_texte(question)
+    question_clean = nettoyer_texte(question)
     st.write("🧼 Texte nettoyé :", question_clean)  # Debug temporaire
 
     # 1. Direct
-    if question_cleanin base_complet:
+    if question_clean in base_complet:
         st.write("✅ Match direct trouvé")
         return base_complet[question_clean]
 
