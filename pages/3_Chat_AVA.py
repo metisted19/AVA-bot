@@ -248,23 +248,33 @@ def gerer_modules_speciaux(question_clean):
             try:
                 resultats = []
                 fichiers = glob.glob("data/donnees_*.csv")
+
                 for fichier in fichiers:
-                    df = pd.read_csv(fichier)
-                    df.columns = [col.capitalize() for col in df.columns]
-                    df = ajouter_indicateurs_techniques(df)  # ← Important !
-                    analyse, suggestion = analyser_signaux_techniques(df)
                     try:
+                        df = pd.read_csv(fichier)
+                        df.columns = [col.capitalize() for col in df.columns]
+                        df = ajouter_indicateurs_techniques(df)
+
                         analyse, suggestion = analyser_signaux_techniques(df)
                         nom = fichier.split("donnees_")[1].replace(".csv", "").upper()
-                        resume = f"\n📌 **{nom}**\n{analyse}\n📁 {suggestion}"
+
+                        # Résumé visuel par actif
+                        resume = f"📌 **{nom}**\n{analyse}\n💬 *Conseil AVA :* {suggestion}"
                         resultats.append(resume)
-                    except:
-                        continue
+
+                    except Exception as err_fichier:
+                        print(f"Erreur avec {fichier} : {err_fichier}")  # log interne
+
                 if resultats:
-                    message_bot += "📊 **Analyse complète du marché :**\n" + "\n\n".join(resultats) + "\n\n"
+                    message_bot += "📊 **Analyse technique complète du marché :**\n\n" + "\n\n".join(resultats)
+                    message_bot += "\n\n🧠 *Gardez un œil sur les signaux, les opportunités ne préviennent pas !*"
                     analyse_complete = True
+                else:
+                    message_bot += "⚠️ Aucun actif n’a pu être analysé pour le moment. Vérifiez vos fichiers CSV."
+
             except Exception as e:
-                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n\n"
+                message_bot += f"❌ Erreur lors de l'analyse complète : {e}\n"
+
 
         # --- Bloc météo intelligent (villages inclus) ---
         if not horoscope_repondu and not analyse_complete \
@@ -297,6 +307,14 @@ def gerer_modules_speciaux(question_clean):
                 message_bot += f"⚠️ Je n'ai pas trouvé la météo pour **{ville_detectee}**. Essayez un autre lieu.\n\n"
             else:
                 message_bot += f"🌦️ **Météo à {ville_detectee}** :\n{meteo}\n\n"
+                message_bot += random.choice([
+                        "🧥 Pense à t’habiller en conséquence !",
+                        "☕ Rien de tel qu’un bon café pour commencer la journée, peu importe le temps.",
+                        "🔮 Le ciel en dit long… mais toi, tu décides de ta journée !",
+                        "💡 L’info météo, c’est déjà une longueur d’avance.",
+                        "🧠 Une journée bien préparée commence par une météo bien checkée."
+                    ])
+    
 
             meteo_repondu = True
 
@@ -304,6 +322,7 @@ def gerer_modules_speciaux(question_clean):
 
         # --- Actualités améliorées ---
         if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
+            message_bot = message_bot or "" 
             actus = get_general_news()
             if isinstance(actus, str):
                 message_bot += actus
@@ -338,7 +357,8 @@ def gerer_modules_speciaux(question_clean):
             elif "transpire" in question_clean or "j'ai froid" in question_clean:
                 message_bot = "🥶 Des frissons ? Cela peut être lié à une poussée de fièvre. Couvrez-vous légèrement, reposez-vous."
 
-            
+         return message_bot
+
         # --- Bloc Remèdes naturels ---
         if not message_bot and any(phrase in question_clean for phrase in [
                 "remède", "solution naturelle", "astuce maison", "traitement doux", "soulager naturellement",
@@ -400,6 +420,8 @@ def gerer_modules_speciaux(question_clean):
                 message_bot = "🧂 Cataplasme d’argile verte, infusion de curcuma et gingembre, ou massage à l’huile de millepertuis."
             else:
                 message_bot = "🌱 Je connais plein de remèdes naturels ! Dites-moi pour quel symptôme ou souci, et je vous propose une solution douce et efficace."
+        
+        return message_bot
 
         # --- Bloc Réponses médicales explicites ---
         elif not message_bot and any(mot in question_clean for mot in [ "grippe", "rhume", "fièvre", "migraine", "angine", "hypertension", "stress", "toux", "maux", "douleur", "asthme", "bronchite",
@@ -504,6 +526,7 @@ def gerer_modules_speciaux(question_clean):
                 if cle in question_clean:
                     message_bot = rep
                     break
+            return message_bot
 
         # --- Bloc Réponses géographiques enrichi (restauré avec l'ancien bloc + pays en plus) ---
         elif any(kw in question_clean for kw in ["capitale", "capitale de", "capitale du", "capitale d", "capitale des", "où se trouve", "ville principale", "ville de"]):
@@ -688,9 +711,11 @@ def gerer_modules_speciaux(question_clean):
 
             }
             if pays_detecte and pays_detecte in capitales:
-                message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
-            else:
-                message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+            message_bot = f"📌 La capitale de {pays_detecte.capitalize()} est {capitales[pays_detecte]}."
+            return message_bot
+        else:
+            message_bot = "🌍 Je ne connais pas encore la capitale de ce pays. Essayez un autre !"
+            return message_bot
 
 
 
@@ -715,6 +740,7 @@ def gerer_modules_speciaux(question_clean):
                 "🧭 *Quand tu sais où tu vas, même les tempêtes deviennent utiles.*"
             ]
             message_bot = random.choice(punchlines)
+            return message_bot
 
         # --- Bloc Culture Générale (questions simples) ---
         if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
@@ -764,6 +790,9 @@ def gerer_modules_speciaux(question_clean):
                 if question_cle in question_clean:
                     message_bot = reponse
                     break
+
+        if message_bot:
+            return message_bot
 
         # --- Nouveau Bloc : Analyse simple si la question commence par "analyse " ---
         if not message_bot and question_clean.startswith("analyse "):
@@ -830,6 +859,9 @@ def gerer_modules_speciaux(question_clean):
             else:
                 message_bot = f"🤔 Je ne connais pas encore **{nom_simple}**. Réessayez avec un autre actif."
 
+        if message_bot:
+            return message_bot
+
         # --- Bloc Calcul (simple expression mathématique ou phrase) ---
         if not message_bot:
             question_calc = question_clean.replace(",", ".")
@@ -849,6 +881,9 @@ def gerer_modules_speciaux(question_clean):
                         message_bot = f"🧮 Le résultat est : **{round(result, 4)}**"
             except:
                 pass
+
+        if message_bot:
+            return message_bot
 
         # --- Bloc Convertisseur intelligent ---
         if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
@@ -897,6 +932,9 @@ def gerer_modules_speciaux(question_clean):
                         message_bot = f"🌡️ {f_temp}°F = {round(c_temp, 2)}°C"
             except Exception as e:
                 message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
+            
+        if message_bot:
+            return message_bot
 
         # === Bloc Reconnaissance des tickers (exemple) ===
         if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
@@ -943,6 +981,9 @@ def gerer_modules_speciaux(question_clean):
                 nom_ticker = "uni-usd"
             elif "ndx" in nom_ticker or "nasdaq" in nom_ticker or "nasdaq100" in nom_ticker:
                 nom_ticker = "^ndx"
+
+            message_bot = f"🔍 Vous souhaitez en savoir plus sur **{nom_ticker.upper()}** ? Tapez `analyse {nom_ticker}` pour une analyse complète 📊"
+            return message_bot    
         
 
         
@@ -984,6 +1025,9 @@ def gerer_modules_speciaux(question_clean):
             else:
                 message_bot = f"❌ Oops ! Ce n'était pas ça... La bonne réponse était **{reponse_attendue.capitalize()}**."
             st.session_state["quiz_attendu"] = ""
+
+        if message_bot:
+            return message_bot
 
         # --- Bloc Faits Insolites ---
         # Liste des faits insolites (définie une seule fois)
@@ -1040,6 +1084,7 @@ def gerer_modules_speciaux(question_clean):
                 st.session_state['derniere_fait'] = random.choice(faits_insolites)
             message_bot = f"✨ Voici un fait insolite :\n\n{st.session_state['derniere_fait']}"
 
+
         # Gestion de la demande "encore un" ou "plus" pour les faits insolites
         if any(mot in question_clean for mot in ["encore un", "un autre","encore"]):
             if 'derniere_fait' in st.session_state:
@@ -1053,8 +1098,9 @@ def gerer_modules_speciaux(question_clean):
             else:
                 message_bot = "⚠️ Je n'ai pas encore de fait insolite à te redonner, pose une autre question !"
 
-
-
+        if message_bot:
+            return message_bot
+        
         # --- Bloc Recettes rapides 
         recettes = [
             "🥪 **Sandwich thon-avocat** : pain complet, thon, avocat écrasé, citron, sel, poivre. 5 minutes chrono !",
@@ -1107,6 +1153,8 @@ def gerer_modules_speciaux(question_clean):
                 message_bot = f"🍽️ Voici une autre idée :\n\n{random.choice(recettes)}"
             else:
                 message_bot = "⚠️ Je n'ai pas encore de recette à te redonner, pose une autre question !"
+        if message_bot:
+            return message_bot
 
         # ─── 4) Bases de réponses ───────────────────────────────────────────────────
         # 4.a) Hard‑codées
@@ -1406,9 +1454,9 @@ def gerer_modules_speciaux(question_clean):
                 if question_base in question_clean:
                     message_bot = reponse_base
                     break
-                
-            if message_bot:
-                return message_bot
+
+        if message_bot:
+            return message_bot
 
 
         
