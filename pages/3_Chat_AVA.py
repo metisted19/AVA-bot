@@ -150,15 +150,15 @@ for message in st.session_state.messages:
 # --- Moteur central de réponse AVA ---
 def trouver_reponse(question):
     qc = nettoyer_texte(question)
-    st.write("🧼 Texte nettoyé :", qc)  # Debug temporaire
+    st.write("🧼 Texte nettoyé :", question_clean)  # Debug temporaire
 
     # 1. Direct
-    if qc in base_complet:
+    if question_cleanin base_complet:
         st.write("✅ Match direct trouvé")
-        return base_complet[qc]
+        return base_complet[question_clean]
 
     # 2. Fuzzy
-    proche = difflib.get_close_matches(qc, base_complet.keys(), n=1, cutoff=0.85)
+    proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
     if proche:
         st.write(f"🔎 Match fuzzy : {proche[0]}")
         return base_complet[proche[0]]
@@ -166,7 +166,7 @@ def trouver_reponse(question):
     # 3. Sémantique
     keys = list(base_complet.keys())
     vb = model_semantic.encode(keys)
-    vq = model_semantic.encode([qc])[0]
+    vq = model_semantic.encode([question_clean])[0]
     sims = cosine_similarity([vq], vb)[0]
     best, score = max(zip(keys, sims), key=lambda x: x[1])
     st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
@@ -175,19 +175,19 @@ def trouver_reponse(question):
         return base_complet[best]
 
     # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
-    return gerer_modules_speciaux(qc)
+    return gerer_modules_speciaux(question_clean)
 
 # --- Modules personnalisés (à enrichir) ---
-def gerer_modules_speciaux(qc):
-    if "analyse" in qc and "btc" in qc:
+def gerer_modules_speciaux(question_clean):
+    if "analyse" in question_clean and "btc" in question_clean:
         return "📊 Analyse technique BTC : RSI en surachat, attention à une possible correction."
-    if "horoscope" in qc:
+    if "horoscope" in question_clean:
         return "🔮 Votre horoscope du jour : des opportunités inattendues à saisir..."
-    if "météo" in qc and "paris" in qc:
+    if "météo" in question_clean and "paris" in question_clean:
         return "🌤️ Il fait 18°C à Paris avec un ciel partiellement dégagé."
     # Tu peux ajouter ici tous tes modules spéciaux avec détection par mot-clé
-def gerer_modules_speciaux(qc):
-    if "blague" in qc:
+def gerer_modules_speciaux(question_clean):
+    if "blague" in question_clean:
         blagues = [
             "Pourquoi les traders n'ont jamais froid ? Parce qu’ils ont toujours des bougies japonaises ! 😂",
             "Quel est le comble pour une IA ? Tomber en panne pendant une mise à jour 😅",
