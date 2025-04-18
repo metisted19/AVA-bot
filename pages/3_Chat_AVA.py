@@ -1463,7 +1463,10 @@ if question:
         question_raw = st.chat_input("Posez votre question ici :")
 
         if question_raw:
-            message_bot = trouver_reponse(question_raw)
+            question_clean = question_raw.lower()
+            qc = question_clean  # 👈 Très important pour éviter les erreurs plus bas
+
+            message_bot = trouver_reponse(qc)
 
             with st.chat_message("user"):
                 st.markdown(question_raw)
@@ -1471,8 +1474,7 @@ if question:
             with st.chat_message("assistant"):
                 st.markdown(message_bot)
 
-        st.markdown(message_bot)
-        st.session_state.messages.append({"role": "assistant", "content": message_bot})
-        st.sidebar.button("🪛 Effacer les messages", on_click=lambda: st.session_state.__setitem__("messages", []))
+            st.markdown(message_bot)
+            st.session_state.messages.append({"role": "assistant", "content": message_bot})
 
 
