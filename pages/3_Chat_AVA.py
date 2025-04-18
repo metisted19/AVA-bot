@@ -176,14 +176,21 @@ if question:
         geographie_repondu = False
         sante_repondu = False
         perso_repondu = False
+        # --- Interface utilisateur ---
+        st.title("💬 Chat AVA")
 
+        question_raw = st.chat_input("Posez votre question ici :")
+
+        if question_raw:
+        qc = question_raw.lower()  # 🔑 Rend la question minuscule pour faciliter les détections
+            message_bot = trouver_reponse(qc)  # Optionnel si tu appelles une fonction externe
         # --- Partie Horoscope ---
-        if any(mot in question_clean for mot in ["horoscope", "signe", "astrologie"]):
+        if any(mot in qc for mot in ["horoscope", "signe", "astrologie"]):
             signes_disponibles = [
                 "bélier", "taureau", "gémeaux", "cancer", "lion", "vierge", "balance",
                 "scorpion", "sagittaire", "capricorne", "verseau", "poissons"
             ]
-            signe_detecte = next((s for s in signes_disponibles if s in question_clean), None)
+            signe_detecte = next((s for s in signes_disponibles if s in qc), None)
             if not signe_detecte:
                 message_bot += "🔮 Pour vous donner votre horoscope, indiquez-moi votre **signe astrologique** (ex : Lion, Vierge...).\n\n"
                 horoscope_repondu = True
@@ -218,7 +225,7 @@ if question:
                     horoscope_repondu = True
 
         # --- Analyse complète / technique ---
-        if not horoscope_repondu and any(phrase in question_clean for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
+        if not horoscope_repondu and any(phrase in qc for phrase in ["analyse complète", "analyse des marchés", "analyse technique", "prévision boursière"]):
             try:
                 resultats = []
                 fichiers = glob.glob("data/donnees_*.csv")
@@ -242,7 +249,7 @@ if question:
 
         # --- Bloc météo intelligent (villages inclus) ---
         if not horoscope_repondu and not analyse_complete \
-           and any(kw in question_clean for kw in ["météo", "quel temps"]):
+           and any(kw in qc for kw in ["météo", "quel temps"]):
 
             # fallback
             ville_detectee = "Paris"
@@ -277,7 +284,7 @@ if question:
 
 
         # --- Actualités améliorées ---
-        if not horoscope_repondu and ("actualité" in question_clean or "news" in question_clean):
+        if not horoscope_repondu and ("actualité" in qc or "news" in qc):
             actus = get_general_news()
             if isinstance(actus, str):
                 message_bot += actus
@@ -376,7 +383,7 @@ if question:
                 pass
 
         # --- Bloc Convertisseur intelligent ---
-        if not message_bot and any(kw in question_clean for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
+        if not message_bot and any(kw in qc for kw in ["convertis", "convertir", "combien vaut", "en dollars", "en euros", "en km", "en miles", "en mètres", "en celsius", "en fahrenheit"]):
             try:
                 phrase = question_clean.replace(",", ".")
                 match = re.search(r"(\d+(\.\d+)?)\s*([a-z]{3})\s*(en|to)\s*([a-z]{3})", phrase, re.IGNORECASE)
@@ -424,7 +431,7 @@ if question:
                 message_bot = f"⚠️ Désolé, la conversion n’a pas pu être effectuée en raison d’un problème de connexion. Veuillez réessayer plus tard."
 
         # === Bloc Reconnaissance des tickers (exemple) ===
-        if any(symb in question_clean for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
+        if any(symb in qc for symb in ["btc", "bitcoin", "eth", "ethereum", "aapl", "apple", "tsla", "tesla", "googl", "google", "msft", "microsoft", "amzn", "amazon", "nvda", "nvidia", "doge", "dogecoin", "ada", "cardano", "sol", "solana", "gold", "or", "sp500", "s&p", "cac", "cac40", "cl", "petrole", "pétrole", "si", "argent", "xrp", "ripple", "bnb", "matic", "polygon", "uni", "uniswap", "ndx", "nasdaq", "nasdaq100"]):
             nom_ticker = question_clean.replace(" ", "").replace("-", "")
             if "btc" in nom_ticker or "bitcoin" in nom_ticker:
                 nom_ticker = "btc-usd"
@@ -1457,16 +1464,7 @@ if question:
                 return random.choice(blagues)
             return "🤖 Je n’ai pas encore de réponse spécifique pour cela, mais je m’améliore chaque jour !"
 
-        # --- Interface utilisateur ---
-        st.title("💬 Chat AVA")
-
-        question_raw = st.chat_input("Posez votre question ici :")
-
-        if question_raw:
-            question_clean = question_raw.lower()
-            qc = question_raw.lower()  # 👈 Très important pour éviter les erreurs plus bas
-            message_bot = trouver_reponse(qc)
-
+        
             with st.chat_message("user"):
                 st.markdown(question_raw)
 
