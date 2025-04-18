@@ -200,19 +200,19 @@ def gerer_modules_speciaux(qc):
     return "🤖 Ce sujet est encore flou pour moi. Mais je progresse chaque jour !"       
         
 
-        # --- Interface utilisateur ---
-        st.title("💬 Chat AVA")
+# --- Interface utilisateur ---
+st.title("💬 Chat AVA")
 
-        question_raw = st.chat_input("Posez votre question ici :")
+question_raw = st.chat_input("Posez votre question ici :")
 
-        if question_raw:
-            message_bot = trouver_reponse(question_raw)
+if question_raw:
+    message_bot = trouver_reponse(question_raw)
 
-            with st.chat_message("user"):
-                st.markdown(question_raw)
+    with st.chat_message("user"):
+        st.markdown(question_raw)
 
-            with st.chat_message("assistant"):
-                st.markdown(message_bot)
+    with st.chat_message("assistant"):
+        st.markdown(message_bot)
 
 
 # Récupération de la question utilisateur
