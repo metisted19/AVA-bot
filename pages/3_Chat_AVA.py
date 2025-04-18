@@ -202,7 +202,17 @@ def gerer_modules_speciaux(question_clean):
 
 # Récupération de la question utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
+if question:
+    reponse = trouver_reponse(question)
 
+    with st.chat_message("user"):
+        st.markdown(question)
+
+    with st.chat_message("assistant"):
+        st.markdown(reponse)
+
+    st.session_state.messages.append({"role": "assistant", "content": reponse})
+    
 # 🔒 Sécurité : détection d'entrée dangereuse
 if question and re.search(r"[<>;{}]", question):
     st.warning("⛔ Entrée invalide détectée.")
