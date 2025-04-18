@@ -183,6 +183,9 @@ if question:
 
         if question_raw:
             qc = question_raw.lower()  # Nettoyage de la question en minuscule
+            # Déboguer pour voir ce qui est dans qc
+            print(f"Type de qc: {type(qc)}")
+            print(f"Valeur de qc: {qc}")
 
             # Vérifie que qc est une chaîne de caractères et non vide
             if isinstance(qc, str) and qc.strip():
