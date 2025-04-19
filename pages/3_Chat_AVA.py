@@ -29,7 +29,6 @@ if "user_id" not in st.session_state:
     pseudo = st.text_input("Entrez votre pseudo pour démarrer :", key="login_input")
     if pseudo:
         st.session_state["user_id"] = pseudo.strip()
-        st.experimental_rerun()
     else:
         st.stop()  # on ne continue que quand pseudo est renseigné
 
