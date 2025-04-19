@@ -45,7 +45,7 @@ def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
     _sauver_memoire()
 
-ef trouver_reponse(question):
+def trouver_reponse(question):
     # on nettoie la question
     question_clean = nettoyer_texte(question)
 
