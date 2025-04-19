@@ -25,7 +25,7 @@ from typing import Optional
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# ─── Initialisation unique de la mémoire ─────────────────────────────────
+# — Initialisation de la mémoire AVA —
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
@@ -36,7 +36,7 @@ if "souvenirs" not in st.session_state:
     except FileNotFoundError:
         st.session_state["souvenirs"] = {}
     except Exception as e:
-        st.error(f"Erreur de chargement de la mémoire : {e}")
+        st.error(f"Erreur au chargement de la mémoire : {e}")
         st.session_state["souvenirs"] = {}
 
 def _sauver_memoire():
@@ -44,7 +44,7 @@ def _sauver_memoire():
         with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
     except Exception as e:
-        st.error(f"Impossible de sauver la mémoire : {e}")
+        st.error(f"Impossible de sauver la mémoire : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
@@ -53,7 +53,7 @@ def stocker_souvenir(cle: str, valeur: str):
 def retrouver_souvenir(cle: str) -> str:
     return st.session_state["souvenirs"].get(
         cle,
-        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
