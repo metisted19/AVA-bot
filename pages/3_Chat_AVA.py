@@ -21,10 +21,10 @@ import urllib.parse
 import glob
 import json
 
-# 1️⃣ Page config : impératif tout de suite après les imports
+# 1️⃣ Page config Streamlit : impératif tout de suite
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 2️⃣ Initialisation de la mémoire en session_state
+# 2️⃣ Chargement / initialisation de la mémoire
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
@@ -46,15 +46,26 @@ def _sauver_memoire():
         st.error(f"Impossible de sauvegarder la mémoire : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
+    """Ajoute ou met à jour un souvenir, et sauve immédiatement."""
     st.session_state["souvenirs"][cle] = valeur
     _sauver_memoire()
 
 def retrouver_souvenir(cle: str) -> str:
-    return st.session_state["souvenirs"].get(
-        cle,
-        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
-    ) 
-
+    """
+    Tente :
+      1) correspondance exacte
+      2) cle partielle (c’est-à-dire une cle existante contenant ce fragment)
+    """
+    mem = st.session_state["souvenirs"]
+    # 1) Exact
+    if cle in mem:
+        return mem[cle]
+    # 2) Partiel
+    for k, v in mem.items():
+        if cle in k:
+            return v
+    # 3) RAS
+    return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
