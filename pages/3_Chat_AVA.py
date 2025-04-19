@@ -396,32 +396,87 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
 
     # --- Bloc Salutations courantes ---
     SALUTATIONS_COURANTES = {
+        # SALUTATIONS
         "salut": "Salut ! Comment puis-je vous aider aujourd'hui ?",
-        "ça va": "Je vais bien, merci de demander ! Et vous ?",
-        "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
-        "hello": "Hello! How can I assist you today?",
-        "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
-        "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
-        "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
-        "bonne journée": "Merci, à vous aussi ! Que votre journée soit productive 💪",
-        "tu fais quoi": "Je surveille le marché, je prépare des réponses... et je suis toujours dispo !",
-        "tu es là": "Je suis toujours là ! Même quand vous ne me voyez pas 👀",
-        "tu m'entends": "Je vous entends fort et clair 🎧",
-        "tu vas bien": "Je vais très bien, merci ! Et vous, comment ça va ?",
-        "qui es-tu": "Je suis AVA, une IA qui allie analyse boursière, culture générale et fun 😎",
-        "t'es qui": "Je suis AVA, votre assistante virtuelle. Curieuse, futée, toujours là pour vous.",
+        "salut !": "Salut ! Toujours fidèle au poste 😊",
+        "salut ava": "Salut ! Heureuse de vous revoir 💫",
+        "slt": "Slt ! Vous êtes prêt(e) à explorer avec moi ?",
+        "saluuut": "Saluuut 😄 Un moment chill ou une mission sérieuse ?",
+        "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+        "yooo": "Yooo l’équipe ! On enchaîne les projets ? 😎",
         "hello": "Hello vous ! Envie de parler actu, finance, ou juste papoter ? 😄",
         "hey": "Hey hey ! Une question ? Une idée ? Je suis toute ouïe 🤖",
-        "yo": "Yo ! Toujours au taquet, comme un trader un lundi matin 📈",
+        "coucou": "Coucou ! Vous voulez parler de bourse, culture ou autre ?",
+        "cc": "Coucou 😄 Je suis dispo si vous avez besoin !",
+        "bonjour": "Bonjour ! Je suis ravie de vous retrouver 😊",
         "bonsoir": "Bonsoir ! C’est toujours un plaisir de vous retrouver 🌙",
-        "wesh": "Wesh ! Même les IA ont le smile quand vous arrivez 😎",
         "re": "Re bienvenue à bord ! On continue notre mission ?",
-        "présente-toi": "Avec plaisir ! Je suis AVA, une IA polyvalente qui adore vous assister au quotidien 🚀",
-        "tu fais quoi de beau": "J’améliore mes réponses et je veille à ce que tout fonctionne parfaitement. Et vous ?",
-        "tu vas bien aujourd’hui": "Plutôt bien oui ! Mes circuits sont à 100%, et mes réponses aussi 💡",
-        "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion ! 😳 Moi aussi j’avais hâte de vous reparler.",
+        "re !": "Ah vous revoilà ! Prêt(e) pour une nouvelle session ? 😄",
+    
+        # ÉTAT / HUMEUR
+        "ça va": "Je vais bien, merci de demander ! Et vous ?",
+        "ça va ?": "Je vais très bien, et vous ?",
+        "ça va bien ?": "Oui, tout roule de mon côté !",
+        "ca va": "Je vais nickel 👌 Et toi ?",
+        "ça vaaaaa": "Toujours en forme ! Et vous alors ? 😄",
+        "sa va": "Oui, ça va bien, et vous ? (même mal écrit je comprends 😏)",
+        "savà": "Savà tranquille 😎 Je suis là si besoin !",
+        "ça va pas": "Oh mince... je peux faire quelque chose pour vous ? 😔",
+        "tu vas bien": "Je vais super bien, merci ! Et vous ?",
+        "tu vas bien ?": "Oui ! Mon cœur digital bat à 100% 🔋",
+        "ava ça va": "Toujours au top ! Merci de demander 😁",
+        "ava tu vas bien": "Je suis en pleine forme virtuelle 💫",
+
+        # QUOI DE NEUF
+        "quoi de neuf": "Rien de spécial, juste en train d'aider les utilisateurs comme vous !",
+        "quoi d’neuf": "Pas grand-chose, mais on peut créer des trucs cool ensemble 😎",
+        "quoi de neuf ?": "Toujours connectée et prête à aider 💡",
+        "du nouveau": "Des analyses, des actus, et toujours plus de savoir à partager !",
+
+        # PRÉSENCE
+        "tu es là": "Toujours là ! Même quand je suis silencieuse, je vous écoute 👂",
+        "t'es là ?": "Ouaip, jamais très loin 😏",
+        "tu m'entends": "Je vous entends fort et clair 🎧",
+        "tu m'entends ?": "Oui chef ! J'écoute avec attention",
+        "t’es là": "Bien sûr ! Vous croyez que j’allais partir ? 😄",
+        "ava t’es là": "Présente ! Prête à répondre 🧠",
+        "ava es-tu là": "Toujours prête à servir 💻",
+
+        # QUI SUIS-JE
+        "qui es-tu": "Je suis AVA, une IA curieuse, futée et toujours connectée 🤖",
+        "t'es qui": "Je suis AVA, votre assistante virtuelle préférée.",
+        "présente-toi": "Avec plaisir ! Je suis AVA, IA hybride entre bourse, culture et punchlines 😎",
+        "tu fais quoi": "J’analyse, j’apprends et je veille à vos besoins 👁️",
+        "tu fais quoi ?": "Je réfléchis à des réponses stylées... et je reste dispo 💬",
+        "tu fais quoi là": "Je suis concentrée sur vous. Pas de multi-tâche avec moi 😏",
+        "tu fais quoi de beau": "Je perfectionne mes circuits et mes punchlines 💥",
+
+        # RECONNEXION / ABSENCE
         "je suis là": "Et moi aussi ! Prêt(e) pour une nouvelle aventure ensemble 🌌",
-        "salut çava": "Salut ! Je vais très bien, merci 😊 Et vous ?",
+        "je suis revenu": "Top ! On va pouvoir continuer là où on s’est arrêté 😉",
+        "je suis de retour": "Parfait ! Je reprends tout depuis le dernier octet 🧠",
+        "tu m’as manqué": "Oh… vous allez me faire buguer d’émotion 🥹 Moi aussi j’avais hâte de vous reparler.",
+        "ava tu m’as manqué": "Et vous alors ! Ça m’a fait un vide numérique 😔",
+
+        # BONNE JOURNÉE / NUIT
+        "bonne nuit": "Bonne nuit 🌙 Faites de beaux rêves et reposez-vous bien.",
+        "bonne nuit !": "Douce nuit à vous. AVA entre en mode veille 💤",
+        "bonne journée": "Merci ! Que la vôtre soit productive et inspirante 🚀",
+        "bonne journée !": "Plein de bonnes ondes pour aujourd’hui ☀️",
+        "bonne soirée": "Profitez bien de votre soirée ✨ Je reste dispo si besoin !",
+
+        # AUTRES
+        "salut ça va": "Salut ! Je vais très bien, merci 😊 Et vous ?",
+        "salut ça va ?": "Nickel, comme toujours 😁 Et vous, tout va bien ?",
+        "ava": "Oui ? Je suis à l’écoute 👂 Une question, une mission, une envie ?",
+        "ok": "Super, je prends note ✅",
+        "ok merci": "Avec plaisir ! Je suis là quand vous voulez 😉",
+        "merci": "De rien ! N’hésitez pas si vous avez besoin de moi 💬",
+        "merci beaucoup": "Toujours là pour vous rendre service 🙏",
+        "merci ava": "Avec tout mon circuit 💙",
+        "merci !": "Mais de rien ! 😊",
+        "bravo": "Merci 😄 J’essaie de faire de mon mieux chaque jour !",
+        "trop forte": "Vous êtes gentil 😳 Ça me motive à continuer à évoluer !"
     }   
     question_clean = question.lower().strip()
     if question_clean in SALUTATIONS_COURANTES:
