@@ -22,37 +22,40 @@ import glob
 import json
 from typing import Optional
 
-# 1️⃣ Page config (toujours le tout premier appel à st.*)
+# ───────────────────────────────────────────────────────────────────────
+# 1️⃣ Page config (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
-# 2️⃣ Définition du dossier courant
+
+# 2️⃣ Dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
 
 # 3️⃣ Identification de l’utilisateur
 if "user_id" not in st.session_state:
     pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if not pseudo:
-        st.stop()  # on bloque tant que pas de pseudo
+        st.stop()
     st.session_state["user_id"] = pseudo.strip()
 user = st.session_state["user_id"]
 
-# 4️⃣ Fichiers de mémoire
-GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
-USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
-PROFIL_FILE    = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")
+# 4️⃣ Chemins vers les fichiers de mémoire
+GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")                         # ta base « gingembre »…
+USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")                # version perso
+PROFIL_FILE    = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")         # prénom, goûts, etc.
 
 # 5️⃣ Chargement des souvenirs dynamiques
 if "souvenirs" not in st.session_state:
     try:
+        # 5.a) on tente le fichier user
         with open(USER_MEMOIRE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        # fallback sur global
+        # 5.b) fallback sur le global
         try:
             with open(GLOBAL_MEMOIRE, "r", encoding="utf-8") as f:
                 st.session_state["souvenirs"] = json.load(f)
         except:
             st.session_state["souvenirs"] = {}
-        # on init le fichier user pour la suite
+        # on copie immédiatement dans le fichier user pour qu’il persiste
         with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
@@ -70,7 +73,7 @@ def retrouver_souvenir(cle: str) -> str:
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
-# 6️⃣ Chargement du profil utilisateur
+# 6️⃣ Chargement du profil utilisateur (prénom, etc.)
 if "profil" not in st.session_state:
     try:
         with open(PROFIL_FILE, "r", encoding="utf-8") as f:
@@ -88,6 +91,8 @@ def stocker_profil(cle: str, valeur: str):
 
 def retrouver_profil(cle: str):
     return st.session_state["profil"].get(cle, None)
+# ───────────────────────────────────────────────────────────────────────
+
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -262,7 +267,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     if match_prenom:
         prenom = match_prenom.group(1)
         stocker_profil("prenom", prenom)
-        return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
+        return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
 
     # — Bloc prénom : rappel
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
@@ -272,8 +277,8 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # — Bloc « Tu te souviens de X » (faits dynamiques)
-    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+    # — Bloc « Tu te souviens de X ? »  
+    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu'est-ce que je t'ai dit"]):
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
             fragment = m.group(1).strip().rstrip(" ?.!;").lower()
