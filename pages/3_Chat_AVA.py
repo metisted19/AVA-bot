@@ -24,7 +24,6 @@ import json
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 2️⃣ Initialisation de la mémoire
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
@@ -32,7 +31,7 @@ if "souvenirs" not in st.session_state:
     try:
         with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
-    except:
+    except FileNotFoundError:
         st.session_state["souvenirs"] = {}
 
 def _sauver_memoire():
@@ -43,6 +42,11 @@ def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
     _sauver_memoire()
 
+def retrouver_souvenir(cle: str) -> str:
+    return st.session_state["souvenirs"].get(
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    )
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
