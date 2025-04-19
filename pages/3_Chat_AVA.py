@@ -297,8 +297,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
             # 3) rien trouvé
             return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
 
-    # Ici tu peux continuer avec tes autres modules (météo, news, culture, etc.)
-    return None
+   
 
     # Initialisation
     message_bot       = ""
