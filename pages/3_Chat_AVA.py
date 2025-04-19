@@ -22,10 +22,10 @@ import glob
 import json
 from typing import Optional
 
-# ─── 1️⃣ Page config (TOUJOURS juste après les imports) ────────────────
+# ─── 1️⃣ Page config ────────────────────────────────────────────────────
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# ─── 2️⃣ Identification de l’utilisateur (login obligatoire) ───────────
+# ─── 2️⃣ Login / identification ─────────────────────────────────────────
 if "user_id" not in st.session_state:
     pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if not pseudo:
@@ -33,26 +33,29 @@ if "user_id" not in st.session_state:
     st.session_state["user_id"] = pseudo.strip()
 user = st.session_state["user_id"]
 
-# ─── 3️⃣ Définition des chemins JSON par utilisateur ───────────────────
+# ─── 3️⃣ Chemins des JSON (un par utilisateur) ─────────────────────────
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 PROFIL_FILE  = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")
 
-# ─── 4️⃣ Mémoire dynamique (faits, anecdotes…) ─────────────────────────
-if "souvenirs" not in st.session_state:
-    try:
-        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
-            st.session_state["souvenirs"] = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        st.session_state["souvenirs"] = {}
+# ─── 4️⃣ Initialisation des dictionnaires en session_state ─────────────
+for key, path in [("souvenirs", MEMOIRE_FILE), ("profil", PROFIL_FILE)]:
+    if key not in st.session_state:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                st.session_state[key] = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            st.session_state[key] = {}
 
-def _save_souvenirs():
-    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+# ─── 5️⃣ Sauvegarde générique ───────────────────────────────────────────
+def _save(key: str, path: str):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(st.session_state[key], f, ensure_ascii=False, indent=2)
 
+# ─── 6️⃣ Mémoire dynamique (faits, anecdotes…) ───────────────────────────
 def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
-    _save_souvenirs()
+    _save("souvenirs", MEMOIRE_FILE)
 
 def retrouver_souvenir(cle: str) -> str:
     return st.session_state["souvenirs"].get(
@@ -60,21 +63,10 @@ def retrouver_souvenir(cle: str) -> str:
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
-# ─── 5️⃣ Profil utilisateur (statique) ────────────────────────────────
-if "profil" not in st.session_state:
-    try:
-        with open(PROFIL_FILE, "r", encoding="utf-8") as f:
-            st.session_state["profil"] = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        st.session_state["profil"] = {}
-
-def _save_profil():
-    with open(PROFIL_FILE, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
-
+# ─── 7️⃣ Profil statique (prénom, goûts…) ───────────────────────────────
 def stocker_profil(cle: str, valeur: str):
     st.session_state["profil"][cle] = valeur
-    _save_profil()
+    _save("profil", PROFIL_FILE)
 
 def retrouver_profil(cle: str) -> str:
     return st.session_state["profil"].get(cle, None)
@@ -245,13 +237,15 @@ def trouver_reponse(question: str) -> str:
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # — Bloc prénom : stockage
+    # — Bloc prénom : stockage (on accepte majuscule ou minuscule grâce à IGNORECASE)
     m = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
-        question
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÿ'\-]+)",
+        question,
+        flags=re.IGNORECASE
     )
     if m:
-        prenom = m.group(1)
+        # On normalise en capitalisant
+        prenom = m.group(1).strip().capitalize()
         stocker_profil("prenom", prenom)
         return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
 
@@ -269,7 +263,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         if mm:
             cle = mm.group(1).strip().replace(" ", "_")
             return retrouver_souvenir(cle)
-            
+
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
