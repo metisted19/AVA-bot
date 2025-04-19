@@ -78,8 +78,7 @@ def sauvegarder_style_ava(style):
         json.dump(style, f, indent=4)
 
 # ───────────────────────────────────────────────────────────────────────
-# 1️⃣ Page config (toujours juste après les imports)
-st.set_page_config(page_title="Chat AVA", layout="centered")
+
 
 # 2️⃣ Dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
