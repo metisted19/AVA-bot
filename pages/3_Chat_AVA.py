@@ -247,22 +247,25 @@ def trouver_reponse(question: str) -> str:
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # Bloc prénom
+    # — Bloc détection du prénom (dynamiquement, quel que soit la casse) —
     match_prenom = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
-        question
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÖØ-öø-ÿ'-]+)",
+        question,
+        re.IGNORECASE
     )
     if match_prenom:
-        prenom = match_prenom.group(1)
+        # On normalise : première lettre en majuscule, le reste en minuscules
+        prenom = match_prenom.group(1).capitalize()
         stocker_souvenir("prenom", prenom)
-        return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
+        return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
 
-    # Rappel du prénom
+    # — Bloc rappel du prénom —
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
         if "prenom" in st.session_state["souvenirs"]:
-            return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
+            prenom = st.session_state["souvenirs"]["prenom"]
+            return f"Tu m'as dit que tu t'appelles **{prenom}**."
         else:
-            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
+            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
     # Bloc « Tu te souviens de X ? »
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
