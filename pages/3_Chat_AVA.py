@@ -311,9 +311,7 @@ for message in st.session_state.messages:
 
 # ─── CHARGEMENT DE LA BASE DANS LA VARIABLE PRINCIPALE ──────────
 base_complet = charger_base_connaissances()
-# 🧪 Test de débogage pour s'assurer que la base contient bien la question
-print("🔍 Nombre d'entrées chargées :", len(base_complet))
-print("🔍 Contient la question ?", "quelle est la plus haute montagne du monde" in base_complet)
+
 
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
