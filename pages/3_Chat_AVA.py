@@ -1349,7 +1349,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
 
     if message_bot:
         return message_bot
-           # --- Bloc Culture Générale (questions simples) ---
+    # --- Bloc Culture Générale (questions simples) ---
     if not message_bot and any(mot in question_clean for mot in ["qui", "quand", "où", "combien", "quel", "quelle"]):
         base_connaissances = {
                 "qui a inventé internet": "🌐 Internet a été développé principalement par **Vinton Cerf** et **Robert Kahn** dans les années 1970.",
