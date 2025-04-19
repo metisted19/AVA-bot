@@ -33,43 +33,38 @@ if "user_id" not in st.session_state:
     st.session_state["user_id"] = pseudo.strip()
 user = st.session_state["user_id"]
 
-# ─── 3️⃣ Chemins des JSON (un par utilisateur) ─────────────────────────
-SCRIPT_DIR   = os.path.dirname(__file__)
+# Après st.set_page_config et identification user…
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 PROFIL_FILE  = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")
 
-# ─── 4️⃣ Initialisation des dictionnaires en session_state ─────────────
 for key, path in [("souvenirs", MEMOIRE_FILE), ("profil", PROFIL_FILE)]:
     if key not in st.session_state:
         try:
             with open(path, "r", encoding="utf-8") as f:
                 st.session_state[key] = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+        except:
             st.session_state[key] = {}
 
-# ─── 5️⃣ Sauvegarde générique ───────────────────────────────────────────
-def _save(key: str, path: str):
+def _save(key, path):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(st.session_state[key], f, ensure_ascii=False, indent=2)
 
-# ─── 6️⃣ Mémoire dynamique (faits, anecdotes…) ───────────────────────────
-def stocker_souvenir(cle: str, valeur: str):
-    st.session_state["souvenirs"][cle] = valeur
-    _save("souvenirs", MEMOIRE_FILE)
-
-def retrouver_souvenir(cle: str) -> str:
-    return st.session_state["souvenirs"].get(
-        cle,
-        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
-    )
-
-# ─── 7️⃣ Profil statique (prénom, goûts…) ───────────────────────────────
-def stocker_profil(cle: str, valeur: str):
+def stocker_profil(cle, valeur):
     st.session_state["profil"][cle] = valeur
     _save("profil", PROFIL_FILE)
 
-def retrouver_profil(cle: str) -> str:
+def retrouver_profil(cle):
     return st.session_state["profil"].get(cle, None)
+
+def stocker_souvenir(cle, valeur):
+    st.session_state["souvenirs"][cle] = valeur
+    _save("souvenirs", MEMOIRE_FILE)
+
+def retrouver_souvenir(cle):
+    return st.session_state["souvenirs"].get(
+        cle, "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    )
+
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
