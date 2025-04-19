@@ -24,32 +24,39 @@ from typing import Optional
 
 # 1️⃣ Page config (toujours le tout premier appel à st.*)
 st.set_page_config(page_title="Chat AVA", layout="centered")
-# 2️⃣ Déclaration du dossier courant (chémin vers ce script)
+# 2️⃣ Déclaration du dossier courant (chemin vers ce script)
 SCRIPT_DIR = os.path.dirname(__file__)
-# 2️⃣ Identification de l’utilisateur (login)
+
+# 3️⃣ Identification de l’utilisateur (login)
 if "user_id" not in st.session_state:
     pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if not pseudo:
         st.stop()  # on bloque tant qu'il n'y a pas de pseudo
     st.session_state["user_id"] = pseudo.strip()
+user = st.session_state["user_id"]
 
-user = st.session_state["user_id"]  # → défini ici
+# 4️⃣ Définition des chemins de mémoire (global + user‑spécifique)
+GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 
-# ─── Chargement & fallback ──────────────────────────────────────────────
+# 5️⃣ Chargement de la mémoire dans st.session_state["souvenirs"]
 if "souvenirs" not in st.session_state:
+    # 5.a) on essaie d'abord le fichier user
     try:
         with open(USER_MEMOIRE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
+        # 5.b) sinon on retombe sur le fichier global
         try:
             with open(GLOBAL_MEMOIRE, "r", encoding="utf-8") as f:
                 st.session_state["souvenirs"] = json.load(f)
-        except:
+        except (FileNotFoundError, json.JSONDecodeError):
             st.session_state["souvenirs"] = {}
-        # on initialise le fichier user pour la suite
+        # et on crée le fichier user pour la suite
         with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
+# 6️⃣ Fonctions d’accès et de sauvegarde
 def _save_souvenirs():
     with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
         json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
