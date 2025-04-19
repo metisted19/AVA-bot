@@ -63,7 +63,7 @@ def trouver_reponse(question: str):
     proche = difflib.get_close_matches(...)
     if proche:
         return base_complet[proche[0]]
-    …
+
     # 4.c) Fallback
     return random.choice([…, …])
 # --- Modèle sémantique (cache) ---
