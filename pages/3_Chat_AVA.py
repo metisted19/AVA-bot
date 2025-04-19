@@ -243,16 +243,32 @@ def gerer_modules_speciaux(question_clean):
      16.SALUTATIONS COURANTES
     Retourne la réponse ou None si aucun module ne match.
     """
-        # ─── 0) Détection de rappel / souvenir ────────────────────────────
+     # ─── 0) Détection du rappel / mémoire ─────────────────────────────
     if any(phrase in question_clean for phrase in [
         "tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"
     ]):
-        # on extrait les mots longs pour construire une clé possible
-        mots_importants = re.findall(r"[a-zA-Zéèêàùûç'\-]+", question_clean)
-        mots_utiles    = [mot for mot in mots_importants if len(mot) > 3]
-        if mots_utiles:
-            cle_possible = mots_utiles[-1]
-            return retrouver_souvenir(cle_possible)
+        # On extrait la partie qui suit "de", "du", "des" ou "sur"
+        match = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
+        if match:
+            # Normalisation de la clé : minuscules, espaces → underscores, suppression des ponct.
+            cle_raw = match.group(1).strip().rstrip(" ?.!;").lower()
+            cle = cle_raw.replace(" ", "_")
+
+            # 1) tentative de clé exacte
+            valeur = SOUVENIRS.get(cle)
+
+            # 2) si pas trouvée, on tente un match partiel
+            if not valeur:
+                for k, v in SOUVENIRS.items():
+                    if cle_raw in k:
+                        valeur = v
+                        break
+
+            if valeur:
+                return f"🧠 Je me souviens : {valeur}"
+
+        # Si rien n’a matché
+        return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
