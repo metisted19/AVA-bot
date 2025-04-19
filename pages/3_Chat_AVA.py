@@ -20,6 +20,20 @@ from fonctions_chat import obtenir_reponse_ava
 import urllib.parse
 import glob
 
+# Initialise ton dictionnaire de souvenirs s'il n'existe pas encore
+if "souvenirs" not in st.session_state:
+    st.session_state["souvenirs"] = {}
+
+def stocker_souvenir(cle: str, valeur: str):
+    """Ajoute un souvenir sous forme de clé→valeur."""
+    st.session_state["souvenirs"][cle] = valeur
+
+def retrouver_souvenir(cle: str) -> str:
+    """Récupère le souvenir correspondant à `cle` ou un message d’erreur."""
+    return st.session_state["souvenirs"].get(
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
