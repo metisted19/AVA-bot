@@ -25,37 +25,56 @@ from typing import Optional
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# ── Chargement mémoire AVA ──
-# À placer juste après vos imports
-SCRIPT_DIR    = os.path.dirname(__file__)
-MEMOIRE_AVA   = os.path.join(SCRIPT_DIR, "memoire_ava.json")
-PROFIL_FILE   = os.path.join(SCRIPT_DIR, "profil_utilisateur.json")
+# ─── 2️⃣ Définition de SCRIPT_DIR ──────────────────────────────────────────────
+SCRIPT_DIR = os.path.dirname(__file__)
 
-# 1) Initialisation st.session_state["souvenirs"]
+# ─── 3️⃣ Mémoire « souvenirs » (dynamique) ──────────────────────────────────────
+MEMOIRE_AVA = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 if "souvenirs" not in st.session_state:
     try:
         with open(MEMOIRE_AVA, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
-    except FileNotFoundError:
-        st.session_state["souvenirs"] = {}
-    except Exception as e:
-        st.error(f"Erreur chargement mémoire AVA : {e}")
+    except (FileNotFoundError, json.JSONDecodeError):
         st.session_state["souvenirs"] = {}
 
 def _save_souvenirs():
-    try:
-        with open(MEMOIRE_AVA, "w", encoding="utf-8") as f:
-            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        st.error(f"Impossible de sauver la mémoire AVA : {e}")
+    with open(MEMOIRE_AVA, "w", encoding="utf-8") as f:
+        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
 def stocker_souvenir(cle: str, valeur: str):
+    """Ajoute ou met à jour un souvenir dynamique."""
     st.session_state["souvenirs"][cle] = valeur
     _save_souvenirs()
 
 def retrouver_souvenir(cle: str) -> str:
-    return st.session_state["souvenirs"].get(cle, "❓ Je n'ai pas de souvenir pour ça…")
+    """Récupère un souvenir, ou message d’erreur."""
+    return st.session_state["souvenirs"].get(
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    )
 
+# ─── 4️⃣ Profil utilisateur (statique) ─────────────────────────────────────────
+PROFIL_FILE = os.path.join(SCRIPT_DIR, "profil_utilisateur.json")
+if "profil" not in st.session_state:
+    try:
+        with open(PROFIL_FILE, "r", encoding="utf-8") as f:
+            st.session_state["profil"] = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        st.session_state["profil"] = {}
+
+def _save_profil():
+    with open(PROFIL_FILE, "w", encoding="utf-8") as f:
+        json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
+
+def stocker_profil(cle: str, valeur: str):
+    """Ajoute ou met à jour une donnée de profil."""
+    st.session_state["profil"][cle] = valeur
+    _save_profil()
+
+def retrouver_profil(cle: str):
+    """Récupère un élément de profil (ou None)."""
+    return st.session_state["profil"].get(cle, None)
+    
 # 2) Initialisation st.session_state["profil"]
 if "profil" not in st.session_state:
     try:
