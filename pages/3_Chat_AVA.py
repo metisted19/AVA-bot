@@ -33,16 +33,28 @@ if "souvenirs" not in st.session_state:
             st.session_state["souvenirs"] = json.load(f)
     except FileNotFoundError:
         st.session_state["souvenirs"] = {}
+    except Exception as e:
+        st.error(f"Erreur de chargement de la mémoire : {e}")
+        st.session_state["souvenirs"] = {}
 
+# 👇 (Optionnel) Affiche en debug la mémoire chargée
+st.write("🧠 Souvenirs chargés :", st.session_state["souvenirs"])
+
+# ─── Fonctions de sauvegarde / récupération ────────────────────────────────
 def _sauver_memoire():
-    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+    try:
+        with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"Impossible de sauver la mémoire : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
+    """Ajoute ou met à jour un souvenir, puis l’enregistre."""
     st.session_state["souvenirs"][cle] = valeur
     _sauver_memoire()
 
 def retrouver_souvenir(cle: str) -> str:
+    """Retourne le souvenir ou un message d’erreur si la clé est absente."""
     return st.session_state["souvenirs"].get(
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
