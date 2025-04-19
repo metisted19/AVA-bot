@@ -90,35 +90,38 @@ except Exception as e:
     st.error(f"Impossible de charger base_connaissances.json : {e}")
     base_savoir = {}
 
-# 3️⃣ Identification de l’utilisateur
+# 7️⃣ Identification de l’utilisateur
 if "user_id" not in st.session_state:
-    pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
+    pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if not pseudo:
         st.stop()
     st.session_state["user_id"] = pseudo.strip()
 user = st.session_state["user_id"]
 
-# 4️⃣ Chemins vers les fichiers de mémoire
-GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")                         # ta base « gingembre »…
-USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")                # version perso
-PROFIL_FILE    = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")         # prénom, goûts, etc.
+# 8️⃣ Chemins vers les fichiers perso
+USER_MEMOIRE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
+USER_PROFIL  = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")        # prénom, goûts, etc.
 
-# 5️⃣ Chargement des souvenirs dynamiques
+ 9️⃣ Initialisation des souvenirs dynamiques
 if "souvenirs" not in st.session_state:
     try:
-        # 5.a) on tente le fichier user
+        # a) on tente le fichier de cet utilisateur
         with open(USER_MEMOIRE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        # 5.b) fallback sur le global
-        try:
-            with open(GLOBAL_MEMOIRE, "r", encoding="utf-8") as f:
-                st.session_state["souvenirs"] = json.load(f)
-        except:
-            st.session_state["souvenirs"] = {}
-        # on copie immédiatement dans le fichier user pour qu’il persiste
+    except:
+        # b) sinon on reprend la mémoire globale
+        st.session_state["souvenirs"] = global_souvenirs.copy()
+        # on enregistre aussitôt pour créer le fichier user
         with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+
+# 10️⃣ Initialisation du profil utilisateur
+if "profil" not in st.session_state:
+    try:
+        with open(USER_PROFIL, "r", encoding="utf-8") as f:
+            st.session_state["profil"] = json.load(f)
+    except:
+        st.session_state["profil"] = {}
 
 def _save_souvenirs():
     with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
@@ -134,23 +137,15 @@ def retrouver_souvenir(cle: str) -> str:
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
-# 6️⃣ Chargement du profil utilisateur (prénom, etc.)
-if "profil" not in st.session_state:
-    try:
-        with open(PROFIL_FILE, "r", encoding="utf-8") as f:
-            st.session_state["profil"] = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        st.session_state["profil"] = {}
-
 def _save_profil():
-    with open(PROFIL_FILE, "w", encoding="utf-8") as f:
+    with open(USER_PROFIL, "w", encoding="utf-8") as f:
         json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
 
 def stocker_profil(cle: str, valeur: str):
     st.session_state["profil"][cle] = valeur
     _save_profil()
 
-def retrouver_profil(cle: str):
+def retrouver_profil(cle: str) -> Optional[str]:
     return st.session_state["profil"].get(cle, None)
 # ───────────────────────────────────────────────────────────────────────
 
