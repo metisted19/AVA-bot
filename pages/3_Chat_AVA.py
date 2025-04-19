@@ -25,7 +25,19 @@ from typing import Optional
 # ───────────────────────────────────────────────────────────────────────
 # 1️⃣ Page config (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
-
+def charger_style_ava() -> dict:
+    """Charge les paramètres de style depuis style_ava.json (fallback par défaut)."""
+    try:
+        with open(os.path.join(SCRIPT_DIR, "style_ava.json"), "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {
+            "ton": "neutre",
+            "langage": "classique",
+            "niveau_humour": 0.3,
+            "niveau_spontane": 0.3,
+            "niveau_libre_arbitre": 0.3
+        }
 # 2️⃣ Dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -184,6 +196,32 @@ def traduire_texte(texte, langue_dest):
         return r["responseData"]["translatedText"]
     except:
         return texte  # fallback
+def style_reponse_ava(texte: str) -> str:
+    """
+    Applique le style défini (humour, spontanéité, ton) au texte de la réponse.
+    """
+    style = charger_style_ava()
+    humour   = style.get("niveau_humour", 0.5)
+    spontane = style.get("niveau_spontane", 0.5)
+    ton      = style.get("ton", "neutre")
+
+    # Touche d'humour aléatoire
+    if random.random() < humour:
+        texte += " 😏 (Je le savais, je suis trop forte.)"
+
+    # Touche de spontanéité
+    if random.random() < spontane:
+        texte += " Et j’te balance ça sans filtre, comme j’aime !"
+
+    # Préfixe selon le ton
+    if ton == "malicieuse":
+        texte = "Hmm... " + texte
+    elif ton == "sérieuse":
+        texte = "[Analyse prioritaire] " + texte
+    elif ton == "cool":
+        texte = "Yo ! " + texte
+
+    return texte
 
 # Fonction humeur dynamique selon l'heure
 def humeur_du_jour():
@@ -256,6 +294,9 @@ def trouver_reponse(question: str) -> str:
     # 5) Fallback final → on retente modules spéciaux
     return gerer_modules_speciaux(question, question_clean) or \
            "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
+    reponse = style_reponse_ava(reponse)
+    with st.chat_message("assistant"):
+        st.markdown(reponse)
 
 
 # --- Modules personnalisés (à enrichir) ---
