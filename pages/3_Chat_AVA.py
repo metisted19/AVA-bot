@@ -74,7 +74,7 @@ def stocker_profil(cle: str, valeur: str):
 def retrouver_profil(cle: str):
     """Récupère un élément de profil (ou None)."""
     return st.session_state["profil"].get(cle, None)
-    
+
 # 2) Initialisation st.session_state["profil"]
 if "profil" not in st.session_state:
     try:
@@ -283,13 +283,13 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # « Tu te souviens »
+    # Bloc « Tu te souviens de X ? »
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
-            cle = m.group(1).strip().replace(" ", "_")
+            fragment = m.group(1).strip().rstrip(" ?.!;").lower()
+            cle = fragment.replace(" ", "_")
             return retrouver_souvenir(cle)
-
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
