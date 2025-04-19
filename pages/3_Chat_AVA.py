@@ -1571,7 +1571,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     if message_bot:
         return message_bot
     return None
-     ── 7️⃣ Boucle principale (exemple) ─────────────────────────────────────────────
+   
     st.write(f"👤 Connecté en tant que **{user}**")
 
     question = st.text_input("Que voulez‑vous demander à AVA ?")
