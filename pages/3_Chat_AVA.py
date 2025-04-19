@@ -258,8 +258,9 @@ def trouver_reponse(question: str) -> str:
            "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
 
 
+# --- Modules personnalisés (à enrichir) ---
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # — Bloc prénom : stockage
+    # — Bloc prénom : stockage dans profil_utilisateur_<user>.json —
     match_prenom = re.search(
         r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
         question
@@ -267,9 +268,9 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     if match_prenom:
         prenom = match_prenom.group(1)
         stocker_profil("prenom", prenom)
-        return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
+        return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
 
-    # — Bloc prénom : rappel
+    # — Bloc prénom : rappel depuis profil —
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
         prenom = retrouver_profil("prenom")
         if prenom:
@@ -277,13 +278,18 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # — Bloc « Tu te souviens de X ? »  
-    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu'est-ce que je t'ai dit"]):
+    # — Bloc « Tu te souviens de X ? » pour tes anecdotes/faits dynamiques —
+    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+        # on extrait ce qui suit « de », « du », « sur », etc.
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
             fragment = m.group(1).strip().rstrip(" ?.!;").lower()
             cle = fragment.replace(" ", "_")
             return retrouver_souvenir(cle)
+
+    # Ici tu peux continuer avec tes autres modules (météo, news, culture, etc.)
+    return None
+
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
