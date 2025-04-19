@@ -57,18 +57,25 @@ def incrementer_interactions():
 
     sauvegarder_style_ava(style)
 
-def charger_style_ava() -> dict:
-    """Charge les paramètres de style depuis style_ava.json (fallback par défaut)."""
+def charger_style_ava():
     try:
-        with open(os.path.join(SCRIPT_DIR, "style_ava.json"), "r", encoding="utf-8") as f:
+        with open("style_ava.json", "r") as f:
             return json.load(f)
-    except Exception:
+    except:
         return {
             "ton": "neutre",
             "langage": "classique",
             "niveau_humour": 0.3,
             "niveau_spontane": 0.3,
-            "niveau_libre_arbitre": 0.3
+            "niveau_libre_arbitre": 0.3,
+            "compteur_interactions": 0,
+            "niveau_affection": 0.5
+        }
+
+def sauvegarder_style_ava(style):
+    with open("style_ava.json", "w") as f:
+        json.dump(style, f, indent=4)
+
         }
 # 2️⃣ Dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
@@ -297,7 +304,7 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
-    
+
     incrementer_interactions()  # 🔁 AVA évolue à chaque interaction ici
     ajuster_affection(question)
 
