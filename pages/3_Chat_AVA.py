@@ -23,33 +23,56 @@ import json
 
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
+# 1️⃣ Page config (TOUJOURS en tout début)
+st.set_page_config(page_title="Chat AVA", layout="centered")
 
-def trouver_reponse(question):
-    # 1) On nettoie la question
+# 2️⃣ Initialisation de la mémoire
+SCRIPT_DIR   = os.path.dirname(__file__)
+MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+
+if "souvenirs" not in st.session_state:
+    try:
+        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+            st.session_state["souvenirs"] = json.load(f)
+    except:
+        st.session_state["souvenirs"] = {}
+
+def _sauver_memoire():
+    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+
+def stocker_souvenir(cle: str, valeur: str):
+    st.session_state["souvenirs"][cle] = valeur
+    _sauver_memoire()
+
+ef trouver_reponse(question):
+    # on nettoie la question
     question_clean = nettoyer_texte(question)
 
-    # 2) On appelle le module spécial AVA AVEC la question brute ET la question nettoyée
+    # 1) On essaye les modules spéciaux
     reponse = gerer_modules_speciaux(question, question_clean)
     if reponse:
         return reponse
 
-    # 3) Votre logique direct/fuzzy/sémantique
+    # 2) Recherche direct dans base_complet
     if question_clean in base_complet:
         return base_complet[question_clean]
 
+    # 3) Fuzzy match
     proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
     if proche:
         return base_complet[proche[0]]
 
+    # 4) Sémantique
     keys = list(base_complet.keys())
-    vb = model_semantic.encode(keys)
-    vq = model_semantic.encode([question_clean])[0]
+    vb   = model_semantic.encode(keys)
+    vq   = model_semantic.encode([question_clean])[0]
     sims = cosine_similarity([vq], vb)[0]
     best, score = max(zip(keys, sims), key=lambda x: x[1])
     if score > 0.7:
         return base_complet[best]
 
-    # 4) Fallback final : on réessaie modules spéciaux avec les 2 args
+    # 5) Fallback final → on retente modules spéciaux
     return gerer_modules_speciaux(question, question_clean)
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
@@ -225,6 +248,13 @@ def trouver_reponse(question):
 
 
 # --- Modules personnalisés (à enrichir) ---
+def gerer_modules_speciaux(question_clean):
+        """
+    Gère tous les modules spéciaux...
+    Maintenant reçoit à la fois :
+      - question : texte brut (pour conserver la casse)
+      - question_clean : texte normalisé
+    """
 # 5️⃣ Modules spéciaux
 def gerer_modules_speciaux(question: str, question_clean: str):
     """
