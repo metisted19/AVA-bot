@@ -1660,9 +1660,23 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
                 "quand se passe le solstice d'hiver": "❄️ Le solstice d'hiver a lieu vers le **21 décembre** dans l'hémisphère nord, marquant le début de l'hiver.",
                 "combien de jours dans un mois de février d'une année bissextile": "📅 En année bissextile, **février** compte **29 jours**.",
 
-               
+                # 2) Nettoyer les clés
+                base_savoir_nettoyee = {
+                nettoyer_texte(cle): valeur
+                for cle, valeur in base_savoir.items()
+                }
+                reponses_courantes_nettoyees = {
+                    nettoyer_texte(cle): valeur
+                    for cle, valeur in reponses_courantes.items()
+                }
+
+                # 3) Fusionner
+                base_complet = {
+                **base_savoir_nettoyee,
+                **reponses_courantes_nettoyees
                 
-            }
+                }
+        }     
         for question_cle, reponse in base_connaissances.items():
             if question_cle in question_clean:
                 message_bot = reponse
