@@ -153,6 +153,7 @@ model_semantic = load_model()
 # --- Nettoyage du texte ---
 def nettoyer_texte(txt):
     txt = unicodedata.normalize("NFKC", txt)
+    txt = txt.replace("’", "'")
     txt = txt.lower().strip()
     txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
     txt = re.sub(r"\s+", " ", txt)
