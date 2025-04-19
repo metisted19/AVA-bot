@@ -53,6 +53,7 @@ def retrouver_souvenir(cle: str) -> str:
     return st.session_state["souvenirs"].get(
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    ) 
 
 
 # --- Modèle sémantique (cache) ---
