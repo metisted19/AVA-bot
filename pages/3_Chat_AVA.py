@@ -34,12 +34,14 @@ except Exception as e:
     st.error(f"Erreur lors du chargement de la mémoire : {e}")
     SOUVENIRS = {}
 
-# 👀 Debug : affichez les clés bien chargées
-st.write("🧠 Souvenirs disponibles :", list(SOUVENIRS.keys()))
 
+# Chargement de la mémoire (toujours présent)
+with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+    SOUVENIRS = json.load(f)
 
-# 👀 Debug : affichez les clés bien chargées
-st.write("🧠 Souvenirs disponibles :", list(SOUVENIRS.keys()))
+# Dans gerer_modules_speciaux(), quand on détecte "tu te souviens"…
+return retrouver_souvenir(cle_possible)
+
 def stocker_souvenir(cle: str, valeur: str):
     """Ajoute un souvenir sous forme de clé→valeur."""
     st.session_state["souvenirs"][cle] = valeur
