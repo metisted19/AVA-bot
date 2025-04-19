@@ -24,6 +24,7 @@ import json
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
+# ─── Initialisation unique de la mémoire ─────────────────────────────────
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
@@ -37,10 +38,6 @@ if "souvenirs" not in st.session_state:
         st.error(f"Erreur de chargement de la mémoire : {e}")
         st.session_state["souvenirs"] = {}
 
-# 👇 (Optionnel) Affiche en debug la mémoire chargée
-st.write("🧠 Souvenirs chargés :", st.session_state["souvenirs"])
-
-# ─── Fonctions de sauvegarde / récupération ────────────────────────────────
 def _sauver_memoire():
     try:
         with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
@@ -49,17 +46,14 @@ def _sauver_memoire():
         st.error(f"Impossible de sauver la mémoire : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
-    """Ajoute ou met à jour un souvenir, puis l’enregistre."""
     st.session_state["souvenirs"][cle] = valeur
     _sauver_memoire()
 
 def retrouver_souvenir(cle: str) -> str:
-    """Retourne le souvenir ou un message d’erreur si la clé est absente."""
     return st.session_state["souvenirs"].get(
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
-
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -226,30 +220,27 @@ def trouver_reponse(question: str) -> str:
     return gerer_modules_speciaux(question, question_clean)
 
 
-# --- Modules personnalisés (à enrichir) ---
-def gerer_modules_speciaux(question: str, question_clean: str) -> str | None:
+def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
+    # — Bloc prénom —
     """
     question       : version brute (garde la casse pour capter les prénoms…)
     question_clean : version « nettoyée » (lowercase + sans accents) pour les mots‑clés
     """
 
-    # — Bloc prénom —
     match_prenom = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
         question
     )
     if match_prenom:
         prenom = match_prenom.group(1)
         stocker_souvenir("prenom", prenom)
-        return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
+        return f"Enchantée, {prenom} ! Je m'en souviendrai 🙂"
 
     # — Bloc rappel prénom —
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
-        if "prenom" in st.session_state["souvenirs"]:
-            val = retrouver_souvenir("prenom")
-            return f"Tu m'as dit que tu t'appelles **{val}**."
-        else:
-            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
+        return (f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
+                if "prenom" in st.session_state["souvenirs"]
+                else "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles.")
 
     # — Bloc « Tu te souviens » —
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
