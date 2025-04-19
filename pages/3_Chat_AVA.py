@@ -102,7 +102,7 @@ user = st.session_state["user_id"]
 USER_MEMOIRE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 USER_PROFIL  = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")        # prénom, goûts, etc.
 
- 9️⃣ Initialisation des souvenirs dynamiques
+#9️⃣ Initialisation des souvenirs dynamiques
 if "souvenirs" not in st.session_state:
     try:
         # a) on tente le fichier de cet utilisateur
