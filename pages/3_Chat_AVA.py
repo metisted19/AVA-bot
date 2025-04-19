@@ -25,17 +25,14 @@ import json
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 📂 Définition du chemin vers votre fichier de souvenirs
-SCRIPT_DIR = os.path.dirname(__file__)
-MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+def charger_souvenirs(fichier='memoire_ava.json'):
+    if os.path.exists(fichier):
+        with open(fichier, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
 
-# 🔄 Chargement des souvenirs
-try:
-    with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
-        SOUVENIRS = json.load(f)
-except Exception as e:
-    st.error(f"Erreur lors du chargement de la mémoire : {e}")
-    SOUVENIRS = {}
+SOUVENIRS = charger_souvenirs()
+
 
 # 👀 Debug : affichez les clés bien chargées
 st.write("🧠 Souvenirs disponibles :", list(SOUVENIRS.keys()))
