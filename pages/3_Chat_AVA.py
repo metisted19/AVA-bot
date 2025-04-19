@@ -25,12 +25,6 @@ from typing import Optional
 # ───────────────────────────────────────────────────────────────────────
 # 1️⃣ Page config (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
-def charger_base_connaissances():
-    try:
-        with open("base_connaissances.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return {}
 
 def ajuster_affection(question):
     style = charger_style_ava()
@@ -164,7 +158,12 @@ def nettoyer_texte(txt):
     txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
     txt = re.sub(r"\s+", " ", txt)
     return txt
-
+def charger_base_connaissances():
+    try:
+        with open("base_connaissances.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {}
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
@@ -309,7 +308,7 @@ for message in st.session_state.messages:
     else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-            
+
 # ─── CHARGEMENT DE LA BASE DANS LA VARIABLE PRINCIPALE ──────────
 base_complet = charger_base_connaissances()
 
