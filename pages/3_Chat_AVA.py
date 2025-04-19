@@ -22,6 +22,8 @@ import glob
 import json
 from typing import Optional
 
+# ─── 2️⃣ Page config Streamlit ──────────────────────────────────────────
+st.set_page_config(page_title="Chat AVA", layout="centered")
 
 # ─── 1️⃣ Identification de l’utilisateur (login) ─────────────────────────
 if "user_id" not in st.session_state:
@@ -31,8 +33,7 @@ if "user_id" not in st.session_state:
     st.session_state["user_id"] = pseudo.strip()
 user = st.session_state["user_id"]
 
-# ─── 2️⃣ Page config Streamlit ──────────────────────────────────────────
-st.set_page_config(page_title="Chat AVA", layout="centered")
+
 
 # ─── 3️⃣ Chemins de fichiers selon l’utilisateur ─────────────────────────
 SCRIPT_DIR   = os.path.dirname(__file__)
