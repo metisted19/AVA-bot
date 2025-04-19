@@ -24,27 +24,20 @@ import json
 # 1️⃣ Page config Streamlit : impératif tout de suite
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# ─── Mémoire AVA ───────────────────────────────────────────────────────────
+# 📂 Chemin mémoire + initialisation st.session_state["souvenirs"]
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
-# Initialise st.session_state["souvenirs"]
 if "souvenirs" not in st.session_state:
     try:
         with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
-    except FileNotFoundError:
-        st.session_state["souvenirs"] = {}
-    except Exception as e:
-        st.error(f"Erreur lors du chargement de la mémoire : {e}")
+    except:
         st.session_state["souvenirs"] = {}
 
 def _sauver_memoire():
-    try:
-        with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
-            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        st.error(f"Impossible de sauvegarder la mémoire : {e}")
+    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
 def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
@@ -54,7 +47,7 @@ def retrouver_souvenir(cle: str) -> str:
     return st.session_state["souvenirs"].get(
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
-    ) 
+    )
 
 # ─── Mémoire AVA ⇦ ICI ⇦───────────────────────────────────────────────
 SCRIPT_DIR   = os.path.dirname(__file__)
@@ -281,19 +274,24 @@ def gerer_modules_speciaux(question_clean):
      16.SALUTATIONS COURANTES
     Retourne la réponse ou None si aucun module ne match.
     """
-    # ─── Mémoire : rappel de ce qu'on s'est dit ────────────────────────────
-    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
-        # on extrait la clé après "de"/"du"/"sur"
-        match = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
-        if match:
-            cle_raw = match.group(1).strip().rstrip(" ?.!;").lower()
-            cle = cle_raw.replace(" ", "_")
-            return retrouver_souvenir(cle)
-            match_prenom = re.search(r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)", question)
-            if match_prenom:
-                prenom = match_prenom.group(1).strip()
-                stocker_souvenir("prenom", prenom)
-                return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
+# ─── Mémoire : rappel de ce qu'on s'est dit ────────────────────────────
+match_prenom = re.search(
+    r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
+    question  # **non** nettoyé pour garder la casse
+)
+if match_prenom:
+    prenom = match_prenom.group(1)
+    stocker_souvenir("prenom", prenom)
+    return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
+
+# 0.b) Rappeler un souvenir précis par clé
+if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+    # si on parle de "mon prénom"
+    if "prénom" in question_clean:
+        if "prenom" in st.session_state["souvenirs"]:
+            return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
+        else:
+            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
 
 
