@@ -76,7 +76,7 @@ def sauvegarder_style_ava(style):
     with open("style_ava.json", "w") as f:
         json.dump(style, f, indent=4)
 
-        }
+        
 # 2️⃣ Dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
 
