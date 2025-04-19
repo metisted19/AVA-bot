@@ -1,5 +1,3 @@
-# 1️⃣ Page config (TOUJOURS en tout début)
-st.set_page_config(page_title="Chat AVA", layout="centered")
 import streamlit as st
 import os
 import re
@@ -23,7 +21,8 @@ import urllib.parse
 import glob
 import json
 
-
+# 1️⃣ Page config (TOUJOURS en tout début)
+st.set_page_config(page_title="Chat AVA", layout="centered")
 
 # 2️⃣ Initialisation de la mémoire
 SCRIPT_DIR   = os.path.dirname(__file__)
