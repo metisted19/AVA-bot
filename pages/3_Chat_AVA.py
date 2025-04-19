@@ -21,6 +21,8 @@ import urllib.parse
 import glob
 import json
 
+# 1) Page config —> impératif : tout en haut du script
+st.set_page_config(page_title="Chat AVA", layout="centered")
 
 # 📂 Chemin vers le fichier de mémoire
 SCRIPT_DIR = os.path.dirname(__file__)
