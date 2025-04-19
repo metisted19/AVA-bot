@@ -289,6 +289,11 @@ def gerer_modules_speciaux(question_clean):
             cle_raw = match.group(1).strip().rstrip(" ?.!;").lower()
             cle = cle_raw.replace(" ", "_")
             return retrouver_souvenir(cle)
+            match_prenom = re.search(r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)", question)
+            if match_prenom:
+                prenom = match_prenom.group(1).strip()
+                stocker_souvenir("prenom", prenom)
+                return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
 
 
 
