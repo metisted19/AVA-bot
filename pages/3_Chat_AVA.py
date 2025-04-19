@@ -65,7 +65,10 @@ def trouver_reponse(question: str):
         return base_complet[proche[0]]
 
     # 4.c) Fallback
-    return random.choice([…, …])
+    return random.choice([
+        "Je n'ai pas compris, reformulez s'il vous plaît 🤖",
+        "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !"
+    ])
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -242,13 +245,11 @@ def trouver_reponse(question):
 # --- Modules personnalisés (à enrichir) ---
 # 5️⃣ Modules spéciaux
 def gerer_modules_speciaux(question: str, question_clean: str):
-            """
-    Gère tous les modules spéciaux...
-    Maintenant reçoit à la fois :
-      - question : texte brut (pour conserver la casse)
-      - question_clean : texte normalisé
     """
-
+    Gère tous les modules spéciaux...
+    - question : texte brut (pour conserver la casse)
+    - question_clean : texte nettoyé (minuscules, sans ponctuation)
+    """
     # — Bloc prénom —
     match_prenom = re.search(
         r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
@@ -261,14 +262,17 @@ def gerer_modules_speciaux(question: str, question_clean: str):
 
     # — Bloc rappel prénom —
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
-        return retrouver_souvenir("prenom") if "prenom" in st.session_state["souvenirs"] \
-               else "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
+        if "prenom" in st.session_state["souvenirs"]:
+            val = retrouver_souvenir("prenom")
+            return f"Tu m'as dit que tu t'appelles **{val}**."
+        else:
+            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
     # — Bloc mémoire générale —
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
-            cle = m.group(1).replace(" ", "_")
+            cle = m.group(1).strip().replace(" ", "_")
             return retrouver_souvenir(cle)
 
     
