@@ -22,36 +22,27 @@ import glob
 import json
 from typing import Optional
 
-
-# 1️⃣ Page config
+# ─── Page config (TOUJOURS en tout début) ───────────────────────────────
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 2️⃣ Identification de l’utilisateur
-if "user_id" not in st.session_state:
-    pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
-    if pseudo:
-        st.session_state["user_id"] = pseudo.strip()
-    else:
-        # On arrête l'exécution tant que l'utilisateur n'a pas saisi son pseudo
-        st.stop()
+# ─── Définition du dossier du script ────────────────────────────────────
+SCRIPT_DIR = os.path.dirname(__file__)
 
-# À partir d’ici, st.session_state["user_id"] est toujours défini
-user = st.session_state["user_id"]
-
-# 3️⃣ Chargement du fichier de mémoire propre à cet utilisateur
-SCRIPT_DIR   = os.path.dirname(__file__)
-MEMOIRE_FILE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
-
+# ─── Mémoire dynamique (faits, anecdotes…) ─────────────────────────────
+MEMOIRE_AVA = os.path.join(SCRIPT_DIR, f"memoire_ava_{st.session_state.get('user_id','')}.json")
 if "souvenirs" not in st.session_state:
     try:
-        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+        with open(MEMOIRE_AVA, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         st.session_state["souvenirs"] = {}
 
 def _save_souvenirs():
-    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+    try:
+        with open(MEMOIRE_AVA, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"🔒 Impossible de sauvegarder les souvenirs : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
@@ -63,6 +54,28 @@ def retrouver_souvenir(cle: str) -> str:
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
+# ─── Profil utilisateur (prénom, goûts, etc.) ──────────────────────────
+PROFIL_FILE = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{st.session_state.get('user_id','')}.json")
+if "profil" not in st.session_state:
+    try:
+        with open(PROFIL_FILE, "r", encoding="utf-8") as f:
+            st.session_state["profil"] = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        st.session_state["profil"] = {}
+
+def _save_profil():
+    try:
+        with open(PROFIL_FILE, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"🔒 Impossible de sauvegarder le profil : {e}")
+
+def stocker_profil(cle: str, valeur: str):
+    st.session_state["profil"][cle] = valeur
+    _save_profil()
+
+def retrouver_profil(cle: str) -> Optional[str]:
+    return st.session_state["profil"].get(cle, None)
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
@@ -248,7 +261,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # Bloc « Tu te souviens de X ? »
+    # — Bloc « Tu te souviens de X » (faits dynamiques)
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
