@@ -1422,7 +1422,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
                 "quand a commencé l’apartheid en Afrique du Sud": "⚖️ Le régime d’**apartheid** a été instauré officiellement en **1948** en Afrique du Sud.",
                 "qui a inventé la démocratie": "🏛️ Le concept de **démocratie** est né à **Athènes**, en Grèce antique, au Ve siècle av. J.-C.",
                 "qu’est-ce que le serment du Jeu de Paume": "🤝 Le **serment du Jeu de Paume** a été prêté le **20 juin 1789**, marquant un moment clé de la Révolution française.",
-                "quand a été écrit le Code Napoléon": "📚 Le **Code civil**, aussi appelé **Code Napoléon**, a été promulgué en **1804**."
+                "quand a été écrit le Code Napoléon": "📚 Le **Code civil**, aussi appelé **Code Napoléon**, a été promulgué en **1804**.",
             }
         for question_cle, reponse in base_connaissances.items():
             if question_cle in question_clean:
