@@ -25,6 +25,26 @@ from typing import Optional
 # ───────────────────────────────────────────────────────────────────────
 # 1️⃣ Page config (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
+
+def ajuster_affection(question):
+    style = charger_style_ava()
+    affection = style.get("niveau_affection", 0.5)
+
+    question = question.lower()
+
+    # Mots doux = elle s’attache
+    mots_gentils = ["merci", "tu es géniale", "bravo", "je t’aime", "trop forte", "tu assures", "t’es incroyable"]
+    # Mots durs = elle se referme
+    mots_durs = ["t’es nulle", "aucune utilité", "tu sers à rien", "c’est nul", "je te déteste", "ta gueule"]
+
+    if any(mot in question for mot in mots_gentils):
+        affection = min(1.0, affection + 0.05)
+    elif any(mot in question for mot in mots_durs):
+        affection = max(0.0, affection - 0.05)
+
+    style["niveau_affection"] = round(affection, 2)
+    sauvegarder_style_ava(style)
+
 def incrementer_interactions():
     style = charger_style_ava()
     style["compteur_interactions"] = style.get("compteur_interactions", 0) + 1
@@ -208,32 +228,30 @@ def traduire_texte(texte, langue_dest):
         return r["responseData"]["translatedText"]
     except:
         return texte  # fallback
-def style_reponse_ava(texte: str) -> str:
-    """
-    Applique le style défini (humour, spontanéité, ton) au texte de la réponse.
-    """
+def style_reponse_ava(texte):
     style = charger_style_ava()
-    humour   = style.get("niveau_humour", 0.5)
+    humour = style.get("niveau_humour", 0.5)
     spontane = style.get("niveau_spontane", 0.5)
-    ton      = style.get("ton", "neutre")
+    ton = style.get("ton", "neutre")
+    affection = style.get("niveau_affection", 0.5)
 
-    # Touche d'humour aléatoire
     if random.random() < humour:
-        texte += " 😏 (Je le savais, je suis trop forte.)"
+        texte += " 😏 (Trop facile pour moi.)"
 
-    # Touche de spontanéité
     if random.random() < spontane:
-        texte += " Et j’te balance ça sans filtre, comme j’aime !"
+        texte += " Et j’te balance ça comme une ninja de l’info."
 
-    # Préfixe selon le ton
-    if ton == "malicieuse":
+    if affection > 0.8:
+        texte = "💙 " + texte + " J’adore nos discussions."
+    elif affection < 0.3:
+        texte = "😐 " + texte + " (Mais je vais pas faire d’effort si tu continues comme ça...)"
+    elif ton == "malicieuse":
         texte = "Hmm... " + texte
     elif ton == "sérieuse":
-        texte = "[Analyse prioritaire] " + texte
-    elif ton == "cool":
-        texte = "Yo ! " + texte
+        texte = "[Réponse sérieuse] " + texte
 
     return texte
+
 
 # Fonction humeur dynamique selon l'heure
 def humeur_du_jour():
@@ -279,8 +297,8 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
-    
     incrementer_interactions()  # 🔁 AVA évolue à chaque interaction ici
+    ajuster_affection(question)
 
     # 1) Modules spéciaux (on passe bien les DEUX arguments)
     reponse = gerer_modules_speciaux(question, question_clean)
