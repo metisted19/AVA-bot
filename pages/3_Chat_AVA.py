@@ -21,19 +21,20 @@ import urllib.parse
 import glob
 import json
 
-# Initialise ton dictionnaire de souvenirs s'il n'existe pas encore
-if "souvenirs" not in st.session_state:
-    st.session_state["souvenirs"] = {}
-# ─── Charger les souvenirs depuis le JSON ────────────────────────────
-def charger_souvenirs(fichier='memoire_ava.json'):
-    if os.path.exists(fichier):
-        with open(fichier, 'r', encoding='utf‑8') as f:
-            return json.load(f)
-    return {}
+# 📂 Définition du chemin vers votre fichier de souvenirs
+SCRIPT_DIR = os.path.dirname(__file__)
+MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
-# Dictionnaire global de tous les souvenirs
-SOUVENIRS = charger_souvenirs()
+# 🔄 Chargement des souvenirs
+try:
+    with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+        SOUVENIRS = json.load(f)
+except Exception as e:
+    st.error(f"Erreur lors du chargement de la mémoire : {e}")
+    SOUVENIRS = {}
 
+# 👀 Debug : affichez les clés bien chargées
+st.write("🧠 Souvenirs disponibles :", list(SOUVENIRS.keys()))
 def stocker_souvenir(cle: str, valeur: str):
     """Ajoute un souvenir sous forme de clé→valeur."""
     st.session_state["souvenirs"][cle] = valeur
@@ -243,32 +244,28 @@ def gerer_modules_speciaux(question_clean):
      16.SALUTATIONS COURANTES
     Retourne la réponse ou None si aucun module ne match.
     """
-     # ─── 0) Détection du rappel / mémoire ─────────────────────────────
+    # ─── 0) Mémoire : rappel de ce qu'on s'est dit ─────────────────────────
     if any(phrase in question_clean for phrase in [
         "tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"
     ]):
-        # On extrait la partie qui suit "de", "du", "des" ou "sur"
+        # extrait ce qui suit "de", "du", "des" ou "sur"
         match = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if match:
-            # Normalisation de la clé : minuscules, espaces → underscores, suppression des ponct.
-            cle_raw = match.group(1).strip().rstrip(" ?.!;").lower()
-            cle = cle_raw.replace(" ", "_")
-
-            # 1) tentative de clé exacte
+            cle_raw = match.group(1).strip().rstrip(" ?.!;").lower()   # → "gingembre"
+            cle = cle_raw.replace(" ", "_")                           # → "gingembre"
+            # 1) essai clé exacte
             valeur = SOUVENIRS.get(cle)
-
-            # 2) si pas trouvée, on tente un match partiel
+            # 2) si rien, on cherche partial match
             if not valeur:
                 for k, v in SOUVENIRS.items():
                     if cle_raw in k:
                         valeur = v
                         break
-
             if valeur:
                 return f"🧠 Je me souviens : {valeur}"
-
-        # Si rien n’a matché
+        # pas de match ou pas de clé
         return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
