@@ -20,6 +20,7 @@ from fonctions_chat import obtenir_reponse_ava
 import urllib.parse
 import glob
 import json
+from typing import Optional
 
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
