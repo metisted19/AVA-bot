@@ -218,6 +218,16 @@ def gerer_modules_speciaux(question_clean):
      16.SALUTATIONS COURANTES
     Retourne la réponse ou None si aucun module ne match.
     """
+        # ─── 0) Détection de rappel / souvenir ────────────────────────────
+    if any(phrase in question_clean for phrase in [
+        "tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"
+    ]):
+        # on extrait les mots longs pour construire une clé possible
+        mots_importants = re.findall(r"[a-zA-Zéèêàùûç'\-]+", question_clean)
+        mots_utiles    = [mot for mot in mots_importants if len(mot) > 3]
+        if mots_utiles:
+            cle_possible = mots_utiles[-1]
+            return retrouver_souvenir(cle_possible)
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
