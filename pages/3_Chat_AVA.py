@@ -24,6 +24,15 @@ import json
 # Initialise ton dictionnaire de souvenirs s'il n'existe pas encore
 if "souvenirs" not in st.session_state:
     st.session_state["souvenirs"] = {}
+# ─── Charger les souvenirs depuis le JSON ────────────────────────────
+def charger_souvenirs(fichier='memoire_ava.json'):
+    if os.path.exists(fichier):
+        with open(fichier, 'r', encoding='utf‑8') as f:
+            return json.load(f)
+    return {}
+
+# Dictionnaire global de tous les souvenirs
+SOUVENIRS = charger_souvenirs()
 
 def stocker_souvenir(cle: str, valeur: str):
     """Ajoute un souvenir sous forme de clé→valeur."""
