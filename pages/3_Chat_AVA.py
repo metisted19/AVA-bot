@@ -24,10 +24,11 @@ import json
 # 1️⃣ Page config Streamlit : impératif tout de suite
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 2️⃣ Chargement / initialisation de la mémoire
+# ─── Mémoire AVA ───────────────────────────────────────────────────────────
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
+# Initialise st.session_state["souvenirs"]
 if "souvenirs" not in st.session_state:
     try:
         with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
@@ -35,7 +36,7 @@ if "souvenirs" not in st.session_state:
     except FileNotFoundError:
         st.session_state["souvenirs"] = {}
     except Exception as e:
-        st.error(f"Erreur de chargement de la mémoire : {e}")
+        st.error(f"Erreur lors du chargement de la mémoire : {e}")
         st.session_state["souvenirs"] = {}
 
 def _sauver_memoire():
@@ -46,27 +47,44 @@ def _sauver_memoire():
         st.error(f"Impossible de sauvegarder la mémoire : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
-    """Ajoute ou met à jour un souvenir, et sauve immédiatement."""
     st.session_state["souvenirs"][cle] = valeur
     _sauver_memoire()
 
 def retrouver_souvenir(cle: str) -> str:
-    """
-    Tente :
-      1) correspondance exacte
-      2) cle partielle (c’est-à-dire une cle existante contenant ce fragment)
-    """
-    mem = st.session_state["souvenirs"]
-    # 1) Exact
-    if cle in mem:
-        return mem[cle]
-    # 2) Partiel
-    for k, v in mem.items():
-        if cle in k:
-            return v
-    # 3) RAS
-    return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    return st.session_state["souvenirs"].get(
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
 
+# ─── Mémoire AVA ⇦ ICI ⇦───────────────────────────────────────────────
+SCRIPT_DIR   = os.path.dirname(__file__)
+MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+
+if "souvenirs" not in st.session_state:
+    try:
+        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+            st.session_state["souvenirs"] = json.load(f)
+    except FileNotFoundError:
+        st.session_state["souvenirs"] = {}
+    except Exception as e:
+        st.error(f"Erreur au chargement de la mémoire : {e}")
+        st.session_state["souvenirs"] = {}
+
+def _sauver_memoire():
+    try:
+        with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"Impossible de sauver la mémoire : {e}")
+
+def stocker_souvenir(cle: str, valeur: str):
+    st.session_state["souvenirs"][cle] = valeur
+    _sauver_memoire()
+
+def retrouver_souvenir(cle: str) -> str:
+    return st.session_state["souvenirs"].get(
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    )
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -262,14 +280,15 @@ def gerer_modules_speciaux(question_clean):
      16.SALUTATIONS COURANTES
     Retourne la réponse ou None si aucun module ne match.
     """
-    # ─── 0) Mémoire : rappel de ce qu'on s'est dit ─────────────────────────
-     # Bloc “Tu te souviens ?”
+    # ─── Mémoire : rappel de ce qu'on s'est dit ────────────────────────────
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+        # on extrait la clé après "de"/"du"/"sur"
         match = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if match:
             cle_raw = match.group(1).strip().rstrip(" ?.!;").lower()
-            cle_possible = cle_raw.replace(" ", "_")
-            return retrouver_souvenir(cle_possible)
+            cle = cle_raw.replace(" ", "_")
+            return retrouver_souvenir(cle)
+
 
 
     # Initialisation
