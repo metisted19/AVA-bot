@@ -115,13 +115,7 @@ if "souvenirs" not in st.session_state:
         with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
-# 10️⃣ Initialisation du profil utilisateur
-if "profil" not in st.session_state:
-    try:
-        with open(USER_PROFIL, "r", encoding="utf-8") as f:
-            st.session_state["profil"] = json.load(f)
-    except:
-        st.session_state["profil"] = {}
+
 
 def _save_souvenirs():
     with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
@@ -136,7 +130,13 @@ def retrouver_souvenir(cle: str) -> str:
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
-
+# 10️⃣ Initialisation du profil utilisateur
+if "profil" not in st.session_state:
+    try:
+        with open(USER_PROFIL, "r", encoding="utf-8") as f:
+            st.session_state["profil"] = json.load(f)
+    except:
+        st.session_state["profil"] = {}
 def _save_profil():
     with open(USER_PROFIL, "w", encoding="utf-8") as f:
         json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
