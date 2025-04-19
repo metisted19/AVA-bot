@@ -205,11 +205,10 @@ for message in st.session_state.messages:
     else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-# --- Moteur central de réponse AVA ---
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
 
-    # 1) Modules spéciaux
+    # 1) Modules spéciaux (on passe bien les DEUX arguments)
     reponse = gerer_modules_speciaux(question, question_clean)
     if reponse:
         return reponse
@@ -218,7 +217,7 @@ def trouver_reponse(question: str) -> str:
     if question_clean in base_complet:
         return base_complet[question_clean]
 
-    # 3) Fuzzy match
+    # 3) Fuzzy
     proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
     if proche:
         return base_complet[proche[0]]
@@ -232,19 +231,19 @@ def trouver_reponse(question: str) -> str:
     if score > 0.7:
         return base_complet[best]
 
+    # 5) Fallback final → on retente modules spéciaux
     return gerer_modules_speciaux(question, question_clean) or \
-           "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
+           "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # — Bloc prénom : stockage (on accepte majuscule ou minuscule grâce à IGNORECASE)
+    # — Bloc prénom : stockage (ignore case)
     m = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÿ'\-]+)",
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÖØ-öø-ÿ'\-]+)",
         question,
         flags=re.IGNORECASE
     )
     if m:
-        # On normalise en capitalisant
         prenom = m.group(1).strip().capitalize()
         stocker_profil("prenom", prenom)
         return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
@@ -257,13 +256,12 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # — Bloc « Tu te souviens de X » (faits dynamiques)
+    # — Bloc souvenirs dynamiques
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         mm = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if mm:
             cle = mm.group(1).strip().replace(" ", "_")
             return retrouver_souvenir(cle)
-
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
