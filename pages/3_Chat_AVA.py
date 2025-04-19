@@ -191,13 +191,12 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 # --- Moteur central de réponse AVA ---
 def trouver_reponse(question: str) -> str:
-    # version brute et version nettoyée
     question_clean = nettoyer_texte(question)
 
     # 1) Modules spéciaux
-    rep = gerer_modules_speciaux(question, question_clean)
-    if rep:
-        return rep
+    reponse = gerer_modules_speciaux(question, question_clean)
+    if reponse:
+        return reponse
 
     # 2) Recherche directe
     if question_clean in base_complet:
@@ -217,8 +216,8 @@ def trouver_reponse(question: str) -> str:
     if score > 0.7:
         return base_complet[best]
 
-    # 5) Fallback final → on retente modules spéciaux
-    return gerer_modules_speciaux(question, question_clean)
+    return gerer_modules_speciaux(question, question_clean) or \
+           "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
