@@ -254,36 +254,37 @@ def trouver_reponse(question):
 
 # --- Modules personnalisés (à enrichir) ---
 def gerer_modules_speciaux(question_clean):
+        """
+    Gère tous les modules spéciaux...
+    Maintenant reçoit à la fois :
+      - question : texte brut (pour conserver la casse)
+      - question_clean : texte normalisé
     """
-    Gère tous les modules spéciaux :
-      1. Analyse complète du marché (CSV + indicateurs techniques)
-      2. Analyse simple d'un actif
-      3. Analyse BTC spécifique
-      4. Horoscope
-      5. Météo
-      6. Actualités
-      7. Symptômes courants
-      8. Remèdes naturels
-      9. Punchlines motivationnelles
-     10. Culture générale statique
-     11. Calcul et conversion
-     12. Reconnaissance de tickers
-     13. Quiz de culture générale
-     14. Faits insolites
-     15. Recettes rapides
-     16.SALUTATIONS COURANTES
-    Retourne la réponse ou None si aucun module ne match.
-    """
-# ─── Mémoire : rappel de ce qu'on s'est dit ────────────────────────────
-match_prenom = re.search(
-    r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
-    question  # **non** nettoyé pour garder la casse
-)
-if match_prenom:
-    prenom = match_prenom.group(1)
-    stocker_souvenir("prenom", prenom)
-    return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
+    # ——— Bloc prénom ——————————————————————————————————————————————————
+    match_prenom = re.search(
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
+        question  # on matche sur la question brute pour garder la Majuscule
+    )
+    if match_prenom:
+        prenom = match_prenom.group(1)
+        stocker_souvenir("prenom", prenom)
+        return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
 
+    # ——— Rappel du prénom —————————————————————————————————————————
+    if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
+        if "prenom" in st.session_state["souvenirs"]:
+            return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
+        else:
+            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
+
+# --- Bloc “Tu te souviens ?” ---
+    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+        # Extrait ce qui suit “de”, “du”, “des”, “sur”
+        match = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
+        if match:
+            fragment = match.group(1).strip().rstrip(" ?.!;").lower()
+            cle_possible = fragment.replace(" ", "_")
+            return retrouver_souvenir(cle_possible)
 # 0.b) Rappeler un souvenir précis par clé
 if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
     # si on parle de "mon prénom"
