@@ -25,6 +25,12 @@ from typing import Optional
 # ───────────────────────────────────────────────────────────────────────
 # 1️⃣ Page config (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
+def charger_base_connaissances():
+    try:
+        with open("base_connaissances.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {}
 
 def ajuster_affection(question):
     style = charger_style_ava()
@@ -303,6 +309,10 @@ for message in st.session_state.messages:
     else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+            
+# ─── CHARGEMENT DE LA BASE DANS LA VARIABLE PRINCIPALE ──────────
+base_complet = charger_base_connaissances()
+
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
 
