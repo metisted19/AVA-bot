@@ -297,7 +297,9 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
             # 3) rien trouvé
             return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
 
-   
+    if match_xxx:
+        stocker_profil("ville_favorite", ville)
+        return "Super, je retiens que tu aimes {ville} !"    
 
     # Initialisation
     message_bot       = ""
