@@ -297,6 +297,7 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
+    
     incrementer_interactions()  # 🔁 AVA évolue à chaque interaction ici
     ajuster_affection(question)
 
