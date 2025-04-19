@@ -22,25 +22,23 @@ import glob
 import json
 from typing import Optional
 
-# ─── 2️⃣ Page config Streamlit ──────────────────────────────────────────
+# ─── 1️⃣ Page config (TOUJOURS juste après les imports) ────────────────
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# ─── 1️⃣ Identification de l’utilisateur (login) ─────────────────────────
+# ─── 2️⃣ Identification de l’utilisateur (login obligatoire) ───────────
 if "user_id" not in st.session_state:
     pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if not pseudo:
-        st.stop()  # on bloque tant que pas de pseudo
+        st.stop()
     st.session_state["user_id"] = pseudo.strip()
 user = st.session_state["user_id"]
 
-
-
-# ─── 3️⃣ Chemins de fichiers selon l’utilisateur ─────────────────────────
+# ─── 3️⃣ Définition des chemins JSON par utilisateur ───────────────────
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 PROFIL_FILE  = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")
 
-# ─── 4️⃣ Chargement / init mémoire de faits dynamiques ────────────────────
+# ─── 4️⃣ Mémoire dynamique (faits, anecdotes…) ─────────────────────────
 if "souvenirs" not in st.session_state:
     try:
         with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
@@ -62,7 +60,7 @@ def retrouver_souvenir(cle: str) -> str:
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
-# ─── 5️⃣ Chargement / init profil statique ────────────────────────────────
+# ─── 5️⃣ Profil utilisateur (statique) ────────────────────────────────
 if "profil" not in st.session_state:
     try:
         with open(PROFIL_FILE, "r", encoding="utf-8") as f:
@@ -248,7 +246,10 @@ def trouver_reponse(question: str) -> str:
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     # — Bloc prénom : stockage
-    m = re.search(r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)", question)
+    m = re.search(
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
+        question
+    )
     if m:
         prenom = m.group(1)
         stocker_profil("prenom", prenom)
@@ -266,9 +267,9 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         mm = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if mm:
-            fragment = mm.group(1).strip().rstrip(" ?.!;").lower()
-            cle = fragment.replace(" ", "_")
+            cle = mm.group(1).strip().replace(" ", "_")
             return retrouver_souvenir(cle)
+            
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
