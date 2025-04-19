@@ -277,8 +277,7 @@ def gerer_modules_speciaux(question: str, question_clean: str):
             cle = m.group(1).strip().replace(" ", "_")
             return retrouver_souvenir(cle)
 
-    # … tous les autres blocs ici …
-    return None
+
 
 
     
