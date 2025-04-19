@@ -277,7 +277,7 @@ def gerer_modules_speciaux(question_clean):
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-# --- Bloc “Tu te souviens ?” ---
+    # --- Bloc “Tu te souviens ?” ---
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         # Extrait ce qui suit “de”, “du”, “des”, “sur”
         match = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
@@ -285,14 +285,14 @@ def gerer_modules_speciaux(question_clean):
             fragment = match.group(1).strip().rstrip(" ?.!;").lower()
             cle_possible = fragment.replace(" ", "_")
             return retrouver_souvenir(cle_possible)
-# 0.b) Rappeler un souvenir précis par clé
-if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
-    # si on parle de "mon prénom"
-    if "prénom" in question_clean:
-        if "prenom" in st.session_state["souvenirs"]:
-            return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
-        else:
-            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
+    # 0.b) Rappeler un souvenir précis par clé
+    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+        # si on parle de "mon prénom"
+        if "prénom" in question_clean:
+            if "prenom" in st.session_state["souvenirs"]:
+                 return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
+            else:
+                return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
 
 
