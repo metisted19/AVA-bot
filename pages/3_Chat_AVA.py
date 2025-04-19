@@ -309,8 +309,6 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-# ─── CHARGEMENT DE LA BASE DANS LA VARIABLE PRINCIPALE ──────────
-base_complet = charger_base_connaissances()
 
 
 def trouver_reponse(question: str) -> str:
