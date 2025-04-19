@@ -1399,7 +1399,29 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
                 "combien de secondes dans une heure": "⏳ Il y a **3600 secondes** dans une heure.",
                 "quelle est la durée d'une année sur Vénus": "🪐 Une année sur Vénus dure **225 jours terrestres**, mais une journée sur Vénus est plus longue, environ **243 jours terrestres**.",
                 "quand se passe le solstice d'hiver": "❄️ Le solstice d'hiver a lieu vers le **21 décembre** dans l'hémisphère nord, marquant le début de l'hiver.",
-                "combien de jours dans un mois de février d'une année bissextile": "📅 En année bissextile, **février** compte **29 jours**."
+                "combien de jours dans un mois de février d'une année bissextile": "📅 En année bissextile, **février** compte **29 jours**.",
+
+                # histoire 
+                "quand a été signé le traité de Maastricht": "🇪🇺 Le traité de Maastricht, fondateur de l’Union européenne, a été signé en **1992**.",
+                "qui a été le premier président des États-Unis": "🇺🇸 **George Washington** a été le premier président des États-Unis, en 1789.",
+                "quand a été inventé le vaccin contre la variole": "💉 Le premier vaccin contre la variole a été développé par **Edward Jenner** en **1796**.",
+                "qu’est-ce que la bataille de Waterloo": "⚔️ La bataille de Waterloo en **1815** marque la défaite finale de Napoléon Bonaparte.",
+                "quand a été fondée la ville de Rome": "🏛️ La légende dit que Rome a été fondée en **753 av. J.-C.** par **Romulus**.",
+                "qui était Jeanne d’Arc": "🛡️ **Jeanne d’Arc** était une héroïne française du XVe siècle, brûlée vive à 19 ans, canonisée plus tard.",
+                "quand a été signé l’armistice de 1918": "🕊️ L’armistice mettant fin à la Première Guerre mondiale a été signé le **11 novembre 1918**.",
+                "qu’est-ce que l’affaire Dreyfus": "⚖️ L’**affaire Dreyfus** est un scandale politique et judiciaire du XIXe siècle sur fond d’antisémitisme.",
+                "quand a été découverte la pierre de Rosette": "📜 La pierre de Rosette a été découverte en **1799** et a permis de décrypter les hiéroglyphes.",
+                "qui était Rosa Parks": "✊ **Rosa Parks** est une figure clé de la lutte pour les droits civiques aux États-Unis. Elle a refusé de céder sa place dans un bus en 1955.",
+                "qu’est-ce que la révolution d’octobre": "🟥 La **révolution d’octobre 1917** en Russie a conduit à la prise du pouvoir par les bolcheviks.",
+                "quand a été abolie la monarchie en France": "🇫🇷 La monarchie a été abolie le **21 septembre 1792**, donnant naissance à la Première République.",
+                "qui était Martin Luther King": "🗣️ **Martin Luther King Jr.** était un leader pacifiste emblématique de la lutte contre la ségrégation raciale aux États-Unis.",
+                "quand a eu lieu la prise de la Bastille": "🏰 La Bastille a été prise le **14 juillet 1789**, événement emblématique de la Révolution française.",
+                "quand a été assassiné John F. Kennedy": "🇺🇸 Le président américain **John F. Kennedy** a été assassiné le **22 novembre 1963** à Dallas.",
+                "qu’est-ce que l’indépendance de l’Inde": "🇮🇳 L’**Inde** est devenue indépendante de l’Empire britannique le **15 août 1947**, grâce notamment à **Gandhi**.",
+                "quand a commencé l’apartheid en Afrique du Sud": "⚖️ Le régime d’**apartheid** a été instauré officiellement en **1948** en Afrique du Sud.",
+                "qui a inventé la démocratie": "🏛️ Le concept de **démocratie** est né à **Athènes**, en Grèce antique, au Ve siècle av. J.-C.",
+                "qu’est-ce que le serment du Jeu de Paume": "🤝 Le **serment du Jeu de Paume** a été prêté le **20 juin 1789**, marquant un moment clé de la Révolution française.",
+                "quand a été écrit le Code Napoléon": "📚 Le **Code civil**, aussi appelé **Code Napoléon**, a été promulgué en **1804**."
             }
         for question_cle, reponse in base_connaissances.items():
             if question_cle in question_clean:
