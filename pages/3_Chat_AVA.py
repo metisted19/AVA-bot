@@ -317,14 +317,10 @@ print("🔍 Contient la question ?", "quelle est la plus haute montagne du monde
 
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
-    print("🧪 Question nettoyée :", question_clean)
 
     incrementer_interactions()  # 🔁 AVA évolue à chaque interaction ici
     ajuster_affection(question)
-    # 🔍 Vérification directe dans la base
-    if question_clean in base_complet:
-        print("✅ Réponse trouvée :", base_complet[question_clean])
-        return base_complet[question_clean]
+    
 
     # 1) Modules spéciaux (on passe bien les DEUX arguments)
     reponse = gerer_modules_speciaux(question, question_clean)
