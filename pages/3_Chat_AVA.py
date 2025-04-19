@@ -1501,9 +1501,10 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
                 "comment fonctionne une fusée": "🚀 Une **fusée** avance en projetant des gaz à grande vitesse vers l’arrière, selon le principe d’action-réaction de Newton.",
     
                 # 📚 Histoire
+                "qui a découvert l'amérique": "🌎 **Christophe Colomb** a découvert l’Amérique en 1492, même si des peuples y vivaient déjà.",
                 "qui était napoléon": "👑 Napoléon Bonaparte était un empereur français du XIXe siècle, célèbre pour ses conquêtes militaires.",
                 "en quelle année la tour eiffel a été construite": "🗼 Elle a été achevée en **1889** pour l'Exposition universelle de Paris.",
-                "quelle guerre a eu lieu en 1914": "⚔️ La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918.","qui a découvert l'amérique": "🌎 **Christophe Colomb** a découvert l’Amérique en 1492, même si des peuples y vivaient déjà.",
+                "quelle guerre a eu lieu en 1914": "⚔️ La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918.",
                 "quand a eu lieu la révolution française": "⚔️ La **Révolution française** a commencé en **1789** et a profondément changé la société française.",
                 "qui était cléopâtre": "👑 **Cléopâtre** était la dernière reine d'Égypte, célèbre pour son intelligence et son alliance avec Jules César.",
                 "quand a eu lieu la seconde guerre mondiale": "🌍 La **Seconde Guerre mondiale** a duré de **1939 à 1945** et impliqué de nombreux pays du globe.",
