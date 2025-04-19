@@ -22,9 +22,11 @@ import glob
 import json
 from typing import Optional
 
-# ───────────────────────────────────────────────────────────────────────
-# 1️⃣ Page config (toujours juste après les imports)
+# 1️⃣ Configuration de la page (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
+
+# 2️⃣ Définition du dossier courant
+SCRIPT_DIR = os.path.dirname(__file__)
 
 def ajuster_affection(question):
     style = charger_style_ava()
@@ -79,6 +81,14 @@ def sauvegarder_style_ava(style):
         
 # 2️⃣ Dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
+# 3️⃣ Chargement de la base de connaissances
+FICHIER_BASE = os.path.join(SCRIPT_DIR, "base_connaissances.json")
+try:
+    with open(FICHIER_BASE, "r", encoding="utf-8") as f:
+        base_savoir = json.load(f)
+except Exception as e:
+    st.error(f"Impossible de charger base_connaissances.json : {e}")
+    base_savoir = {}
 
 # 3️⃣ Identification de l’utilisateur
 if "user_id" not in st.session_state:
@@ -158,12 +168,7 @@ def nettoyer_texte(txt):
     txt = re.sub(r"[^\w\sàâäéèêëïîôöùûüç]", "", txt)
     txt = re.sub(r"\s+", " ", txt)
     return txt
-def charger_base_connaissances():
-    try:
-        with open("base_connaissances.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return {}
+
 # Fonction pour supprimer les accents d'une chaîne de caractères
 def remove_accents(input_str):
     nfkd_form = unicodedata.normalize('NFKD', input_str)
@@ -491,7 +496,8 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     question_clean = question.lower().strip()
     if question_clean in SALUTATIONS_COURANTES:
         message_bot = SALUTATIONS_COURANTES[question_clean]
-
+    # 5️⃣ Fusion des deux dictionnaires
+    base_complet = {**base_savoir, **reponses_courantes}
 
     # 4) Actualités générales
     if not message_bot and any(w in question_clean for w in ["actualité", "news"]):
