@@ -24,7 +24,8 @@ from typing import Optional
 
 # 1️⃣ Page config (toujours le tout premier appel à st.*)
 st.set_page_config(page_title="Chat AVA", layout="centered")
-
+# 2️⃣ Déclaration du dossier courant (chémin vers ce script)
+SCRIPT_DIR = os.path.dirname(__file__)
 # 2️⃣ Identification de l’utilisateur (login)
 if "user_id" not in st.session_state:
     pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
@@ -34,24 +35,18 @@ if "user_id" not in st.session_state:
 
 user = st.session_state["user_id"]  # → défini ici
 
-# ─── Chemins des fichiers de mémoire ─────────────────────────────────────
-GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
-USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
-
-# ─── Chargement & initialisation de st.session_state["souvenirs"] ───────
+# ─── Chargement & fallback ──────────────────────────────────────────────
 if "souvenirs" not in st.session_state:
     try:
-        # On tente d’abord le fichier perso
         with open(USER_MEMOIRE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        # Sinon on charge le global en back‑up et on crée le fichier perso
         try:
             with open(GLOBAL_MEMOIRE, "r", encoding="utf-8") as f:
                 st.session_state["souvenirs"] = json.load(f)
         except:
             st.session_state["souvenirs"] = {}
-        # On écrit immédiatement ce contenu dans USER_MEMOIRE
+        # on initialise le fichier user pour la suite
         with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
