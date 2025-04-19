@@ -52,13 +52,37 @@ def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
     sauver_memoire()
 
-# Bloc “Tu te souviens ?”
-if any(phrase in question_clean for phrase in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
-    mots = re.findall(r"[a-zA-Zéèêàùûç'\-]+", question_clean)
-    mots_utils = [m.lower() for m in mots if len(m) > 3]
-    if mots_utils:
-        cle_possible = mots_utils[-1]
-        return retrouver_souvenir(cle_possible)
+# 📂 Chemin vers le fichier de mémoire
+SCRIPT_DIR    = os.path.dirname(__file__)
+MEMOIRE_FILE  = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+
+# 🔄 Initialisation de st.session_state["souvenirs"]
+if "souvenirs" not in st.session_state:
+    try:
+        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+            st.session_state["souvenirs"] = json.load(f)
+    except FileNotFoundError:
+        st.session_state["souvenirs"] = {}
+    except Exception as e:
+        st.error(f"Erreur lors du chargement de la mémoire : {e}")
+        st.session_state["souvenirs"] = {}
+
+def _sauver_memoire():
+    try:
+        with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"Impossible de sauvegarder la mémoire : {e}")
+
+def stocker_souvenir(cle: str, valeur: str):
+    st.session_state["souvenirs"][cle] = valeur
+    _sauver_memoire()
+
+def retrouver_souvenir(cle: str) -> str:
+    return st.session_state["souvenirs"].get(
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    )
 
 # 1) Page config —> impératif : tout en haut du script
 st.set_page_config(page_title="Chat AVA", layout="centered")
@@ -270,16 +294,13 @@ def gerer_modules_speciaux(question_clean):
             cle = cle_raw.replace(" ", "_")                           # → "gingembre"
             # 1) essai clé exacte
             valeur = SOUVENIRS.get(cle)
-            # 2) si rien, on cherche partial match
-            if not valeur:
-                for k, v in SOUVENIRS.items():
-                    if cle_raw in k:
-                        valeur = v
-                        break
-            if valeur:
-                return f"🧠 Je me souviens : {valeur}"
-        # pas de match ou pas de clé
-        return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+            # Bloc “Tu te souviens ?”
+            if any(phrase in question_clean for phrase in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+                mots = re.findall(r"[a-zA-Zéèêàùûç'\-]+", question_clean)
+                mots_utils = [m.lower() for m in mots if len(m) > 3]
+                if mots_utils:
+                    cle_possible = mots_utils[-1]
+                    return retrouver_souvenir(cle_possible)
 
     # Initialisation
     message_bot       = ""
