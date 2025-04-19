@@ -24,54 +24,33 @@ import json
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 2️⃣ Initialisation de la mémoire
-SCRIPT_DIR   = os.path.dirname(__file__)
-MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
-
-if "souvenirs" not in st.session_state:
-    try:
-        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
-            st.session_state["souvenirs"] = json.load(f)
-    except:
-        st.session_state["souvenirs"] = {}
-
-def _sauver_memoire():
-    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
-
-def stocker_souvenir(cle: str, valeur: str):
-    st.session_state["souvenirs"][cle] = valeur
-    _sauver_memoire()
-
-def retrouver_souvenir(cle: str) -> str:
-    return st.session_state["souvenirs"].get(cle, "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?")
-
-# 3️⃣ Toutes vos fonctions utilitaires (nettoyage, météo, news, etc.)
-
-# 4️⃣ Fonction centrale
 def trouver_reponse(question):
+    # 1) On nettoie la question
     question_clean = nettoyer_texte(question)
-    # On passe maintenant les deux versions à gerer_modules_speciaux
-    reponse = gerer_modules_speciaux(question, question_clean)
-    if reponse:  
-        return reponse
-    # 4.a) Modules spéciaux (dont le prénom + mémoire)
+
+    # 2) On appelle le module spécial AVA AVEC la question brute ET la question nettoyée
     reponse = gerer_modules_speciaux(question, question_clean)
     if reponse:
         return reponse
 
-    # 4.b) Base de connaissances (direct / fuzzy / sémantique)
+    # 3) Votre logique direct/fuzzy/sémantique
     if question_clean in base_complet:
         return base_complet[question_clean]
-    proche = difflib.get_close_matches(...)
+
+    proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
     if proche:
         return base_complet[proche[0]]
 
-    # 4.c) Fallback
-    return random.choice([
-        "Je n'ai pas compris, reformulez s'il vous plaît 🤖",
-        "Ce sujet est encore un peu flou pour moi... Je peux parler d'analyse technique, de météo, d'actualités, et bien plus encore !"
-    ])
+    keys = list(base_complet.keys())
+    vb = model_semantic.encode(keys)
+    vq = model_semantic.encode([question_clean])[0]
+    sims = cosine_similarity([vq], vb)[0]
+    best, score = max(zip(keys, sims), key=lambda x: x[1])
+    if score > 0.7:
+        return base_complet[best]
+
+    # 4) Fallback final : on réessaie modules spéciaux avec les 2 args
+    return gerer_modules_speciaux(question, question_clean)
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -250,8 +229,8 @@ def trouver_reponse(question):
 def gerer_modules_speciaux(question: str, question_clean: str):
     """
     Gère tous les modules spéciaux...
-    - question : texte brut (pour conserver la casse)
-    - question_clean : texte nettoyé (minuscules, sans ponctuation)
+    - question : texte brut pour matcher la casse
+    - question_clean : texte normalisé pour keyword searches
     """
     # — Bloc prénom —
     match_prenom = re.search(
