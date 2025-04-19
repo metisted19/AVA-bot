@@ -52,15 +52,13 @@ def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
     sauver_memoire()
 
-def retrouver_souvenir(cle: str) -> str:
-    """
-    Récupère le souvenir ou retourne un message d'erreur.
-    Usage : retrouver_souvenir("gingembre_digestion")
-    """
-    return st.session_state["souvenirs"].get(
-        cle,
-        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
-    )
+# Bloc “Tu te souviens ?”
+if any(phrase in question_clean for phrase in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
+    mots = re.findall(r"[a-zA-Zéèêàùûç'\-]+", question_clean)
+    mots_utils = [m.lower() for m in mots if len(m) > 3]
+    if mots_utils:
+        cle_possible = mots_utils[-1]
+        return retrouver_souvenir(cle_possible)
 
 # 1) Page config —> impératif : tout en haut du script
 st.set_page_config(page_title="Chat AVA", layout="centered")
