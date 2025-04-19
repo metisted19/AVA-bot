@@ -22,37 +22,46 @@ import glob
 import json
 
 
-# 📂 Définition du chemin vers votre fichier de souvenirs
+# 📂 Chemin vers le fichier de mémoire
 SCRIPT_DIR = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
-# 🔄 Chargement des souvenirs
-try:
-    with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
-        SOUVENIRS = json.load(f)
-except Exception as e:
-    st.error(f"Erreur lors du chargement de la mémoire : {e}")
-    SOUVENIRS = {}
+# 🛠️ Initialisation de st.session_state["souvenirs"]
+if "souvenirs" not in st.session_state:
+    try:
+        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+            st.session_state["souvenirs"] = json.load(f)
+    except FileNotFoundError:
+        st.session_state["souvenirs"] = {}
+    except Exception as e:
+        st.error(f"Erreur lors du chargement de la mémoire : {e}")
+        st.session_state["souvenirs"] = {}
 
-
-# Chargement de la mémoire (toujours présent)
-with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
-    SOUVENIRS = json.load(f)
-
-# Dans gerer_modules_speciaux(), quand on détecte "tu te souviens"…
-return retrouver_souvenir(cle_possible)
+def sauver_memoire():
+    """Enregistre st.session_state['souvenirs'] dans memoire_ava.json."""
+    try:
+        with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"Impossible de sauvegarder la mémoire : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
-    """Ajoute un souvenir sous forme de clé→valeur."""
+    """
+    Ajoute ou met à jour un souvenir, puis le sauve sur le disque.
+    Usage : stocker_souvenir("chien_shadow", "Mon chien s'appelle Shadow")
+    """
     st.session_state["souvenirs"][cle] = valeur
+    sauver_memoire()
 
 def retrouver_souvenir(cle: str) -> str:
-    """Récupère le souvenir correspondant à `cle` ou un message d’erreur."""
+    """
+    Récupère le souvenir ou retourne un message d'erreur.
+    Usage : retrouver_souvenir("gingembre_digestion")
+    """
     return st.session_state["souvenirs"].get(
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
-
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
