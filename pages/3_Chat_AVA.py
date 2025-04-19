@@ -25,36 +25,62 @@ from typing import Optional
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# — Initialisation de la mémoire AVA —
-SCRIPT_DIR   = os.path.dirname(__file__)
-MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+# ── Chargement mémoire AVA ──
+# À placer juste après vos imports
+SCRIPT_DIR    = os.path.dirname(__file__)
+MEMOIRE_AVA   = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+PROFIL_FILE   = os.path.join(SCRIPT_DIR, "profil_utilisateur.json")
 
+# 1) Initialisation st.session_state["souvenirs"]
 if "souvenirs" not in st.session_state:
     try:
-        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+        with open(MEMOIRE_AVA, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except FileNotFoundError:
         st.session_state["souvenirs"] = {}
     except Exception as e:
-        st.error(f"Erreur au chargement de la mémoire : {e}")
+        st.error(f"Erreur chargement mémoire AVA : {e}")
         st.session_state["souvenirs"] = {}
 
-def _sauver_memoire():
+def _save_souvenirs():
     try:
-        with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+        with open(MEMOIRE_AVA, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
     except Exception as e:
-        st.error(f"Impossible de sauver la mémoire : {e}")
+        st.error(f"Impossible de sauver la mémoire AVA : {e}")
 
 def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
-    _sauver_memoire()
+    _save_souvenirs()
 
 def retrouver_souvenir(cle: str) -> str:
-    return st.session_state["souvenirs"].get(
-        cle,
-        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
-    )
+    return st.session_state["souvenirs"].get(cle, "❓ Je n'ai pas de souvenir pour ça…")
+
+# 2) Initialisation st.session_state["profil"]
+if "profil" not in st.session_state:
+    try:
+        with open(PROFIL_FILE, "r", encoding="utf-8") as f:
+            st.session_state["profil"] = json.load(f)
+    except FileNotFoundError:
+        st.session_state["profil"] = {}
+    except Exception as e:
+        st.error(f"Erreur chargement profil : {e}")
+        st.session_state["profil"] = {}
+
+def _save_profil():
+    try:
+        with open(PROFIL_FILE, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"Impossible de sauver le profil : {e}")
+
+def stocker_profil(cle: str, valeur: str):
+    st.session_state["profil"][cle] = valeur
+    _save_profil()
+
+def retrouver_profil(cle: str):
+    return st.session_state["profil"].get(cle, None)
+
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
