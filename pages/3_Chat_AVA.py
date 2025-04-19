@@ -311,22 +311,19 @@ for message in st.session_state.messages:
 
 
 
+# ─── Moteur de réponses ────────────────────────────────────────────────────
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
-
-    incrementer_interactions()  # 🔁 AVA évolue à chaque interaction ici
+    sauvegarder_style_ava(style)
+    incrementer_interactions()
     ajuster_affection(question)
-    
-
-    # 1) Modules spéciaux (on passe bien les DEUX arguments)
-    reponse = gerer_modules_speciaux(question, question_clean)
-    if reponse:
-        return reponse
-
-    # 2) Recherche directe
+    # 1) Modules spéciaux
+    rep = gerer_modules_speciaux(question, question_clean)
+    if rep: return rep
+    # 2) Base statique
     if question_clean in base_complet:
         return base_complet[question_clean]
-
+    # … fuzzy / sémantique / fallback …
     # 3) Fuzzy
     proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
     if proche:
@@ -491,8 +488,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     question_clean = question.lower().strip()
     if question_clean in SALUTATIONS_COURANTES:
         message_bot = SALUTATIONS_COURANTES[question_clean]
-    # 5️⃣ Fusion des deux dictionnaires
-    base_complet = {**base_savoir, **reponses_courantes}
+
 
     # 4) Actualités générales
     if not message_bot and any(w in question_clean for w in ["actualité", "news"]):
