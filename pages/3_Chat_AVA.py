@@ -222,11 +222,6 @@ def trouver_reponse(question: str) -> str:
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     # — Bloc prénom —
-    """
-    question       : version brute (garde la casse pour capter les prénoms…)
-    question_clean : version « nettoyée » (lowercase + sans accents) pour les mots‑clés
-    """
-
     match_prenom = re.search(
         r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
         question
