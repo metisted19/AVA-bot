@@ -245,22 +245,14 @@ def trouver_reponse(question):
     return gerer_modules_speciaux(question_clean)
 
 
-# --- Modules personnalisés (à enrichir) ---
-def gerer_modules_speciaux(question_clean):
-        """
-    Gère tous les modules spéciaux...
-    Maintenant reçoit à la fois :
-      - question : texte brut (pour conserver la casse)
-      - question_clean : texte normalisé
-    """
+
 # 5️⃣ Modules spéciaux
 def gerer_modules_speciaux(question: str, question_clean: str):
     """
-    Gère tous les modules spéciaux...
-    - question : texte brut pour matcher la casse
-    - question_clean : texte normalisé pour keyword searches
+    question       : version brute (garde la casse pour capter les prénoms…)
+    question_clean : version « nettoyée » (lowercase + accents retirés) pour les mots‑clés
     """
-    # — Bloc prénom —
+    # Bloc prénom
     match_prenom = re.search(
         r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
         question
@@ -270,7 +262,7 @@ def gerer_modules_speciaux(question: str, question_clean: str):
         stocker_souvenir("prenom", prenom)
         return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
 
-    # — Bloc rappel prénom —
+    # Bloc rappel prénom
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
         if "prenom" in st.session_state["souvenirs"]:
             val = retrouver_souvenir("prenom")
@@ -278,12 +270,16 @@ def gerer_modules_speciaux(question: str, question_clean: str):
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # — Bloc mémoire générale —
+    # Bloc « Tu te souviens »
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
             cle = m.group(1).strip().replace(" ", "_")
             return retrouver_souvenir(cle)
+
+    # … tous les autres blocs ici …
+    return None
+
 
     
     # Initialisation
