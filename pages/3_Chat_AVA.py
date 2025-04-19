@@ -22,26 +22,26 @@ import glob
 import json
 from typing import Optional
 
-# 1️⃣ Page config (TOUJOURS en tout début)
+
+# 1️⃣ Page config
 st.set_page_config(page_title="Chat AVA", layout="centered")
-# juste après st.set_page_config(...)
+
+# 2️⃣ Identification de l’utilisateur
 if "user_id" not in st.session_state:
-    pseudo = st.text_input("Entrez votre pseudo pour démarrer :", key="login_input")
+    pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if pseudo:
         st.session_state["user_id"] = pseudo.strip()
     else:
-        st.stop()  # on ne continue que quand pseudo est renseigné
+        # On arrête l'exécution tant que l'utilisateur n'a pas saisi son pseudo
+        st.stop()
 
-# puis, plus bas, pour charger la mémoire de cet utilisateur :
+# À partir d’ici, st.session_state["user_id"] est toujours défini
 user = st.session_state["user_id"]
-PROFIL_FILE   = os.path.join(SCRIPT_DIR, "profil_utilisateur.json")
 
-# ─── Définition du répertoire et des fichiers ───────────────────────────────
-SCRIPT_DIR    = os.path.dirname(__file__)
-MEMOIRE_FILE  = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+# 3️⃣ Chargement du fichier de mémoire propre à cet utilisateur
+SCRIPT_DIR   = os.path.dirname(__file__)
+MEMOIRE_FILE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 
-
-# ─── Initialisation de st.session_state pour les souvenirs dynamiques ──────
 if "souvenirs" not in st.session_state:
     try:
         with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
@@ -54,43 +54,17 @@ def _save_souvenirs():
         json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
 def stocker_souvenir(cle: str, valeur: str):
-    """Ajoute ou met à jour un souvenir dynamique."""
     st.session_state["souvenirs"][cle] = valeur
     _save_souvenirs()
 
 def retrouver_souvenir(cle: str) -> str:
-    """Récupère un souvenir EXACT ou PARTIEL, ou un message d’erreur."""
-    mem = st.session_state["souvenirs"]
-    # 1) clé exacte
-    if cle in mem:
-        return mem[cle]
-    # 2) recherche partielle
-    for k, v in mem.items():
-        if cle in k:
-            return v
-    # 3) aucun résultat
-    return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    return st.session_state["souvenirs"].get(
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    )
 
-# ─── Initialisation de st.session_state pour le profil utilisateur statique ─
-if "profil" not in st.session_state:
-    try:
-        with open(PROFIL_FILE, "r", encoding="utf-8") as f:
-            st.session_state["profil"] = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        st.session_state["profil"] = {}
-
-def _save_profil():
-    with open(PROFIL_FILE, "w", encoding="utf-8") as f:
-        json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
-
-def stocker_profil(cle: str, valeur: str):
-    """Ajoute ou met à jour une donnée de profil."""
-    st.session_state["profil"][cle] = valeur
-    _save_profil()
-
-def retrouver_profil(cle: str):
-    """Récupère un élément de profil (ou None)."""
-    return st.session_state["profil"].get(cle, None)
+# 4️⃣ (Le reste de votre app : chargement du profil, chat, modules, etc.)
+st.write(f"👤 Connecté en tant que **{user}**")
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
