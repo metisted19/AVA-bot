@@ -1401,7 +1401,7 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
                 "quand se passe le solstice d'hiver": "❄️ Le solstice d'hiver a lieu vers le **21 décembre** dans l'hémisphère nord, marquant le début de l'hiver.",
                 "combien de jours dans un mois de février d'une année bissextile": "📅 En année bissextile, **février** compte **29 jours**.",
 
-                # histoire 
+                # 📚 histoire 
                 "quand a été signé le traité de Maastricht": "🇪🇺 Le traité de Maastricht, fondateur de l’Union européenne, a été signé en **1992**.",
                 "qui a été le premier président des États-Unis": "🇺🇸 **George Washington** a été le premier président des États-Unis, en 1789.",
                 "quand a été inventé le vaccin contre la variole": "💉 Le premier vaccin contre la variole a été développé par **Edward Jenner** en **1796**.",
