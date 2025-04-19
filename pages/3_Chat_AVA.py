@@ -306,18 +306,24 @@ for message in st.session_state.messages:
 # ─── Moteur de réponses ────────────────────────────────────────────────────
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
-    
+
+    # 📈 On fait évoluer AVA au fil des échanges
     incrementer_interactions()
     ajuster_affection(question)
-    # 1) Modules spéciaux
+
+    # 1) Modules spéciaux (prénom, souvenirs, météo…)
     rep = gerer_modules_speciaux(question, question_clean)
-    if rep: return rep
-    # 2) Base statique
+    if rep:
+        return rep
+
+    # 2) Recherche directe dans ton dict “en dur”
     if question_clean in base_complet:
         return base_complet[question_clean]
-    # … fuzzy / sémantique / fallback …
+
     # 3) Fuzzy
-    proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
+    proche = difflib.get_close_matches(question_clean,
+                                       base_complet.keys(),
+                                       n=1, cutoff=0.85)
     if proche:
         return base_complet[proche[0]]
 
@@ -330,12 +336,9 @@ def trouver_reponse(question: str) -> str:
     if score > 0.7:
         return base_complet[best]
 
-    # 5) Fallback final → on retente modules spéciaux
-    return gerer_modules_speciaux(question, question_clean) or \
-           "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
-    reponse = style_reponse_ava(reponse)
-    with st.chat_message("assistant"):
-        st.markdown(reponse)
+    # 5) Fallback final : on retente les modules spéciaux
+    return gerer_modules_speciaux(question, question_clean) \
+           or "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?"
 
 
 # --- Modules personnalisés (à enrichir) ---
