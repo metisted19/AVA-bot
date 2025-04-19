@@ -222,23 +222,24 @@ def trouver_reponse(question: str) -> str:
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # — Bloc prénom —
+    # Bloc prénom
     match_prenom = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
         question
     )
     if match_prenom:
         prenom = match_prenom.group(1)
         stocker_souvenir("prenom", prenom)
-        return f"Enchantée, {prenom} ! Je m'en souviendrai 🙂"
+        return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
 
-    # — Bloc rappel prénom —
+    # Rappel du prénom
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
-        return (f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
-                if "prenom" in st.session_state["souvenirs"]
-                else "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles.")
+        if "prenom" in st.session_state["souvenirs"]:
+            return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
+        else:
+            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # — Bloc « Tu te souviens » —
+    # « Tu te souviens »
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
