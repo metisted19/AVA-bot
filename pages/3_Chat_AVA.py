@@ -21,10 +21,10 @@ import urllib.parse
 import glob
 import json
 
-# 1️⃣ Page config Streamlit : impératif tout de suite
+# 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# 📂 Chemin mémoire + initialisation st.session_state["souvenirs"]
+# 2️⃣ Initialisation de la mémoire
 SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 
@@ -44,41 +44,28 @@ def stocker_souvenir(cle: str, valeur: str):
     _sauver_memoire()
 
 def retrouver_souvenir(cle: str) -> str:
-    return st.session_state["souvenirs"].get(
-        cle,
-        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
-    )
+    return st.session_state["souvenirs"].get(cle, "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?")
 
-# ─── Mémoire AVA ⇦ ICI ⇦───────────────────────────────────────────────
-SCRIPT_DIR   = os.path.dirname(__file__)
-MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+# 3️⃣ Toutes vos fonctions utilitaires (nettoyage, météo, news, etc.)
 
-if "souvenirs" not in st.session_state:
-    try:
-        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
-            st.session_state["souvenirs"] = json.load(f)
-    except FileNotFoundError:
-        st.session_state["souvenirs"] = {}
-    except Exception as e:
-        st.error(f"Erreur au chargement de la mémoire : {e}")
-        st.session_state["souvenirs"] = {}
+# 4️⃣ Fonction centrale
+def trouver_reponse(question: str):
+    question_clean = nettoyer_texte(question)
 
-def _sauver_memoire():
-    try:
-        with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
-            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        st.error(f"Impossible de sauver la mémoire : {e}")
+    # 4.a) Modules spéciaux (dont le prénom + mémoire)
+    reponse = gerer_modules_speciaux(question, question_clean)
+    if reponse:
+        return reponse
 
-def stocker_souvenir(cle: str, valeur: str):
-    st.session_state["souvenirs"][cle] = valeur
-    _sauver_memoire()
-
-def retrouver_souvenir(cle: str) -> str:
-    return st.session_state["souvenirs"].get(
-        cle,
-        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
-    )
+    # 4.b) Base de connaissances (direct / fuzzy / sémantique)
+    if question_clean in base_complet:
+        return base_complet[question_clean]
+    proche = difflib.get_close_matches(...)
+    if proche:
+        return base_complet[proche[0]]
+    …
+    # 4.c) Fallback
+    return random.choice([…, …])
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -253,49 +240,38 @@ def trouver_reponse(question):
 
 
 # --- Modules personnalisés (à enrichir) ---
-def gerer_modules_speciaux(question_clean):
-        """
+# 5️⃣ Modules spéciaux
+def gerer_modules_speciaux(question: str, question_clean: str):
+            """
     Gère tous les modules spéciaux...
     Maintenant reçoit à la fois :
       - question : texte brut (pour conserver la casse)
       - question_clean : texte normalisé
     """
-    # ——— Bloc prénom ——————————————————————————————————————————————————
+
+    # — Bloc prénom —
     match_prenom = re.search(
         r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
-        question  # on matche sur la question brute pour garder la Majuscule
+        question
     )
     if match_prenom:
         prenom = match_prenom.group(1)
         stocker_souvenir("prenom", prenom)
         return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
 
-    # ——— Rappel du prénom —————————————————————————————————————————
+    # — Bloc rappel prénom —
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
-        if "prenom" in st.session_state["souvenirs"]:
-            return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
-        else:
-            return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
+        return retrouver_souvenir("prenom") if "prenom" in st.session_state["souvenirs"] \
+               else "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # --- Bloc “Tu te souviens ?” ---
+    # — Bloc mémoire générale —
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
-        # Extrait ce qui suit “de”, “du”, “des”, “sur”
-        match = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
-        if match:
-            fragment = match.group(1).strip().rstrip(" ?.!;").lower()
-            cle_possible = fragment.replace(" ", "_")
-            return retrouver_souvenir(cle_possible)
-    # 0.b) Rappeler un souvenir précis par clé
-    if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
-        # si on parle de "mon prénom"
-        if "prénom" in question_clean:
-            if "prenom" in st.session_state["souvenirs"]:
-                 return f"Tu m'as dit que tu t'appelles **{retrouver_souvenir('prenom')}**."
-            else:
-                return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
+        m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
+        if m:
+            cle = m.group(1).replace(" ", "_")
+            return retrouver_souvenir(cle)
 
-
-
+    
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
