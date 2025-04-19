@@ -19,6 +19,7 @@ import difflib
 from fonctions_chat import obtenir_reponse_ava 
 import urllib.parse
 import glob
+import json
 
 # Initialise ton dictionnaire de souvenirs s'il n'existe pas encore
 if "souvenirs" not in st.session_state:
