@@ -24,39 +24,38 @@ from typing import Optional
 
 # 1️⃣ Page config (toujours le tout premier appel à st.*)
 st.set_page_config(page_title="Chat AVA", layout="centered")
-# 2️⃣ Déclaration du dossier courant (chemin vers ce script)
+# 2️⃣ Définition du dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
 
-# 3️⃣ Identification de l’utilisateur (login)
+# 3️⃣ Identification de l’utilisateur
 if "user_id" not in st.session_state:
     pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if not pseudo:
-        st.stop()  # on bloque tant qu'il n'y a pas de pseudo
+        st.stop()  # on bloque tant que pas de pseudo
     st.session_state["user_id"] = pseudo.strip()
 user = st.session_state["user_id"]
 
-# 4️⃣ Définition des chemins de mémoire (global + user‑spécifique)
+# 4️⃣ Fichiers de mémoire
 GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
+PROFIL_FILE    = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")
 
-# 5️⃣ Chargement de la mémoire dans st.session_state["souvenirs"]
+# 5️⃣ Chargement des souvenirs dynamiques
 if "souvenirs" not in st.session_state:
-    # 5.a) on essaie d'abord le fichier user
     try:
         with open(USER_MEMOIRE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        # 5.b) sinon on retombe sur le fichier global
+        # fallback sur global
         try:
             with open(GLOBAL_MEMOIRE, "r", encoding="utf-8") as f:
                 st.session_state["souvenirs"] = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+        except:
             st.session_state["souvenirs"] = {}
-        # et on crée le fichier user pour la suite
+        # on init le fichier user pour la suite
         with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
-# 6️⃣ Fonctions d’accès et de sauvegarde
 def _save_souvenirs():
     with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
         json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
@@ -71,7 +70,7 @@ def retrouver_souvenir(cle: str) -> str:
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
-# 5️⃣ Chargement du profil utilisateur (prénom, goûts…)
+# 6️⃣ Chargement du profil utilisateur
 if "profil" not in st.session_state:
     try:
         with open(PROFIL_FILE, "r", encoding="utf-8") as f:
@@ -87,9 +86,8 @@ def stocker_profil(cle: str, valeur: str):
     st.session_state["profil"][cle] = valeur
     _save_profil()
 
-def retrouver_profil(cle: str) -> str:
+def retrouver_profil(cle: str):
     return st.session_state["profil"].get(cle, None)
-
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -256,17 +254,17 @@ def trouver_reponse(question: str) -> str:
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # — Bloc prénom : stockage
-    m = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÖØ-öø-ÿ'-]+)",
-        question, flags=re.IGNORECASE
+    # — Bloc prénom : stockage
+    match_prenom = re.search(
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
+        question
     )
-    if m:
-        prenom = m.group(1).strip().capitalize()
+    if match_prenom:
+        prenom = match_prenom.group(1)
         stocker_profil("prenom", prenom)
         return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
 
-    # — Bloc prénom : rappel
+    # — Bloc prénom : rappel
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
         prenom = retrouver_profil("prenom")
         if prenom:
@@ -274,11 +272,12 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # — Bloc souvenirs dynamiques
+    # — Bloc « Tu te souviens de X » (faits dynamiques)
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
-        mm = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
-        if mm:
-            cle = mm.group(1).strip().replace(" ", "_")
+        m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
+        if m:
+            fragment = m.group(1).strip().rstrip(" ?.!;").lower()
+            cle = fragment.replace(" ", "_")
             return retrouver_souvenir(cle)
     # Initialisation
     message_bot       = ""
