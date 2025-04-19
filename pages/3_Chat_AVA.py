@@ -24,11 +24,23 @@ from typing import Optional
 
 # 1️⃣ Page config (TOUJOURS en tout début)
 st.set_page_config(page_title="Chat AVA", layout="centered")
+# juste après st.set_page_config(...)
+if "user_id" not in st.session_state:
+    pseudo = st.text_input("Entrez votre pseudo pour démarrer :", key="login_input")
+    if pseudo:
+        st.session_state["user_id"] = pseudo.strip()
+        st.experimental_rerun()
+    else:
+        st.stop()  # on ne continue que quand pseudo est renseigné
+
+# puis, plus bas, pour charger la mémoire de cet utilisateur :
+user = st.session_state["user_id"]
+PROFIL_FILE   = os.path.join(SCRIPT_DIR, "profil_utilisateur.json")
 
 # ─── Définition du répertoire et des fichiers ───────────────────────────────
 SCRIPT_DIR    = os.path.dirname(__file__)
 MEMOIRE_FILE  = os.path.join(SCRIPT_DIR, "memoire_ava.json")
-PROFIL_FILE   = os.path.join(SCRIPT_DIR, "profil_utilisateur.json")
+
 
 # ─── Initialisation de st.session_state pour les souvenirs dynamiques ──────
 if "souvenirs" not in st.session_state:
