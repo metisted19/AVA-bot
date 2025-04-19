@@ -63,8 +63,6 @@ def retrouver_souvenir(cle: str) -> str:
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
-# 4️⃣ (Le reste de votre app : chargement du profil, chat, modules, etc.)
-st.write(f"👤 Connecté en tant que **{user}**")
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
@@ -232,22 +230,20 @@ def trouver_reponse(question: str) -> str:
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # — Bloc détection du prénom (dynamiquement, quel que soit la casse) —
+    # — Bloc prénom : stockage
     match_prenom = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÖØ-öø-ÿ'-]+)",
-        question,
-        re.IGNORECASE
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
+        question
     )
     if match_prenom:
-        # On normalise : première lettre en majuscule, le reste en minuscules
-        prenom = match_prenom.group(1).capitalize()
-        stocker_souvenir("prenom", prenom)
-        return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
+        prenom = match_prenom.group(1)
+        stocker_profil("prenom", prenom)
+        return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
 
-    # — Bloc rappel du prénom —
+    # — Bloc prénom : rappel
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
-        if "prenom" in st.session_state["souvenirs"]:
-            prenom = st.session_state["souvenirs"]["prenom"]
+        prenom = retrouver_profil("prenom")
+        if prenom:
             return f"Tu m'as dit que tu t'appelles **{prenom}**."
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
@@ -1575,7 +1571,17 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
     if message_bot:
         return message_bot
     return None
-        
+     ── 7️⃣ Boucle principale (exemple) ─────────────────────────────────────────────
+    st.write(f"👤 Connecté en tant que **{user}**")
+
+    question = st.text_input("Que voulez‑vous demander à AVA ?")
+    if question:
+        question_clean = question.lower().strip()
+        reponse = gerer_modules_speciaux(question, question_clean)
+        if reponse:
+            st.write(reponse)
+        else:
+            st.write("🤖 Je n'ai pas compris…")   
 
 # Récupération de la question utilisateur
 question = st.chat_input("Que souhaitez-vous demander à AVA ?")
