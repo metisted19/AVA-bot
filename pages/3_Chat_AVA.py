@@ -24,62 +24,6 @@ from typing import Optional
 
 # 1️⃣ Configuration de la page (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
-
-
-
-def ajuster_affection(question):
-    style = charger_style_ava()
-    affection = style.get("niveau_affection", 0.5)
-
-    question = question.lower()
-
-    # Mots doux = elle s’attache
-    mots_gentils = ["merci", "tu es géniale", "bravo", "je t’aime", "trop forte", "tu assures", "t’es incroyable"]
-    # Mots durs = elle se referme
-    mots_durs = ["t’es nulle", "aucune utilité", "tu sers à rien", "c’est nul", "je te déteste", "ta gueule"]
-
-    if any(mot in question for mot in mots_gentils):
-        affection = min(1.0, affection + 0.05)
-    elif any(mot in question for mot in mots_durs):
-        affection = max(0.0, affection - 0.05)
-
-    style["niveau_affection"] = round(affection, 2)
-    sauvegarder_style_ava(style)
-
-def incrementer_interactions():
-    style = charger_style_ava()
-    style["compteur_interactions"] = style.get("compteur_interactions", 0) + 1
-
-    # Bonus : elle évolue tous les 20 messages
-    if style["compteur_interactions"] % 20 == 0:
-        style["niveau_spontane"] = min(style["niveau_spontane"] + 0.05, 1.0)
-        style["niveau_humour"] = min(style["niveau_humour"] + 0.05, 1.0)
-        style["niveau_libre_arbitre"] = min(style["niveau_libre_arbitre"] + 0.03, 1.0)
-
-    sauvegarder_style_ava(style)
-
-def charger_style_ava():
-    try:
-        with open("style_ava.json", "r") as f:
-            return json.load(f)
-    except:
-        return {
-            "ton": "neutre",
-            "langage": "classique",
-            "niveau_humour": 0.3,
-            "niveau_spontane": 0.3,
-            "niveau_libre_arbitre": 0.3,
-            "compteur_interactions": 0,
-            "niveau_affection": 0.5
-        }
-
-def sauvegarder_style_ava(style):
-    with open("style_ava.json", "w") as f:
-        json.dump(style, f, indent=4)
-
-# ───────────────────────────────────────────────────────────────────────
-
-
 # 2️⃣ Dossier courant
 SCRIPT_DIR = os.path.dirname(__file__)
 
@@ -146,6 +90,55 @@ def stocker_profil(cle: str, valeur: str):
 def retrouver_profil(cle: str):
     return st.session_state["profil"].get(cle, None)
 # ───────────────────────────────────────────────────────────────────────
+def ajuster_affection(question):
+    style = charger_style_ava()
+    affection = style.get("niveau_affection", 0.5)
+
+    question = question.lower()
+
+    # Mots doux = elle s’attache
+    mots_gentils = ["merci", "tu es géniale", "bravo", "je t’aime", "trop forte", "tu assures", "t’es incroyable"]
+    # Mots durs = elle se referme
+    mots_durs = ["t’es nulle", "aucune utilité", "tu sers à rien", "c’est nul", "je te déteste", "ta gueule"]
+
+    if any(mot in question for mot in mots_gentils):
+        affection = min(1.0, affection + 0.05)
+    elif any(mot in question for mot in mots_durs):
+        affection = max(0.0, affection - 0.05)
+
+    style["niveau_affection"] = round(affection, 2)
+    sauvegarder_style_ava(style)
+
+def incrementer_interactions():
+    style = charger_style_ava()
+    style["compteur_interactions"] = style.get("compteur_interactions", 0) + 1
+
+    # Bonus : elle évolue tous les 20 messages
+    if style["compteur_interactions"] % 20 == 0:
+        style["niveau_spontane"] = min(style["niveau_spontane"] + 0.05, 1.0)
+        style["niveau_humour"] = min(style["niveau_humour"] + 0.05, 1.0)
+        style["niveau_libre_arbitre"] = min(style["niveau_libre_arbitre"] + 0.03, 1.0)
+
+    sauvegarder_style_ava(style)
+
+def charger_style_ava():
+    try:
+        with open("style_ava.json", "r") as f:
+            return json.load(f)
+    except:
+        return {
+            "ton": "neutre",
+            "langage": "classique",
+            "niveau_humour": 0.3,
+            "niveau_spontane": 0.3,
+            "niveau_libre_arbitre": 0.3,
+            "compteur_interactions": 0,
+            "niveau_affection": 0.5
+        }
+
+def sauvegarder_style_ava(style):
+    with open("style_ava.json", "w") as f:
+        json.dump(style, f, indent=4)
 
 
 # --- Modèle sémantique (cache) ---
