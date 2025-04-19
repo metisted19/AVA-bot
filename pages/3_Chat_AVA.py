@@ -34,21 +34,29 @@ if "user_id" not in st.session_state:
 
 user = st.session_state["user_id"]  # → défini ici
 
-# 3️⃣ Définition des chemins **APRES** avoir le `user`
-SCRIPT_DIR   = os.path.dirname(__file__)
-MEMOIRE_FILE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
-PROFIL_FILE  = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")
+# ─── Chemins ────────────────────────────────────────────────────────────────
+GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
+USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 
-# 4️⃣ Chargement de la mémoire dynamique (anecdotes, faits…)
+# ─── Chargement des souvenirs ───────────────────────────────────────────────
 if "souvenirs" not in st.session_state:
     try:
-        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+        # 1️⃣ on tente le fichier perso
+        with open(USER_MEMOIRE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        st.session_state["souvenirs"] = {}
+        # 2️⃣ back‑up sur le fichier global, puis création du perso
+        try:
+            with open(GLOBAL_MEMOIRE, "r", encoding="utf-8") as f:
+                st.session_state["souvenirs"] = json.load(f)
+        except:
+            st.session_state["souvenirs"] = {}
+        # on écrit tout de suite dans le fichier perso pour la suite
+        with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
+            json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
 def _save_souvenirs():
-    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+    with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
         json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
 def stocker_souvenir(cle: str, valeur: str):
