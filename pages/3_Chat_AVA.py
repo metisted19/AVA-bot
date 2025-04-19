@@ -33,6 +33,7 @@ def retrouver_souvenir(cle: str) -> str:
     return st.session_state["souvenirs"].get(
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+    )
 
 # --- CONFIG ---
 st.set_page_config(page_title="Chat AVA", layout="centered")
