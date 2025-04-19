@@ -1,3 +1,5 @@
+# 1️⃣ Page config (TOUJOURS en tout début)
+st.set_page_config(page_title="Chat AVA", layout="centered")
 import streamlit as st
 import os
 import re
@@ -21,8 +23,7 @@ import urllib.parse
 import glob
 import json
 
-# 1️⃣ Page config (TOUJOURS en tout début)
-st.set_page_config(page_title="Chat AVA", layout="centered")
+
 
 # 2️⃣ Initialisation de la mémoire
 SCRIPT_DIR   = os.path.dirname(__file__)
@@ -43,35 +44,7 @@ def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
     _sauver_memoire()
 
-def trouver_reponse(question):
-    # on nettoie la question
-    question_clean = nettoyer_texte(question)
 
-    # 1) On essaye les modules spéciaux
-    reponse = gerer_modules_speciaux(question, question_clean)
-    if reponse:
-        return reponse
-
-    # 2) Recherche direct dans base_complet
-    if question_clean in base_complet:
-        return base_complet[question_clean]
-
-    # 3) Fuzzy match
-    proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
-    if proche:
-        return base_complet[proche[0]]
-
-    # 4) Sémantique
-    keys = list(base_complet.keys())
-    vb   = model_semantic.encode(keys)
-    vq   = model_semantic.encode([question_clean])[0]
-    sims = cosine_similarity([vq], vb)[0]
-    best, score = max(zip(keys, sims), key=lambda x: x[1])
-    if score > 0.7:
-        return base_complet[best]
-
-    # 5) Fallback final → on retente modules spéciaux
-    return gerer_modules_speciaux(question, question_clean)
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
 def load_model():
@@ -207,52 +180,45 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 # --- Moteur central de réponse AVA ---
-def trouver_reponse(question):
+def trouver_reponse(question: str) -> str:
+    # version brute et version nettoyée
     question_clean = nettoyer_texte(question)
-    reponse = gerer_modules_speciaux(question_clean)
-    if reponse:
-        return reponse
-    else:
-        # Réponse catch-all si aucun module n’a matché
-        return random.choice([
-            "Je n'ai pas compris, reformulez s'il vous plaît 🤖",
-            "Ce sujet est flou pour moi... mais je m'améliore chaque jour !"
-        ])
 
-    # 1. Direct
+    # 1) Modules spéciaux
+    rep = gerer_modules_speciaux(question, question_clean)
+    if rep:
+        return rep
+
+    # 2) Recherche directe
     if question_clean in base_complet:
-        st.write("✅ Match direct trouvé")
         return base_complet[question_clean]
 
-    # 2. Fuzzy
+    # 3) Fuzzy match
     proche = difflib.get_close_matches(question_clean, base_complet.keys(), n=1, cutoff=0.85)
     if proche:
-        st.write(f"🔎 Match fuzzy : {proche[0]}")
         return base_complet[proche[0]]
 
-    # 3. Sémantique
+    # 4) Sémantique
     keys = list(base_complet.keys())
-    vb = model_semantic.encode(keys)
-    vq = model_semantic.encode([question_clean])[0]
+    vb   = model_semantic.encode(keys)
+    vq   = model_semantic.encode([question_clean])[0]
     sims = cosine_similarity([vq], vb)[0]
     best, score = max(zip(keys, sims), key=lambda x: x[1])
-    st.write(f"🧠 Sémantique : '{best}' (score = {round(score, 3)})")
-
     if score > 0.7:
         return base_complet[best]
 
-    # 4. Fallback → Modules spéciaux (bourse, météo, horoscope...)
-    return gerer_modules_speciaux(question_clean)
+    # 5) Fallback final → on retente modules spéciaux
+    return gerer_modules_speciaux(question, question_clean)
 
 
-
-# 5️⃣ Modules spéciaux
-def gerer_modules_speciaux(question: str, question_clean: str):
+# --- Modules personnalisés (à enrichir) ---
+def gerer_modules_speciaux(question: str, question_clean: str) -> str | None:
     """
     question       : version brute (garde la casse pour capter les prénoms…)
-    question_clean : version « nettoyée » (lowercase + accents retirés) pour les mots‑clés
+    question_clean : version « nettoyée » (lowercase + sans accents) pour les mots‑clés
     """
-    # Bloc prénom
+
+    # — Bloc prénom —
     match_prenom = re.search(
         r"(?:mon prénom est|je m'appelle|je suis)\s+([A-ZÉÈÀÂÄ][a-zéèêëàâäîïôöùûüç-]+)",
         question
@@ -262,7 +228,7 @@ def gerer_modules_speciaux(question: str, question_clean: str):
         stocker_souvenir("prenom", prenom)
         return f"Enchantée, {prenom} ! Je m'en souviendrai la prochaine fois 🙂"
 
-    # Bloc rappel prénom
+    # — Bloc rappel prénom —
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
         if "prenom" in st.session_state["souvenirs"]:
             val = retrouver_souvenir("prenom")
@@ -270,17 +236,13 @@ def gerer_modules_speciaux(question: str, question_clean: str):
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # Bloc « Tu te souviens »
+    # — Bloc « Tu te souviens » —
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
             cle = m.group(1).strip().replace(" ", "_")
             return retrouver_souvenir(cle)
 
-
-
-
-    
     # Initialisation
     message_bot       = ""
     horoscope_repondu = False
