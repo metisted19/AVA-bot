@@ -278,14 +278,24 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
         else:
             return "Je ne connais pas encore ton prénom ! Dis‑moi comment tu t'appelles."
 
-    # — Bloc « Tu te souviens de X ? » pour tes anecdotes/faits dynamiques —
+    # — Bloc « Tu te souviens de X ? » pour tes anecdotes/faits dynamiques —
     if any(kw in question_clean for kw in ["tu te souviens", "tu te rappelles", "qu’est-ce que je t’ai dit"]):
-        # on extrait ce qui suit « de », « du », « sur », etc.
         m = re.search(r"(?:de|du|des|sur)\s+(.+)", question_clean)
         if m:
             fragment = m.group(1).strip().rstrip(" ?.!;").lower()
-            cle = fragment.replace(" ", "_")
-            return retrouver_souvenir(cle)
+            base = fragment.replace(" ", "_")  # ex. "gingembre"
+
+            # 1) match exact
+            if base in st.session_state["souvenirs"]:
+                return retrouver_souvenir(base)
+
+            # 2) fallback : chercher une clé qui contient ce fragment
+            for key in st.session_state["souvenirs"].keys():
+                if base in key:
+                    return retrouver_souvenir(key)
+
+            # 3) rien trouvé
+            return "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
 
     # Ici tu peux continuer avec tes autres modules (météo, news, culture, etc.)
     return None
