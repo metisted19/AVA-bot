@@ -1662,8 +1662,8 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
 
                 # 2) Nettoyer les clés
                 base_savoir_nettoyee = {
-                nettoyer_texte(cle): valeur
-                for cle, valeur in base_savoir.items()
+                    nettoyer_texte(cle): valeur
+                     for cle, valeur in base_savoir.items()
                 }
                 reponses_courantes_nettoyees = {
                     nettoyer_texte(cle): valeur
@@ -1672,8 +1672,8 @@ def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
 
                 # 3) Fusionner
                 base_complet = {
-                **base_savoir_nettoyee,
-                **reponses_courantes_nettoyees
+                    **base_savoir_nettoyee,
+                    **reponses_courantes_nettoyees
                 
                 }
         }     
