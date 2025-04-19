@@ -25,6 +25,18 @@ from typing import Optional
 # ───────────────────────────────────────────────────────────────────────
 # 1️⃣ Page config (toujours juste après les imports)
 st.set_page_config(page_title="Chat AVA", layout="centered")
+def incrementer_interactions():
+    style = charger_style_ava()
+    style["compteur_interactions"] = style.get("compteur_interactions", 0) + 1
+
+    # Bonus : elle évolue tous les 20 messages
+    if style["compteur_interactions"] % 20 == 0:
+        style["niveau_spontane"] = min(style["niveau_spontane"] + 0.05, 1.0)
+        style["niveau_humour"] = min(style["niveau_humour"] + 0.05, 1.0)
+        style["niveau_libre_arbitre"] = min(style["niveau_libre_arbitre"] + 0.03, 1.0)
+
+    sauvegarder_style_ava(style)
+
 def charger_style_ava() -> dict:
     """Charge les paramètres de style depuis style_ava.json (fallback par défaut)."""
     try:
@@ -267,6 +279,8 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
+    
+    incrementer_interactions()  # 🔁 AVA évolue à chaque interaction ici
 
     # 1) Modules spéciaux (on passe bien les DEUX arguments)
     reponse = gerer_modules_speciaux(question, question_clean)
