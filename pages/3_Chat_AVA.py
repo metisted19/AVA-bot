@@ -21,9 +21,6 @@ import urllib.parse
 import glob
 import json
 
-# 1) Page config —> impératif : tout en haut du script
-st.set_page_config(page_title="Chat AVA", layout="centered")
-
 # 📂 Chemin vers le fichier de mémoire
 SCRIPT_DIR = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
@@ -64,6 +61,10 @@ def retrouver_souvenir(cle: str) -> str:
         cle,
         "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
+
+# 1) Page config —> impératif : tout en haut du script
+st.set_page_config(page_title="Chat AVA", layout="centered")
+
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
