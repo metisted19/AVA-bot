@@ -22,49 +22,63 @@ import glob
 import json
 from typing import Optional
 
-# ─── 1️⃣ Page config ────────────────────────────────────────────────────
+# 1️⃣ Page config (toujours le tout premier appel à st.*)
 st.set_page_config(page_title="Chat AVA", layout="centered")
 
-# ─── 2️⃣ Login / identification ─────────────────────────────────────────
+# 2️⃣ Identification de l’utilisateur (login)
 if "user_id" not in st.session_state:
     pseudo = st.text_input("🔑 Entrez votre pseudo pour commencer :", key="login_input")
     if not pseudo:
-        st.stop()
+        st.stop()  # on bloque tant qu'il n'y a pas de pseudo
     st.session_state["user_id"] = pseudo.strip()
-user = st.session_state["user_id"]
 
-# Après st.set_page_config et identification user…
+user = st.session_state["user_id"]  # → défini ici
+
+# 3️⃣ Définition des chemins **APRES** avoir le `user`
+SCRIPT_DIR   = os.path.dirname(__file__)
 MEMOIRE_FILE = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 PROFIL_FILE  = os.path.join(SCRIPT_DIR, f"profil_utilisateur_{user}.json")
 
-for key, path in [("souvenirs", MEMOIRE_FILE), ("profil", PROFIL_FILE)]:
-    if key not in st.session_state:
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                st.session_state[key] = json.load(f)
-        except:
-            st.session_state[key] = {}
+# 4️⃣ Chargement de la mémoire dynamique (anecdotes, faits…)
+if "souvenirs" not in st.session_state:
+    try:
+        with open(MEMOIRE_FILE, "r", encoding="utf-8") as f:
+            st.session_state["souvenirs"] = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        st.session_state["souvenirs"] = {}
 
-def _save(key, path):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(st.session_state[key], f, ensure_ascii=False, indent=2)
+def _save_souvenirs():
+    with open(MEMOIRE_FILE, "w", encoding="utf-8") as f:
+        json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
-def stocker_profil(cle, valeur):
-    st.session_state["profil"][cle] = valeur
-    _save("profil", PROFIL_FILE)
-
-def retrouver_profil(cle):
-    return st.session_state["profil"].get(cle, None)
-
-def stocker_souvenir(cle, valeur):
+def stocker_souvenir(cle: str, valeur: str):
     st.session_state["souvenirs"][cle] = valeur
-    _save("souvenirs", MEMOIRE_FILE)
+    _save_souvenirs()
 
-def retrouver_souvenir(cle):
+def retrouver_souvenir(cle: str) -> str:
     return st.session_state["souvenirs"].get(
-        cle, "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
+        cle,
+        "❓ Je n'ai pas de souvenir pour ça… Peux‑tu me le redire ?"
     )
 
+# 5️⃣ Chargement du profil utilisateur (prénom, goûts…)
+if "profil" not in st.session_state:
+    try:
+        with open(PROFIL_FILE, "r", encoding="utf-8") as f:
+            st.session_state["profil"] = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        st.session_state["profil"] = {}
+
+def _save_profil():
+    with open(PROFIL_FILE, "w", encoding="utf-8") as f:
+        json.dump(st.session_state["profil"], f, ensure_ascii=False, indent=2)
+
+def stocker_profil(cle: str, valeur: str):
+    st.session_state["profil"][cle] = valeur
+    _save_profil()
+
+def retrouver_profil(cle: str) -> str:
+    return st.session_state["profil"].get(cle, None)
 
 # --- Modèle sémantique (cache) ---
 @st.cache_resource
@@ -232,18 +246,17 @@ def trouver_reponse(question: str) -> str:
 
 
 def gerer_modules_speciaux(question: str, question_clean: str) -> Optional[str]:
-    # — Bloc prénom : stockage (ignore case)
+    # — Bloc prénom : stockage
     m = re.search(
-        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÖØ-öø-ÿ'\-]+)",
-        question,
-        flags=re.IGNORECASE
+        r"(?:mon prénom est|je m'appelle|je suis)\s+([A-Za-zÀ-ÖØ-öø-ÿ'-]+)",
+        question, flags=re.IGNORECASE
     )
     if m:
         prenom = m.group(1).strip().capitalize()
         stocker_profil("prenom", prenom)
         return f"Enchantée, {prenom} ! Je m’en souviendrai la prochaine fois 🙂"
 
-    # — Bloc prénom : rappel
+    # — Bloc prénom : rappel
     if any(kw in question_clean for kw in ["mon prénom", "ton prénom", "comment je m'appelle"]):
         prenom = retrouver_profil("prenom")
         if prenom:
