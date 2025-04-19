@@ -34,24 +34,24 @@ if "user_id" not in st.session_state:
 
 user = st.session_state["user_id"]  # → défini ici
 
-# ─── Chemins ────────────────────────────────────────────────────────────────
+# ─── Chemins des fichiers de mémoire ─────────────────────────────────────
 GLOBAL_MEMOIRE = os.path.join(SCRIPT_DIR, "memoire_ava.json")
 USER_MEMOIRE   = os.path.join(SCRIPT_DIR, f"memoire_ava_{user}.json")
 
-# ─── Chargement des souvenirs ───────────────────────────────────────────────
+# ─── Chargement & initialisation de st.session_state["souvenirs"] ───────
 if "souvenirs" not in st.session_state:
     try:
-        # 1️⃣ on tente le fichier perso
+        # On tente d’abord le fichier perso
         with open(USER_MEMOIRE, "r", encoding="utf-8") as f:
             st.session_state["souvenirs"] = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        # 2️⃣ back‑up sur le fichier global, puis création du perso
+        # Sinon on charge le global en back‑up et on crée le fichier perso
         try:
             with open(GLOBAL_MEMOIRE, "r", encoding="utf-8") as f:
                 st.session_state["souvenirs"] = json.load(f)
         except:
             st.session_state["souvenirs"] = {}
-        # on écrit tout de suite dans le fichier perso pour la suite
+        # On écrit immédiatement ce contenu dans USER_MEMOIRE
         with open(USER_MEMOIRE, "w", encoding="utf-8") as f:
             json.dump(st.session_state["souvenirs"], f, ensure_ascii=False, indent=2)
 
