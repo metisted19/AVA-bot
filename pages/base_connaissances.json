@@ -66,7 +66,7 @@
 "quelle est la température d'ébullition de l'eau": "💧 L'eau bout à **100°C** à une pression normale (1 atmosphère).",
 "combien de langues sont parlées dans le monde": "🌍 Il y a environ **7 000 langues** parlées dans le monde aujourd'hui.",
 "qu'est-ce que l'effet de serre": "🌍 L'effet de serre est un phénomène naturel où certains gaz dans l'atmosphère retiennent la chaleur du Soleil, mais il est amplifié par les activités humaines.",
-# 🌍 Météo & nature
+
 "quelle est la température idéale pour un être humain": "🌡️ La température corporelle idéale est autour de 36,5 à 37°C.",
 "qu'est-ce qu'un ouragan": "🌀 Un ouragan est une tempête tropicale très puissante, formée au-dessus des océans chauds.",
 "comment se forme un arc-en-ciel": "🌈 Un arc-en-ciel se forme par la réfraction, la réflexion et la dispersion de la lumière dans les gouttelettes d'eau.",
@@ -90,7 +90,7 @@
 "quelle est la température moyenne sur Terre": "🌍 La température moyenne sur Terre est d’environ 15°C, mais elle varie selon les régions et les saisons.",
 "quels sont les gaz à effet de serre": "💨 Dioxyde de carbone, méthane, vapeur d’eau, ozone… ce sont les principaux gaz responsables du réchauffement climatique.",
 
-# 🐾 Animaux
+
 "combien de cœurs a une pieuvre": "🐙 Une pieuvre a **trois cœurs** ! Deux pour les branchies et un pour le corps.",
 "quel est l’animal le plus rapide du monde": "🐆 Le guépard est l’animal terrestre le plus rapide, avec une pointe à 112 km/h.",
 "quel animal pond des œufs mais allaite": "🦘 L’ornithorynque ! Un mammifère unique qui pond des œufs et allaite ses petits.",
@@ -123,7 +123,7 @@
 "quel est l’animal le plus ancien": "⏳ Le **trilobite**, aujourd’hui disparu, est l’un des premiers animaux complexes, apparu il y a plus de 500 millions d’années.",
 
 
-# 🔬 Science
+
 "qu'est-ce que la gravité": "🌌 La gravité est une force qui attire deux masses l'une vers l'autre, comme la Terre attire les objets vers elle.",
 "combien de planètes dans le système solaire": "🪐 Il y a 8 planètes : Mercure, Vénus, Terre, Mars, Jupiter, Saturne, Uranus, Neptune.",
 "quelle est la plus petite particule": "⚛️ Le quark est l'une des plus petites particules connues dans la physique quantique.",
@@ -154,7 +154,7 @@
 "qu'est-ce qu’un proton": "🧪 Un **proton** est une particule subatomique à charge positive, présente dans le noyau des atomes.",
 "comment fonctionne une fusée": "🚀 Une **fusée** avance en projetant des gaz à grande vitesse vers l’arrière, selon le principe d’action-réaction de Newton.",
 
-# 📚 Histoire
+
 "qui était napoléon": "👑 Napoléon Bonaparte était un empereur français du XIXe siècle, célèbre pour ses conquêtes militaires.",
 "en quelle année la tour eiffel a été construite": "🗼 Elle a été achevée en **1889** pour l'Exposition universelle de Paris.",
 "quelle guerre a eu lieu en 1914": "⚔️ La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918.","qui a découvert l'amérique": "🌎 **Christophe Colomb** a découvert l’Amérique en 1492, même si des peuples y vivaient déjà.",
@@ -182,7 +182,7 @@
 "quand a été signé le traité de versailles": "📜 Le **traité de Versailles** a été signé en **1919** pour mettre fin à la Première Guerre mondiale.",
 "quand a commencé l’antiquité": "🏺 L’**Antiquité** commence vers **-3000 av. J.-C.** avec l’invention de l’écriture.",
 
-# 🧠 Connaissances générales
+
 "quelle est la langue officielle du brésil": "🇧🇷 C’est le **portugais**.",
 "combien de dents a un adulte": "🦷 Un adulte possède généralement **32 dents**.",
 "qu'est-ce que le code morse": "📡 C’est un système de communication utilisant des points et des tirets.",
@@ -214,7 +214,7 @@
 "qu’est-ce que l’énergie renouvelable": "♻️ C’est une énergie qui se régénère naturellement : soleil, vent, eau, géothermie ou biomasse.",
 "qu’est-ce que la biodiversité": "🦋 La biodiversité désigne la variété des espèces vivantes sur Terre, essentielles à l’équilibre écologique.",
 "quel est le plus grand désert du monde": "🏜️ Le plus grand désert est **l’Antarctique**. Oui, c’est un désert de glace !",
-# 🧮 Maths & Logique
+
 "quelle est la racine carrée de 64": "📐 La racine carrée de 64 est **8**.",
 "combien font 7 fois 9": "🧠 7 multiplié par 9 égale **63**.",
 "quel est le chiffre pi": "🔢 Le chiffre **pi (π)** est une constante mathématique d’environ **3,14159**.",
@@ -241,7 +241,7 @@
 "qu'est-ce qu'une série arithmétique": "🔢 Une **série arithmétique** est une suite de nombres où chaque terme est obtenu en ajoutant une constante à son prédécesseur.",
 "qu'est-ce qu'une fonction affine": "🧮 Une **fonction affine** est une fonction de la forme **f(x) = ax + b**, où a est la pente et b l'ordonnée à l'origine.",
 
-# 🗺️ Géographie bonus
+
 "quel est le plus long fleuve du monde": "🌊 Le Nil et l’Amazone se disputent le titre, mais l’Amazone est souvent considéré comme le plus long.",
 "quel est le pays le plus peuplé": "👥 La Chine est le pays le plus peuplé, avec plus d’1,4 milliard d’habitants.",
 "quel est le plus grand désert du monde": "🏜️ Le **désert de l’Antarctique** est le plus grand au monde, même s’il est froid !",
@@ -267,7 +267,7 @@
 "quels pays ont une frontière avec l’Allemagne": "🌍 **L'Allemagne** partage une frontière avec **9 pays** : Danemark, Pologne, République tchèque, Autriche, Suisse, France, Luxembourg, Belgique, et les Pays-Bas.",
 "où se trouve la forêt amazonienne": "🌳 La **forêt amazonienne** s’étend sur plusieurs pays, principalement le **Brésil**, mais aussi le **Pérou**, la **Colombie**, et plusieurs autres pays d'Amérique du Sud.",
 
-# ⏰ Temps & Calendrier
+
 "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
 "quels sont les mois de l'été": "☀️ En France, l'été comprend **juin, juillet et août**.",
 "combien y a-t-il de jours dans une année": "📅 Une année classique compte **365 jours**, et **366** lors des années bissextiles.",
@@ -290,7 +290,7 @@
 "quand se passe le solstice d'hiver": "❄️ Le solstice d'hiver a lieu vers le **21 décembre** dans l'hémisphère nord, marquant le début de l'hiver.",
 "combien de jours dans un mois de février d'une année bissextile": "📅 En année bissextile, **février** compte **29 jours**.",
 
-# 📚 histoire 
+
 "quand a été signé le traité de Maastricht": "🇪🇺 Le traité de Maastricht, fondateur de l’Union européenne, a été signé en **1992**.",
 "qui a été le premier président des États-Unis": "🇺🇸 **George Washington** a été le premier président des États-Unis, en 1789.",
 "quand a été inventé le vaccin contre la variole": "💉 Le premier vaccin contre la variole a été développé par **Edward Jenner** en **1796**.",
