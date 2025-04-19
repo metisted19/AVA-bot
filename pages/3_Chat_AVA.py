@@ -53,8 +53,8 @@ def trouver_reponse(question):
     question_clean = nettoyer_texte(question)
     # On passe maintenant les deux versions à gerer_modules_speciaux
     reponse = gerer_modules_speciaux(question, question_clean)
-    if reponse:
-
+    if reponse:  
+        return reponse
     # 4.a) Modules spéciaux (dont le prénom + mémoire)
     reponse = gerer_modules_speciaux(question, question_clean)
     if reponse:
