@@ -314,7 +314,7 @@ for message in st.session_state.messages:
 # ─── Moteur de réponses ────────────────────────────────────────────────────
 def trouver_reponse(question: str) -> str:
     question_clean = nettoyer_texte(question)
-    sauvegarder_style_ava(style)
+    
     incrementer_interactions()
     ajuster_affection(question)
     # 1) Modules spéciaux
